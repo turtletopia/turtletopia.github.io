@@ -24,7 +24,9 @@ I am Dominik. I am a software developer and Data Science student (with the time 
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
       <guid>/about/</guid>
-      <description>This is a &amp;ldquo;hello world&amp;rdquo; example website for the blogdown package. The theme was forked from @jrutheiser/hugo-lithium-theme and modified by Yihui Xie.</description>
+      <description>Hey, Laura and Dominik here!
+We&amp;rsquo;ve studied and worked together on several R projects in many domains over the last few years. There were shiny apps, machine learning, bioinformatics, Rcpp, data visualization&amp;hellip; we can&amp;rsquo;t even list it all. And the time has come to share that knowledge.
+We want to have a few types of blog posts: some talking about our experiences with certain packages/frameworks (looking at you, shiny!), some sharing obscure knowledge and R facts, some showing how to implement something in a given framework, and some giving an overview of existing solutions to certain problems.</description>
     </item>
     
   </channel>
