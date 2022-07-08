@@ -1,3 +1,6 @@
+/* NOTE: this theme is slightly altered, we are still learning to use blogdown :) */
+
+
 html,
 body {
   margin: 0;
@@ -326,4 +329,22 @@ img {
   .article-content a {
     box-shadow: none;
   }
+}
+
+
+/* custom rules */
+
+.article-content p {
+  text-align: justify;
+}
+
+div.figure img {
+  display: block;
+  margin: auto;
+}
+
+div.figure p.caption {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
 }
