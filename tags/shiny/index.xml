@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on turtletopia blog</title>
-    <link>/post/</link>
-    <description>Recent content in Posts on turtletopia blog</description>
+    <title>Shiny on turtletopia blog</title>
+    <link>/tags/shiny/</link>
+    <description>Recent content in Shiny on turtletopia blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/shiny/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1</title>
       <link>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</link>
@@ -14,17 +14,6 @@
       
       <guid>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid>
       <description>Preface Use case and naive solution A quick recap of environments Environments in Shiny Solution 1: Create an environment for each observer Solution 2: Inject the constants Solution 3 (or solution suggestion): Utilize Shiny modules Summary   Preface I’ve been recently working a lot in Shiny, and I’ve constantly been stumbling across new problems. Many of them seemed interesting enough for me to want to write an article.</description>
-    </item>
-    
-    <item>
-      <title>Hello world</title>
-      <link>/2022/07/01/hello-world/</link>
-      <pubDate>Fri, 01 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/2022/07/01/hello-world/</guid>
-      <description>Hi all!
-I think it would be some aberration to start a programming blog with a post with any other title than &amp;ldquo;Hello world&amp;rdquo;&amp;hellip;
-I am Dominik. I am a software developer and Data Science student (with the time of graduation approaching with high velocity). My friend Laura and I are passionate about programming in R. We love creating tools and playing with language to please others and ourselves (in any order).</description>
     </item>
     
   </channel>
