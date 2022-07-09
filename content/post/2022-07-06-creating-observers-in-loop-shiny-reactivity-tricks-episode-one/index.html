@@ -110,12 +110,12 @@ shinyApp(ui, server)</code></pre>
 <p>Now goes the neat part: during the application runtime, code provided to <code>observer</code> is evaluated as is in the server function execution environment. So, when it seeks for a variable, it looks for its value in this environment. It does not magically replace <code>i</code> variable with value used in the iteration of the loop, as it might be expected. I made a diagram (included below) which illustrates how it <strong>does not</strong> work.</p>
 <div class="figure">
 <img src="observer_exp.png" alt="" />
-<p class="caption">Expected situation.</p>
+<p class="caption">Expected situation</p>
 </div>
 <p>Stating it once again: every time the observer is called, <code>i</code> is being sought in the current or enclosing environments. But that rises the question: shouldn’t that mean that <code>i</code> is missing at all and calling <code>i</code> raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, variable that is used to iterate <strong>is not destroyed</strong> after finishing the loop execution and it stays in the environment with the value of the last value used in loop. In our case, <code>i</code> exists in the server environment and it has value <code>3</code>. See diagram below.</p>
 <div class="figure">
 <img src="observer_actual.png" alt="" />
-<p class="caption">Actual situation.</p>
+<p class="caption">Actual situation</p>
 </div>
 <p>As a side note I want to add that there is also topic of visibility of Shiny objects between users’ sessions. This is covered by <a href="https://shiny.rstudio.com/articles/scoping.html">an article on the official Shiny webpage</a>. I strongly recommend reading it.</p>
 <p>Now, when we know what happens, we need to find out how to make a way around it. There are at lest a few solutions.</p>
