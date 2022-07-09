@@ -5,6 +5,9 @@ date: '2022-07-09'
 slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
 categories: ['Tutorial']
 tags: ['R', 'Shiny', 'reactivity', 'environments']
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
 # Preface
@@ -82,7 +85,7 @@ ui <- fluidPage(
 )
 ```
 
-Okay, this is simple, indeed. It works without the loop; you can check on your own if you don't believe me. 
+Okay, this is simple, indeed. It works as it did without the loop; you can check on your own if you don't believe me. 
 
 Now it's time for the server. Here we are calling `observer` mainly for its side effect (i.e. registration of observers), so the `for` loop might be more appropriate.
 
@@ -104,7 +107,7 @@ And now -- something strange happens! Only the last of the observers works as ex
 
 # A quick recap of environments
 
-Each R expression is evaluated in some **environment**. The environment can be considered a list of names with associated values. There are, however, some differences, of which two are the most important: 
+Each R expression is evaluated in some **environment**. An environment can be considered a list of names with associated values. There are, however, some differences, of which two are the most important: 
 
 Firstly, each environment contains a **reference to its parent**, so they create a tree-like structure. One exception to this rule is the *empty environment* which does not have a parent and serves as the root of the whole hierarchy. 
 
@@ -112,7 +115,7 @@ Secondly, **environments are mutable**. If you pass an environment to a function
 
 Every time we create an object in R and assign its value to some time, we bind this object within some environment. Calls from the console or scripts at the top-level assign objects to *the global environment*. Creating variables inside a function assigns them to an *execution environment*. Each *package* also has its environment, where all its functions and objects are available. 
 
-When we want to access some variable, it is first sought in the *evaluation environment*, i.e. the environment where this call is performed. If no object of this name is found, it is sought down the **search path**: in the parent environment of the calling env, then in the parent of the parent, etc., down to the empty env. At the start of the R session, base packages are inserted into this hierarchy, so those objects are accessible from the global environment. Additionally, every time we use `library`, the environment of the loaded package is inserted into the path. That explains why we have access to all the functions and objects from the console. That also explains why objects in the global environment are visible from within the function called in a global environment.
+When we want to access some variable, it is first sought in the *evaluation environment*, i.e. the environment where this call is performed. If no object of this name is found, it is sought down the **search path**: in the parent environment of the calling env, then in the parent of the parent, etc., down to the empty env. At the start of the R session, base packages are inserted into this hierarchy, so those objects are accessible from the global environment. Additionally, every time we use `library`, the environment of the loaded package is inserted into the path. That explains why we have access to all the functions and objects from the console. That also explains why objects in the global environment are visible from within the function called in the global environment.
 
 One more thing worth mentioning -- in R, we can manage the time of evaluation of the code. If a function is provided with an expression, there are means to suspend the evaluation of its arguments. Then we can modify it or evaluate it later. 
 
@@ -120,11 +123,11 @@ I won't go into the details of how to do it right now (but don't worry, I like t
 
 # Environments in Shiny
 
-Environments are super crazy functional. The fact that they exist does Shiny work at all. And they are also why our *for* loop did not work. That is, of course, only a part of the whole picture, but such complicated topics are easier to swallow in smaller bits.
+Environments are super crazy functional. The fact that they exist does Shiny work at all. And they are also the reason why our *for* loop did not work. That is, of course, only a part of the whole picture, but such complicated topics are easier to swallow in smaller bits.
 
 We need to focus on what happens when the app starts (e.g. when function `shinyApp(ui, server)` is called). Somewhere in the guts of Shiny, the `server` function is called. Just as with any other function, it has its execution environment. This environment is provided with `input` and `output` lists of reactive values; it also has the global environment as its ancestor (and therefore, it has access to any loaded packages). When the code inside this function is executed, objects specified by the user are created. Significantly, all reactive objects are made, and the user can modify `input` and `output` reactive values. Also, our objects of focus -- observers -- are registered.
 
-The most crucial point is: that when the `server` function is executed, and R stumbles upon the `observer` call, it **does not** evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in `reactive`'s, `render`'s, etc., but we skip them in the other part as they do not appear in our example.
+The most crucial point is: when the `server` function is executed, and R stumbles upon the `observer` call, it **does not** evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in `reactive`'s, `render`'s, etc., but we skip them in the other part as they do not appear in our example.
 
 Now goes the neat part: during the application runtime, code provided to `observer` is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the `i` variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it **does not** work.
 
@@ -138,7 +141,7 @@ As a side note, I want to add that there is also the topic of visibility of Shin
 
 Since we already know what happens, we must learn how to get around it. There are at least a few solutions.
 
-# Solution 1: Creation of an environment for each observer
+# Solution 1: Create an environment for each observer
 
 I told you that the code in observers etc., is evaluated in the server environment. It is true **by default**. There are ways of changing it, even straightforward ways. `observer` function has a parameter `env`, which allows us to set the evaluation environment. 
 
@@ -163,7 +166,7 @@ In each loop iteration, we create a new environment whose parent is the server e
 
 We can also do the same with a small change. `new.env()` call can be replaced with `rlang::env()`. *rlang* is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is [the project webpage](https://rlang.r-lib.org/).
 
-# Solution 2: Injection of constant
+# Solution 2: Inject the constants
 
 Speaking of rlang... The second solution employs rlang's features and does something very clever: it replaces a variable with a constant.
 
@@ -185,10 +188,10 @@ Beautiful, isn't it? This code looks almost the same as the code from the not-wo
 
 This solution is possible with base R, but the code is significantly less appealing and easy to understand, so we will only stick to it.
 
-# Solution 3 (or solution suggestion): Shiny modules
+# Solution 3 (or solution suggestion): Utilize Shiny modules
 
 Finally, there is one more solution. If you are already familiar with *shiny modules* then it should be clear that you can use them. I will not provide the code yet, mainly because it seems to me that many things have already happened today. But don't worry -- I have a lot to say about the modules too. We will come back to it. Those that know how they work can write code using modules as homework. Those that do not know should read some introduction to shiny modules.
 
 # Summary
 
-When environments and modification of expressions come into play, even as simple as loops may get complicated, I wanted to show you that coming across them in R (especially in Shiny) is easy. Without a slightly more profound understanding of it, they might seem illogical and not rarely impossible to overcome. Having the additional knowledge and ability to use such tools as `rlang` might allow you to make your code better and cleaner. And sometimes working at all.
+When environments and modification of expressions come into play, even as simple as loops may get complicated, I wanted to show you that coming across them in R (especially in Shiny) is easy. Without a slightly more profound understanding of it, they might seem illogical and not rarely impossible to overcome. Having the additional knowledge and ability to use such tools as rlang might allow you to make your code better and cleaner. And sometimes working at all.
