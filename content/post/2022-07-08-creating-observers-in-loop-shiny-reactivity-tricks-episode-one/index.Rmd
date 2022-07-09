@@ -4,7 +4,7 @@ author: Dominik Rafacz
 date: '2022-07-09'
 slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
 categories: ['Tutorial']
-tags: ['R', 'Shiny', 'reactivity']
+tags: ['R', 'Shiny', 'reactivity', 'environments']
 ---
 
 # Preface
@@ -114,9 +114,9 @@ Every time we create an object in R and assign its value to some time, we bind t
 
 When we want to access some variable it is first sought in the *evaluation environment*, i.e. the environment where this call is performed. If no object of this name is found, then it is sought down the **search path**, that is: in the parent environment of the calling env, then in the parent of the parent, etc. down to the empty env. At the start of the R session base packages are inserted into this hierarchy so that those objects are accessible from global environment. Additionally, every time we use `library`, environment of the loaded package is inserted into the path. That explains why we have access to all the functions and object from the console. That also explains why objects in global environment are visible from within the function called in global environment.
 
-One more thing worth mentioning -- in R we can actually manage the time of evaluation of the code. If a function is provided an expression, there are means to 
+One more thing worth mentioning -- in R we can actually manage the time of evaluation of the code. If a function is provided an expression, there are means to suspend evaluation of some of its arguments and either modify it and/or evaluate it later. 
 
-I won't go more into the details, if you want to get new knowledge or refresh the one that you've got, you can see [a chapter in Advanced R by Hadley Wickham](https://adv-r.hadley.nz/environments.html)
+I won't go more into the details how to do it right now (but don't worry, I like the topic too much not to tell more about it). If you want to get new knowledge or refresh the one that you've got, you can see [a chapter in Advanced R by Hadley Wickham](https://adv-r.hadley.nz/environments.html)
 
 # Environments in Shiny
 
@@ -161,7 +161,7 @@ In each iteration of the loop we create a new environment whose parent is the se
 
 ![Solution with creation of environments](observer_envs.png)
 
-We can also do the same with a small change. `new.env()` call can be replaced with `rlang::env()`. *rlang* is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are really messy. A minor change, but on this blog we are going to demonstrate `rlang` features heavily, so you should get used to it.
+We can also do the same with a small change. `new.env()` call can be replaced with `rlang::env()`. *rlang* is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are really messy. A minor change, but on this blog we are going to demonstrate `rlang` features heavily, so you should get used to it. Additional source is [the project webpage](https://rlang.r-lib.org/).
 
 # Solution 2: Injection of constant
 

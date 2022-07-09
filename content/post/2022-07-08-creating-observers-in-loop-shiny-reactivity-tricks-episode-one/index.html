@@ -4,7 +4,7 @@ author: Dominik Rafacz
 date: '2022-07-09'
 slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
 categories: ['Tutorial']
-tags: ['R', 'Shiny', 'reactivity']
+tags: ['R', 'Shiny', 'reactivity', 'environments']
 ---
 
 
@@ -99,8 +99,8 @@ shinyApp(ui, server)</code></pre>
 <p>Secondly, <strong>environments are mutable</strong>. If you pass an environment to a function and mutate some objects inside of it, the values in the environments are changed also for the external viewer.</p>
 <p>Every time we create an object in R and assign its value to some time, we bind this object within some environment. Calls from console or scripts at the top-level assign objects to <em>the global environment</em>. Creating variables inside of a function assigns them to an <em>execution environment</em>. Each <em>package</em> also has its environment, where all its functions and objects are available.</p>
 <p>When we want to access some variable it is first sought in the <em>evaluation environment</em>, i.e. the environment where this call is performed. If no object of this name is found, then it is sought down the <strong>search path</strong>, that is: in the parent environment of the calling env, then in the parent of the parent, etc. down to the empty env. At the start of the R session base packages are inserted into this hierarchy so that those objects are accessible from global environment. Additionally, every time we use <code>library</code>, environment of the loaded package is inserted into the path. That explains why we have access to all the functions and object from the console. That also explains why objects in global environment are visible from within the function called in global environment.</p>
-<p>One more thing worth mentioning – in R we can actually manage the time of evaluation of the code. If a function is provided an expression, there are means to</p>
-<p>I won’t go more into the details, if you want to get new knowledge or refresh the one that you’ve got, you can see <a href="https://adv-r.hadley.nz/environments.html">a chapter in Advanced R by Hadley Wickham</a></p>
+<p>One more thing worth mentioning – in R we can actually manage the time of evaluation of the code. If a function is provided an expression, there are means to suspend evaluation of some of its arguments and either modify it and/or evaluate it later.</p>
+<p>I won’t go more into the details how to do it right now (but don’t worry, I like the topic too much not to tell more about it). If you want to get new knowledge or refresh the one that you’ve got, you can see <a href="https://adv-r.hadley.nz/environments.html">a chapter in Advanced R by Hadley Wickham</a></p>
 </div>
 <div id="environments-in-shiny" class="section level1">
 <h1>Environments in Shiny</h1>
@@ -140,7 +140,7 @@ shinyApp(ui, server)</code></pre>
 <img src="observer_envs.png" alt="" />
 <p class="caption">Solution with creation of environments</p>
 </div>
-<p>We can also do the same with a small change. <code>new.env()</code> call can be replaced with <code>rlang::env()</code>. <em>rlang</em> is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are really messy. A minor change, but on this blog we are going to demonstrate <code>rlang</code> features heavily, so you should get used to it.</p>
+<p>We can also do the same with a small change. <code>new.env()</code> call can be replaced with <code>rlang::env()</code>. <em>rlang</em> is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are really messy. A minor change, but on this blog we are going to demonstrate <code>rlang</code> features heavily, so you should get used to it. Additional source is <a href="https://rlang.r-lib.org/">the project webpage</a>.</p>
 </div>
 <div id="solution-2-injection-of-constant" class="section level1">
 <h1>Solution 2: Injection of constant</h1>
