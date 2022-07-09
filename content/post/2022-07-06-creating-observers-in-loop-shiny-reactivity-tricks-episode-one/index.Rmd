@@ -128,11 +128,11 @@ The most important point is: when `server` function is executed and R stumbles u
 
 Now goes the neat part: during the application runtime, code provided to `observer` is evaluated as is in the server function execution environment. So, when it seeks for a variable, it looks for its value in this environment. It does not magically replace `i` variable with value used in the iteration of the loop, as it might be expected. I made a diagram (included below) which illustrates how it **does not** work.
 
-![Expected situation.](observer_exp.png)
+![Expected situation](observer_exp.png)
 
 Stating it once again: every time the observer is called, `i` is being sought in the current or enclosing environments. But that rises the question: shouldn't that mean that `i` is missing at all and calling `i` raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, variable that is used to iterate **is not destroyed** after finishing the loop execution and it stays in the environment with the value of the last value used in loop. In our case, `i` exists in the server environment and it has value `3`. See diagram below.
 
-![Actual situation.](observer_actual.png)
+![Actual situation](observer_actual.png)
 
 As a side note I want to add that there is also topic of visibility of Shiny objects between users' sessions. This is covered by [an article on the official Shiny webpage](https://shiny.rstudio.com/articles/scoping.html). I strongly recommend reading it.
 
