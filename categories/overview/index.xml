@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Overview on turtletopia blog</title>
+    <link>/categories/overview/</link>
+    <description>Recent content in Overview on turtletopia blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 16 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/categories/overview/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Overview: Sorting Version Codes</title>
+      <link>/2022/07/16/overview-sort-version-codes/</link>
+      <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/07/16/overview-sort-version-codes/</guid>
+      <description>Problem statement Solutions  Using base R Using gtools Using naturalsort Using stringr/stringi Using versionsort  Semantic version codes  Using semver Using semverutils  Conclusion   Problem statement Different versions of software are traditionally described using version codes. These codes contain usually numerical values and subsequent versions increment these codes, allowing them to be sorted. The standard is to use “semantic versioning”, where codes are in the form of “major.</description>
+    </item>
+    
+  </channel>
+</rss>
