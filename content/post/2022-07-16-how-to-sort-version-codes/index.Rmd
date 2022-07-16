@@ -34,19 +34,19 @@ sort(codes)
 
 ...oh. Where did something go wrong?
 
-This is what's called "alphabetical sorting". It checks characters one-by-one, including digits. "1" is before "2", so "10" goes before "2", no matter the value. Thus, it cannot compare numbers, if they have different number of digits.
+This is what's called "alphabetical sorting". It checks characters one by one, including digits. "1" is before "2", so "10" goes before "2", no matter the value. Thus, it cannot compare numbers, if they have a different number of digits.
 
 Numerous software uses the following trick to have it sort correctly: it pads the numbers with leading 0's until a certain length. For example, your old camera could name photos like `00034.jpg`, `00164.jpg`, etc. But this is not the approach to use here. We need a different one.
 
-Sorting version codes requires using something called "natural sort", where numbers are detected and ordered according to their value (with letters still sorted alphabetically, thus placing e.g. "a99" before "b51"). This is a more intuitive sorting for humans that pure alphabetical sort.
+Sorting version codes requires using something called "natural sort", where numbers are detected and ordered according to their value (with letters still sorted alphabetically, thus placing e.g. "a99" before "b51"). This is a more intuitive sorting for humans than pure alphabetical sort.
 
 ## Solutions
 
-There are several packages that allow natural sorting character vectors. There's even a base R solution! However, not all natural sorting algorithms are adapted to handle version codes, which (usually) have a particular structure with dots and/or dashes. Let's have a look at the options.
+Several packages allow natural sorting of character vectors. There's even a base R solution! However, not all natural sorting algorithms are adapted to handle version codes, which (usually) have a particular structure with dots and/or dashes. Let's have a look at the options.
 
 ### Using base R
 
-There's a facility in base R allowing the user to handle (numeric) version codes. While there is no simple "sort these strings like they were version codes" function, you can wrap your vector in `numeric_version()` and use associated methods, like comparison operators (`<`, `==`, `>=`...), as well as `sort()` method for this class. This is how it looks like:
+There's a facility in base R allowing the user to handle (numeric) version codes. While there is no simple "sort these strings like they were version codes" function, you can wrap your vector in `numeric_version()` and use associated methods, like comparison operators (`<`, `==`, `>=`...), as well as `sort()` method for this class. This is what it looks like:
 
 ```{r base_numeric_sort}
 sort(numeric_version(codes))
@@ -56,11 +56,11 @@ There are two main problems with this approach, however. But first, let's quote 
 
 > Numeric versions are sequences of one or more non-negative integers, usually (...) represented as character strings with the elements of the sequence concatenated and separated by single . or - characters.
 
-This means that version codes cannot have any string components or non-standard separators. As described in semantic versioning standard, letters are allowed in pre-release identifiers and build metadata, so base solution cannot even handle all valid cases of semantic versioning, much less the variety of version codes that don't fit these rules.
+This means that version codes cannot have any string components or non-standard separators. As described in the semantic versioning standard, letters are allowed in pre-release identifiers and build metadata, so the base solution cannot even handle all valid cases of semantic versioning, much less the variety of version codes that don't fit these rules.
 
 ### Using gtools
 
-[gtools](https://github.com/r-gregmisc/gtools) is a collection of functions to help with simple tasks when writing R packages. It has `mixedsort()` function that detects embedded numbers in strings. However...
+[gtools](https://github.com/r-gregmisc/gtools) is a collection of functions to help with simple tasks when writing R packages. It has a `mixedsort()` function that detects embedded numbers in strings. However...
 
 ```{r gtools_sort}
 gtools::mixedsort(codes)
@@ -76,7 +76,7 @@ gtools::mixedsort(codes)
 naturalsort::naturalsort(codes)
 ```
 
-...it gets the job done. The difference lies in not treating dots as decimal separators (in fact, naturalsort doesn't recognize decimals at all). Instead, the code detect numbers and non-numbers, and splits the strings into continuous pieces of numbers and non-numbers. If we were to For example, `"1.10-a"` would be split like that:
+...it gets the job done. The difference lies in not treating dots as decimal separators (in fact, naturalsort doesn't recognize decimals at all). Instead, the code detects numbers and non-numbers, then splits the strings into continuous pieces of numbers and non-numbers. If we were to For example, `"1.10-a"` would be split like that:
 
 ```{r def_split_like_naturalsort, include=FALSE}
 split_like_naturalsort <- function(x)
@@ -87,7 +87,7 @@ split_like_naturalsort <- function(x)
 split_like_naturalsort("1.10-a")
 ```
 
-These pieces are then used to sort version codes on either alphabetically or by value, depending on whether it's a number or not. Accidentally, this works well for almost all version codes. The only case where it's working a little weird is when there's an inconsistency in separators:
+These pieces are then used to sort version codes either alphabetically or by value, depending on whether it's a number or not. Accidentally, this works well for almost all version codes. The only case where it's working a little weird is when there's an inconsistency in separators:
 
 ```{r naturalsort_weird_codes}
 weird_codes <- c("1.3-6", "1.3-2", "1.3.4")
@@ -96,14 +96,14 @@ naturalsort::naturalsort(weird_codes)
 
 I like that naturalsort has `decreasing` and `na.last` parameters, implemented just like in base `sort()`. There's also a `naturalfactor()` function that could be useful for long vectors of repeated version codes.
 
-naturalsort isn't developed since 2016, but this shouldn't be considered a problem, since the package is in already stable state. There's one pet peeve of mine about this package and it's implicit coercion of parameters. Let's say we accidentally made this call:
+naturalsort isn't developed since 2016, but this shouldn't be considered a problem, since the package is in an already stable state. There's one pet peeve of mine about this package and it's the implicit coercion of parameters. Let's say we accidentally made this call:
 
 ```{r naturalsort_implicit}
 naturalsort::naturalsort(codes,
                          decreasing = c("true", "dat"))
 ```
 
-Turns out `c("true", "dat")` was coerced to logical, then the first element was taken. It should raise an error saying that the arguments are wrong, but -- instead -- it tries to work at all costs, over-interpreting the parameters. Similar thing would happen with a vector of logical values.
+Turns out `c("true", "dat")` was coerced to logical, then the first element was taken. It should raise an error saying that the arguments are wrong, but -- instead -- it tries to work at all costs, over-interpreting the parameters. A similar thing would happen with a vector of logical values.
 
 ### Using stringr/stringi
 
@@ -114,13 +114,13 @@ You've probably already installed [stringr](https://github.com/tidyverse/stringr
 stringi::stri_sort(codes, numeric = TRUE)
 ```
 
-The overall implementation seem to base on the same idea of separating numbers and non-numbers, and it has the same behaviour on inconsistent separators:
+The overall implementation seems to base on the same idea of separating numbers and non-numbers, and it has the same behavior on inconsistent separators:
 
 ```{r stringi_weird_codes}
 stringi::stri_sort(weird_codes, numeric = TRUE)
 ```
 
-There are `decreasing` and `na_last` parameters just like in `naturalsort()` and base `sort()`; and again, there's a silent argument coercion I despise. At least I can give half a point for raising a warning when only the first element is used.
+There are `decreasing` and `na_last` parameters just like in `naturalsort()` and base `sort()`; and again, there's silent argument coercion I despise. At least I can give half a point for raising a warning when only the first element is used.
 
 ### Using versionsort
 
@@ -132,13 +132,13 @@ There's a `ver_sort()` function that's of the main interest here:
 versionsort::ver_sort(codes)
 ```
 
-It works a little differently that other sorts I've mentioned before, as it splits the string on separators first (which are sequences of anything that is not a number or a letter), only then separating numbers and non-numbers (i.e. letters). All separators are equal, which gives a little more predictable behaviour with inconsistent separators:
+It works a little differently than other sorts I've mentioned before, as it splits the string on separators first (which are sequences of anything that is not a number or a letter), only then separating numbers and non-numbers (i.e. letters). All separators are equal, which gives a little more predictable behavior with inconsistent separators:
 
 ```{r versionsort_weird_codes}
 versionsort::ver_sort(weird_codes)
 ```
 
-versionsort is still a Work-In-Progress, which means that it lacks `decreasing` and `na_last` parameters, but this whole analysis serves partially to define requirements for the future development (more in soon-to-be-published versionsort Dev Plan).
+versionsort is still a Work-In-Progress, which means that it lacks `decreasing` and `na_last` parameters, but this whole analysis serves partially to define requirements for future development (more in soon-to-be-published versionsort Dev Plan).
 
 There's one convenient utility versionsort has, though -- the pair of functions named `ver_latest()` and `ver_oldest()`. They return `max()` and `min()` for version codes, respectively, without the need for sorting the whole vector:
 
@@ -193,10 +193,10 @@ v_code <- semverutils::semVer$new(c("1.6.0-dev"))
 v_code$higherThanAll(c("1.5.10", "1.6.0", "1.5.1"))
 ```
 
-Unfortunately, the answer isn't even correct, since `"1.6.0-dev"` precedes `"1.6.0"` due to being pre-release version. 
+Unfortunately, the answer isn't even correct, since `"1.6.0-dev"` precedes `"1.6.0"` due to being a pre-release version. 
 
 ## Conclusion
 
-There are a few ways to sort version codes. If your version codes are simple and well-behaved, `base::numeric_version()` should be enough. If you need to handle semantic version codes, use [semver](https://github.com/johndharrison/semver). Otherwise, there is no best solution, but [versionsort](https://github.com/turtletopia/versionsort) is the closest you can get, especially afterthe next big update is published.
+There are a few ways to sort version codes. If your version codes are simple and well-behaved, `base::numeric_version()` should be enough. If you need to handle semantic version codes, use [semver](https://github.com/johndharrison/semver). Otherwise, there is no best solution, but [versionsort](https://github.com/turtletopia/versionsort) is the closest you can get, especially after the next big update is published.
 
 Missed a package? Described one incorrectly? Contact us [on Twitter](https://twitter.com/Rturtletopia) or make an issue [on Github](https://github.com/turtletopia/turtletopia.github.io/issues).
