@@ -14,6 +14,8 @@
     <br>
     {{ end }}
 
+    {{ partial "colorcategories.html" . }}
+
     {{ if eq .Section "post" }}
     <span class="article-date">{{ .Date.Format "2006-01-02" }}</span>
     {{ end }}

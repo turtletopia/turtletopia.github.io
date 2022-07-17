@@ -1,0 +1,9 @@
+<div class="article-categories">
+  {{ range $post_category := .Params.categories }}
+    {{ range $key, $color := $.Site.Params.categoryColors }}
+      {{ if eq (lower $post_category) $key}}
+        <span class="category" style="background-color: {{ $color }}; ">{{ $post_category }}</span>
+      {{ end }}
+    {{ end }}
+  {{ end }}
+</div>
