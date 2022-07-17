@@ -37,12 +37,12 @@ params:
     url: logo.png
     width: 50
   categoryColors:
-    Overview: "#D33F49"
-    Tutorial: "#77BA99"
-    Organisational: "#D7C0D0"
-    DevDiary: "#FABC2A"
-    Turtletools: "#52489C"
-    Default: "#EEEEEE"
+    Overview: "#D33F49B0"
+    Tutorial: "#77BA99B0"
+    Organisational: "#D7C0D0B0"
+    DevDiary: "#FABC2AB0"
+    Turtletools: "#52489CB0"
+    Default: "#EEEEEEB0"
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
