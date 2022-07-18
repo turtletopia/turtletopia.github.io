@@ -65,6 +65,7 @@ output:
 <pre class="r"><code>gtools::mixedsort(codes)
 ## [1] &quot;1.10&quot; &quot;1.1&quot;  &quot;1.2&quot;</code></pre>
 <p>…it is not suited to sorting version codes. The use case here is different, it’s detecting numbers like these in “Aspirin 50mg” and “Aspirin 100mg” (examples taken from the documentation). Dots in version codes are treated as decimal separators, that’s why <code>"1.10"</code> and <code>"1.1"</code> are considered equal.</p>
+<p>{{% block_highlight "Not suitable for sorting version codes." %}}</p>
 </div>
 <div id="using-naturalsort" class="section level3">
 <h3>Using naturalsort</h3>

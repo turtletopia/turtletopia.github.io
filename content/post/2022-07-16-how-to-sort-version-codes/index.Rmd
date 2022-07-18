@@ -68,6 +68,13 @@ gtools::mixedsort(codes)
 
 ...it is not suited to sorting version codes. The use case here is different, it's detecting numbers like these in "Aspirin 50mg" and "Aspirin 100mg" (examples taken from the documentation). Dots in version codes are treated as decimal separators, that's why `"1.10"` and `"1.1"` are considered equal.
 
+```{r, echo=FALSE}
+blogdown::shortcode(
+  "block_highlight",
+  "Not suitable for sorting version codes."
+)
+```
+
 ### Using naturalsort
 
 [naturalsort](https://github.com/kos59125/naturalsort) isn't written specifically for sorting version codes either, but...
