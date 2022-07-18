@@ -3,7 +3,7 @@ title: Hello world
 author: Dominik Rafacz
 date: '2022-07-01'
 slug: hello-world
-categories: []
+categories: ["Organisational"]
 tags: []
 ---
 
