@@ -1,0 +1,33 @@
+.block-distinct > p {
+  margin: 0;
+}
+
+p.block-distinct-header {
+  float: left;
+  padding: 12px 15px;
+  width: 50px;
+  text-align: center;
+  font-weight: bold;
+}
+
+p.block-distinct-content {
+  float: left;
+  padding: 12px 20px;
+  border-radius: 0 6px 8px 0;
+  width: calc(100% - 130px);
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* BLOCK COLORS */
+
+p.block-highlight-header {
+  background: #EDCC5F;
+}
+p.block-highlight-content {
+  background: #EDCC5F55;
+}
