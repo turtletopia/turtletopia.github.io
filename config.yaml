@@ -31,6 +31,7 @@ params:
     - yaml
   highlightjsTheme: github
   highlightjsVersion: 9.12.0
+  customCSS: ["css/custom.css"]
   logo:
     alt: Logo
     height: 50
