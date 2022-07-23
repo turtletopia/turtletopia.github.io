@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>environments on Turtletopia: a blog about programming in R</title>
-    <link>/tags/environments/</link>
-    <description>Recent content in environments on Turtletopia: a blog about programming in R</description>
+    <title>rlang on Turtletopia: a blog about programming in R</title>
+    <link>/tags/rlang/</link>
+    <description>Recent content in rlang on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/environments/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/rlang/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1</title>
       <link>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</link>

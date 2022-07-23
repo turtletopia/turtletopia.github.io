@@ -17,11 +17,29 @@
     </item>
     
     <item>
-      <title>Overview</title>
+      <title>overview</title>
       <link>/tags/overview/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/overview/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>packages</title>
+      <link>/tags/packages/</link>
+      <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/packages/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>r</title>
+      <link>/tags/r/</link>
+      <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/r/</guid>
       <description></description>
     </item>
     
@@ -53,15 +71,6 @@
     </item>
     
     <item>
-      <title>R</title>
-      <link>/tags/r/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/r/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>reactivity</title>
       <link>/tags/reactivity/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
@@ -71,11 +80,38 @@
     </item>
     
     <item>
-      <title>Shiny</title>
+      <title>rlang</title>
+      <link>/tags/rlang/</link>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/rlang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>shiny</title>
       <link>/tags/shiny/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/shiny/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tutorial</title>
+      <link>/tags/tutorial/</link>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/tutorial/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>organisational</title>
+      <link>/tags/organisational/</link>
+      <pubDate>Fri, 01 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/organisational/</guid>
       <description></description>
     </item>
     

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>sorting on Turtletopia: a blog about programming in R</title>
-    <link>/tags/sorting/</link>
-    <description>Recent content in sorting on Turtletopia: a blog about programming in R</description>
+    <title>packages on Turtletopia: a blog about programming in R</title>
+    <link>/tags/packages/</link>
+    <description>Recent content in packages on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 16 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/sorting/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 16 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/packages/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Overview: Sorting Version Codes</title>
       <link>/2022/07/16/overview-sort-version-codes/</link>

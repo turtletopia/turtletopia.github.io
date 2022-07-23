@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Shiny on Turtletopia: a blog about programming in R</title>
+    <title>shiny on Turtletopia: a blog about programming in R</title>
     <link>/tags/shiny/</link>
-    <description>Recent content in Shiny on Turtletopia: a blog about programming in R</description>
+    <description>Recent content in shiny on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/shiny/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +13,180 @@
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid>
-      <description>Preface Use case and naive solution A quick recap of environments Environments in Shiny Solution 1: Create an environment for each observer Solution 2: Inject the constants Solution 3 (or solution suggestion): Utilize Shiny modules Summary   Preface I’ve been recently working a lot in Shiny, and I’ve constantly been stumbling across new problems. Many of them seemed interesting enough for me to want to write an article.</description>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;preface&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Preface&lt;/h1&gt;
+&lt;p&gt;I’ve been recently working a lot in Shiny, and I’ve constantly been stumbling across new problems. Many of them seemed interesting enough for me to want to write an article. However, in the course of the work, I found that I had too much to write about… so I decided to break it down into a series of smaller articles linked to each other.&lt;/p&gt;
+&lt;p&gt;I’ll start with something simple: creating some objects in a loop. If you think it’s too easy, wait a minute; you may be surprised! This seemingly easy task will be an excuse to understand how certain things in R and shiny work underneath, even though we ignore it daily.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;use-case-and-naive-solution&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Use case and naive solution&lt;/h1&gt;
+&lt;p&gt;Let’s start with some simple examples. Like all simple examples, it may feel highly artificial, but at least it is not very complex. Let’s say that we want to have an app that has four numeric inputs. The first input allows the user to select an &lt;em&gt;Important Number&lt;/em&gt;. Other inputs… well, they are not used. But we want them to have their values updated every time the &lt;em&gt;Important Number&lt;/em&gt; is updated. And we want to have separate observers to handle them (yes, I know that one observer would work here as well… but I told you this might feel artificial!). Their values are calculated via some calculations which are entirely irrelevant right now.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(shiny)
+# side note: all functions which are not prepended with scope operator 
+# are either from base R or from the `shiny` package
+
+do_calculations &amp;lt;- function(important, other) {
+  # this is totally random
+  (important * other * 2^5 + important - 7 * other) %% 101
+}
+
+ui &amp;lt;- fluidPage(
+  numericInput(&amp;quot;important&amp;quot;, &amp;quot;Select important number&amp;quot;, 
+               min = 0, max = 100, value = 42),
+  numericInput(&amp;quot;var_1&amp;quot;, &amp;quot;Select input 1&amp;quot;, 
+               min = 0, max = 100, value = 0),
+  numericInput(&amp;quot;var_2&amp;quot;, &amp;quot;Select input 2&amp;quot;, 
+               min = 0, max = 100, value = 0),
+  numericInput(&amp;quot;var_3&amp;quot;, &amp;quot;Select input 3&amp;quot;, 
+               min = 0, max = 100, value = 0)
+)
+
+server &amp;lt;- function(input, output, session) {
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_1&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 1)
+    )
+  })
+
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_2&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 2)
+    )
+  })
+
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_3&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 3)
+    )
+  })
+}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;peek_1.gif&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Simple version of the app.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it – in UI and server. UI first, since it seems more manageable. We are R users, so we should make &lt;em&gt;real&lt;/em&gt; loops only when there are no other means. Thus we are using good old &lt;code&gt;lapply&lt;/code&gt;, as it is even simpler than trying to use &lt;em&gt;for&lt;/em&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui &amp;lt;- fluidPage(
+  numericInput(&amp;quot;important&amp;quot;, &amp;quot;Select important number&amp;quot;, 
+               min = 0, max = 100, value = 42),
+  lapply(1:3, function(i) {
+    numericInput(inputId = paste0(&amp;quot;var_&amp;quot;, i), paste0(&amp;quot;Select input &amp;quot;, i), 
+                 min = 0, max = 100, value = 0)
+  })
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Okay, this is simple, indeed. It works as it did without the loop; you can check on your own if you don’t believe me.&lt;/p&gt;
+&lt;p&gt;Now it’s time for the server. Here we are calling &lt;code&gt;observer&lt;/code&gt; mainly for its side effect (i.e. registration of observers), so the &lt;code&gt;for&lt;/code&gt; loop might be more appropriate.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;server &amp;lt;- function(input, output, session) {
+  for (i in 1:3) {
+    observe({
+      updateSliderInput(
+        session = session,
+        inputId = paste0(&amp;quot;var_&amp;quot;, i),
+        value = do_calculations(input[[&amp;quot;important&amp;quot;]], i)
+      )
+    })
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And now – something strange happens! Only the last of the observers works as expected; others seem off. If you know at first glance what happens there – congrats; you are good at R and Shiny. If you don’t know, then we need to understand what environments are relevant for Shiny.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-quick-recap-of-environments&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A quick recap of environments&lt;/h1&gt;
+&lt;p&gt;Each R expression is evaluated in some &lt;strong&gt;environment&lt;/strong&gt;. An environment can be considered a list of names with associated values. There are, however, some differences, of which two are the most important:&lt;/p&gt;
+&lt;p&gt;Firstly, each environment contains a &lt;strong&gt;reference to its parent&lt;/strong&gt;, so they create a tree-like structure. One exception to this rule is the &lt;em&gt;empty environment&lt;/em&gt; which does not have a parent and serves as the root of the whole hierarchy.&lt;/p&gt;
+&lt;p&gt;Secondly, &lt;strong&gt;environments are mutable&lt;/strong&gt;. If you pass an environment to a function and mutate some objects inside, the values in the environments are also changed for the external viewer.&lt;/p&gt;
+&lt;p&gt;Every time we create an object in R and assign its value to some time, we bind this object within some environment. Calls from the console or scripts at the top-level assign objects to &lt;em&gt;the global environment&lt;/em&gt;. Creating variables inside a function assigns them to an &lt;em&gt;execution environment&lt;/em&gt;. Each &lt;em&gt;package&lt;/em&gt; also has its environment, where all its functions and objects are available.&lt;/p&gt;
+&lt;p&gt;When we want to access some variable, it is first sought in the &lt;em&gt;evaluation environment&lt;/em&gt;, i.e. the environment where this call is performed. If no object of this name is found, it is sought down the &lt;strong&gt;search path&lt;/strong&gt;: in the parent environment of the calling env, then in the parent of the parent, etc., down to the empty env. At the start of the R session, base packages are inserted into this hierarchy, so those objects are accessible from the global environment. Additionally, every time we use &lt;code&gt;library&lt;/code&gt;, the environment of the loaded package is inserted into the path. That explains why we have access to all the functions and objects from the console. That also explains why objects in the global environment are visible from within the function called in the global environment.&lt;/p&gt;
+&lt;p&gt;One more thing worth mentioning – in R, we can manage the time of evaluation of the code. If a function is provided with an expression, there are means to suspend the evaluation of its arguments. Then we can modify it or evaluate it later.&lt;/p&gt;
+&lt;p&gt;I won’t go into the details of how to do it right now (but don’t worry, I like the topic too much not to tell more about it). If you want to get new knowledge or refresh the one that you’ve got, you can see &lt;a href=&#34;https://adv-r.hadley.nz/environments.html&#34;&gt;a chapter in Advanced R by Hadley Wickham&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;environments-in-shiny&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Environments in Shiny&lt;/h1&gt;
+&lt;p&gt;Environments are super crazy functional. The fact that they exist does Shiny work at all. And they are also the reason why our &lt;em&gt;for&lt;/em&gt; loop did not work. That is, of course, only a part of the whole picture, but such complicated topics are easier to swallow in smaller bits.&lt;/p&gt;
+&lt;p&gt;We need to focus on what happens when the app starts (e.g. when function &lt;code&gt;shinyApp(ui, server)&lt;/code&gt; is called). Somewhere in the guts of Shiny, the &lt;code&gt;server&lt;/code&gt; function is called. Just as with any other function, it has its execution environment. This environment is provided with &lt;code&gt;input&lt;/code&gt; and &lt;code&gt;output&lt;/code&gt; lists of reactive values; it also has the global environment as its ancestor (and therefore, it has access to any loaded packages). When the code inside this function is executed, objects specified by the user are created. Significantly, all reactive objects are made, and the user can modify &lt;code&gt;input&lt;/code&gt; and &lt;code&gt;output&lt;/code&gt; reactive values. Also, our objects of focus – observers – are registered.&lt;/p&gt;
+&lt;p&gt;The most crucial point is: when the &lt;code&gt;server&lt;/code&gt; function is executed, and R stumbles upon the &lt;code&gt;observer&lt;/code&gt; call, it &lt;strong&gt;does not&lt;/strong&gt; evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in &lt;code&gt;reactive&lt;/code&gt;’s, &lt;code&gt;render&lt;/code&gt;’s, etc., but we skip them in the other part as they do not appear in our example.&lt;/p&gt;
+&lt;p&gt;Now goes the neat part: during the application runtime, code provided to &lt;code&gt;observer&lt;/code&gt; is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the &lt;code&gt;i&lt;/code&gt; variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it &lt;strong&gt;does not&lt;/strong&gt; work.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_exp.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Expected situation&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Stating it once again: every time the observer is called, &lt;code&gt;i&lt;/code&gt; is being sought in the current or enclosing environments. But that introduces the question: shouldn’t that mean that &lt;code&gt;i&lt;/code&gt; is missing and calling &lt;code&gt;i&lt;/code&gt; raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate &lt;strong&gt;is not destroyed&lt;/strong&gt; after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, &lt;code&gt;i&lt;/code&gt; exists in the server environment and has the value &lt;code&gt;3&lt;/code&gt;. See the diagram below.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_actual.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Actual situation&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;As a side note, I want to add that there is also the topic of visibility of Shiny objects between users’ sessions. It is covered by &lt;a href=&#34;https://shiny.rstudio.com/articles/scoping.html&#34;&gt;an article on the official Shiny webpage&lt;/a&gt;. I strongly recommend reading it.&lt;/p&gt;
+&lt;p&gt;Since we already know what happens, we must learn how to get around it. There are at least a few solutions.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-1-create-an-environment-for-each-observer&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 1: Create an environment for each observer&lt;/h1&gt;
+&lt;p&gt;I told you that the code in observers etc., is evaluated in the server environment. It is true &lt;strong&gt;by default&lt;/strong&gt;. There are ways of changing it, even straightforward ways. &lt;code&gt;observer&lt;/code&gt; function has a parameter &lt;code&gt;env&lt;/code&gt;, which allows us to set the evaluation environment.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;for (i in 1:3) {
+  env &amp;lt;- new.env()
+  env[[&amp;quot;i&amp;quot;]] &amp;lt;- i
+    
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = paste0(&amp;quot;var_&amp;quot;, i),
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], i)
+    )
+  }, env = env)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the &lt;code&gt;i&lt;/code&gt; to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own &lt;code&gt;i&lt;/code&gt; object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers’ quoted code; they are kept together with code. The concept is illustrated in the diagram below.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_envs.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Solution with the creation of environments&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;We can also do the same with a small change. &lt;code&gt;new.env()&lt;/code&gt; call can be replaced with &lt;code&gt;rlang::env()&lt;/code&gt;. &lt;em&gt;rlang&lt;/em&gt; is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is &lt;a href=&#34;https://rlang.r-lib.org/&#34;&gt;the project webpage&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-2-inject-the-constants&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 2: Inject the constants&lt;/h1&gt;
+&lt;p&gt;Speaking of rlang… The second solution employs rlang’s features and does something very clever: it replaces a variable with a constant.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;for (i in 1:3) {
+  rlang::inject({
+    observe({
+      updateSliderInput(
+        session = session,
+        inputId = paste0(&amp;quot;var_&amp;quot;, !!i),
+        value = do_calculations(input[[&amp;quot;important&amp;quot;]], !!i)
+      )
+    })
+  })
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Beautiful, isn’t it? This code looks almost the same as the code from the not-working approach of simple iteration. The first difference is prepending &lt;code&gt;i&lt;/code&gt; variable appearances with the &lt;code&gt;!!&lt;/code&gt; symbol (&lt;em&gt;bang-bang&lt;/em&gt;, as ones say, or more professionally: &lt;em&gt;unquotation symbol&lt;/em&gt;). The second is wrapping the whole observer with the &lt;code&gt;rlang::inject&lt;/code&gt; function. This function replaces everything prepended by an unquotation symbol with the value of the symbol. That operates on the level of expression. Before &lt;code&gt;observer&lt;/code&gt; is called, both appearances of &lt;code&gt;i&lt;/code&gt; are replaced with the current value of &lt;code&gt;i&lt;/code&gt;. Only after that the observer is called, and modified code is saved instead. You have to admit: this is elegant. It also makes the code work as we expected the original code to work, that is, without creating additional environments.&lt;/p&gt;
+&lt;p&gt;This solution is possible with base R, but the code is significantly less appealing and easy to understand, so we will only stick to it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-3-or-solution-suggestion-utilize-shiny-modules&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/h1&gt;
+&lt;p&gt;Finally, there is one more solution. If you are already familiar with &lt;em&gt;shiny modules&lt;/em&gt; then it should be clear that you can use them. I will not provide the code yet, mainly because it seems to me that many things have already happened today. But don’t worry – I have a lot to say about the modules too. We will come back to it. Those that know how they work can write code using modules as homework. Those that do not know should read some introduction to shiny modules.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;When environments and modification of expressions come into play, even as simple as loops may get complicated, I wanted to show you that coming across them in R (especially in Shiny) is easy. Without a slightly more profound understanding of it, they might seem illogical and not rarely impossible to overcome. Having the additional knowledge and ability to use such tools as rlang might allow you to make your code better and cleaner. And sometimes working at all.&lt;/p&gt;
+&lt;/div&gt;
+</description>
     </item>
     
   </channel>

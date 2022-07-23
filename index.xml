@@ -13,7 +13,154 @@
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/2022/07/16/overview-sort-version-codes/</guid>
-      <description>Problem statement Solutions  Using base R Using gtools Using naturalsort Using stringr/stringi Using versionsort  Semantic version codes  Using semver Using semverutils  Conclusion   Problem statement Different versions of software are traditionally described using version codes. These codes contain usually numerical values and subsequent versions increment these codes, allowing them to be sorted. The standard is to use “semantic versioning”, where codes are in the form of “major.</description>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#problem-statement&#34;&gt;Problem statement&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solutions&#34;&gt;Solutions&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#using-base-r&#34;&gt;Using base R&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-gtools&#34;&gt;Using gtools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-naturalsort&#34;&gt;Using naturalsort&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-stringrstringi&#34;&gt;Using stringr/stringi&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-versionsort&#34;&gt;Using versionsort&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#semantic-version-codes&#34;&gt;Semantic version codes&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#using-semver&#34;&gt;Using semver&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#using-semverutils&#34;&gt;Using semverutils&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#conclusion&#34;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;problem-statement&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Problem statement&lt;/h2&gt;
+&lt;p&gt;Different versions of software are traditionally described using version codes. These codes contain usually numerical values and subsequent versions increment these codes, allowing them to be sorted. The standard is to use “&lt;a href=&#34;https://semver.org&#34;&gt;semantic versioning&lt;/a&gt;”, where codes are in the form of “major.minor.patch”; the bigger the update, the more important number is incremented.&lt;/p&gt;
+&lt;p&gt;However, not all software obey semantic versioning standard.&lt;/p&gt;
+&lt;p&gt;Suppose we have a vector of version codes:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;codes &amp;lt;- c(&amp;quot;1.2&amp;quot;, &amp;quot;1.10&amp;quot;, &amp;quot;1.1&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We’d expect them to be ordered as 1.1, 1.2, 1.10. If you try to order version codes using base &lt;code&gt;sort()&lt;/code&gt; functionality…&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sort(codes)
+## [1] &amp;quot;1.1&amp;quot;  &amp;quot;1.10&amp;quot; &amp;quot;1.2&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;…oh. Where did something go wrong?&lt;/p&gt;
+&lt;p&gt;This is what’s called “alphabetical sorting”. It checks characters one by one, including digits. “1” is before “2”, so “10” goes before “2”, no matter the value. Thus, it cannot compare numbers, if they have a different number of digits.&lt;/p&gt;
+&lt;p&gt;Numerous software uses the following trick to have it sort correctly: it pads the numbers with leading 0’s until a certain length. For example, your old camera could name photos like &lt;code&gt;00034.jpg&lt;/code&gt;, &lt;code&gt;00164.jpg&lt;/code&gt;, etc. But this is not the approach to use here. We need a different one.&lt;/p&gt;
+&lt;p&gt;Sorting version codes requires using something called “natural sort”, where numbers are detected and ordered according to their value (with letters still sorted alphabetically, thus placing e.g. “a99” before “b51”). This is a more intuitive sorting for humans than pure alphabetical sort.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solutions&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Solutions&lt;/h2&gt;
+&lt;p&gt;Several packages allow natural sorting of character vectors. There’s even a base R solution! However, not all natural sorting algorithms are adapted to handle version codes, which (usually) have a particular structure with dots and/or dashes. Let’s have a look at the options.&lt;/p&gt;
+&lt;div id=&#34;using-base-r&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using base R&lt;/h3&gt;
+&lt;p&gt;There’s a facility in base R allowing the user to handle (numeric) version codes. While there is no simple “sort these strings like they were version codes” function, you can wrap your vector in &lt;code&gt;numeric_version()&lt;/code&gt; and use associated methods, like comparison operators (&lt;code&gt;&amp;lt;&lt;/code&gt;, &lt;code&gt;==&lt;/code&gt;, &lt;code&gt;&amp;gt;=&lt;/code&gt;…), as well as &lt;code&gt;sort()&lt;/code&gt; method for this class. This is what it looks like:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;sort(numeric_version(codes))
+## [1] &amp;#39;1.1&amp;#39;  &amp;#39;1.2&amp;#39;  &amp;#39;1.10&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;There are two main problems with this approach, however. But first, let’s quote the documentation:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Numeric versions are sequences of one or more non-negative integers, usually (…) represented as character strings with the elements of the sequence concatenated and separated by single . or - characters.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This means that version codes cannot have any string components or non-standard separators. As described in the semantic versioning standard, letters are allowed in pre-release identifiers and build metadata, so the base solution cannot even handle all valid cases of semantic versioning, much less the variety of version codes that don’t fit these rules.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-gtools&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using gtools&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/r-gregmisc/gtools&#34;&gt;gtools&lt;/a&gt; is a collection of functions to help with simple tasks when writing R packages. It has a &lt;code&gt;mixedsort()&lt;/code&gt; function that detects embedded numbers in strings. However…&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;gtools::mixedsort(codes)
+## [1] &amp;quot;1.10&amp;quot; &amp;quot;1.1&amp;quot;  &amp;quot;1.2&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;…it is not suited to sorting version codes. The use case here is different, it’s detecting numbers like these in “Aspirin 50mg” and “Aspirin 100mg” (examples taken from the documentation). Dots in version codes are treated as decimal separators, that’s why &lt;code&gt;&#34;1.10&#34;&lt;/code&gt; and &lt;code&gt;&#34;1.1&#34;&lt;/code&gt; are considered equal.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-naturalsort&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using naturalsort&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/kos59125/naturalsort&#34;&gt;naturalsort&lt;/a&gt; isn’t written specifically for sorting version codes either, but…&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;naturalsort::naturalsort(codes)
+## [1] &amp;quot;1.1&amp;quot;  &amp;quot;1.2&amp;quot;  &amp;quot;1.10&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;…it gets the job done. The difference lies in not treating dots as decimal separators (in fact, naturalsort doesn’t recognize decimals at all). Instead, the code detects numbers and non-numbers, then splits the strings into continuous pieces of numbers and non-numbers. If we were to For example, &lt;code&gt;&#34;1.10-a&#34;&lt;/code&gt; would be split like that:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;split_like_naturalsort(&amp;quot;1.10-a&amp;quot;)
+## [1] &amp;quot;1&amp;quot;  &amp;quot;.&amp;quot;  &amp;quot;10&amp;quot; &amp;quot;-a&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;These pieces are then used to sort version codes either alphabetically or by value, depending on whether it’s a number or not. Accidentally, this works well for almost all version codes. The only case where it’s working a little weird is when there’s an inconsistency in separators:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;weird_codes &amp;lt;- c(&amp;quot;1.3-6&amp;quot;, &amp;quot;1.3-2&amp;quot;, &amp;quot;1.3.4&amp;quot;)
+naturalsort::naturalsort(weird_codes)
+## [1] &amp;quot;1.3-2&amp;quot; &amp;quot;1.3-6&amp;quot; &amp;quot;1.3.4&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I like that naturalsort has &lt;code&gt;decreasing&lt;/code&gt; and &lt;code&gt;na.last&lt;/code&gt; parameters, implemented just like in base &lt;code&gt;sort()&lt;/code&gt;. There’s also a &lt;code&gt;naturalfactor()&lt;/code&gt; function that could be useful for long vectors of repeated version codes.&lt;/p&gt;
+&lt;p&gt;naturalsort isn’t developed since 2016, but this shouldn’t be considered a problem, since the package is in an already stable state. There’s one pet peeve of mine about this package and it’s the implicit coercion of parameters. Let’s say we accidentally made this call:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;naturalsort::naturalsort(codes,
+                         decreasing = c(&amp;quot;true&amp;quot;, &amp;quot;dat&amp;quot;))
+## [1] &amp;quot;1.10&amp;quot; &amp;quot;1.2&amp;quot;  &amp;quot;1.1&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Turns out &lt;code&gt;c(&#34;true&#34;, &#34;dat&#34;)&lt;/code&gt; was coerced to logical, then the first element was taken. It should raise an error saying that the arguments are wrong, but – instead – it tries to work at all costs, over-interpreting the parameters. A similar thing would happen with a vector of logical values.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-stringrstringi&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using stringr/stringi&lt;/h3&gt;
+&lt;p&gt;You’ve probably already installed &lt;a href=&#34;https://github.com/tidyverse/stringr&#34;&gt;stringr&lt;/a&gt; and/or &lt;a href=&#34;https://github.com/gagolews/stringi&#34;&gt;stringi&lt;/a&gt; if you’ve been using R for a while. Both these packages can do way, way more to strings than just some natural sorting, but we’ll focus on just that. There’s a parameter called &lt;code&gt;numeric&lt;/code&gt; in &lt;code&gt;stri_sort()&lt;/code&gt;, where we can pass &lt;code&gt;TRUE&lt;/code&gt; to sort digits numerically:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# There&amp;#39;s analogous stringr::str_sort() function
+stringi::stri_sort(codes, numeric = TRUE)
+## [1] &amp;quot;1.1&amp;quot;  &amp;quot;1.2&amp;quot;  &amp;quot;1.10&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;The overall implementation seems to base on the same idea of separating numbers and non-numbers, and it has the same behavior on inconsistent separators:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;stringi::stri_sort(weird_codes, numeric = TRUE)
+## [1] &amp;quot;1.3-2&amp;quot; &amp;quot;1.3-6&amp;quot; &amp;quot;1.3.4&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;There are &lt;code&gt;decreasing&lt;/code&gt; and &lt;code&gt;na_last&lt;/code&gt; parameters just like in &lt;code&gt;naturalsort()&lt;/code&gt; and base &lt;code&gt;sort()&lt;/code&gt;; and again, there’s silent argument coercion I despise. At least I can give half a point for raising a warning when only the first element is used.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-versionsort&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using versionsort&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/turtletopia/versionsort&#34;&gt;versionsort&lt;/a&gt; is our solution to this problem. I’ve implemented, documented, tested, and submitted it to CRAN within 24 hours when working on implementing a feature in &lt;a href=&#34;https://github.com/DominikRafacz/deepdep&#34;&gt;deepdep&lt;/a&gt;; obviously, it has changed a bit since then.&lt;/p&gt;
+&lt;p&gt;There’s a &lt;code&gt;ver_sort()&lt;/code&gt; function that’s of the main interest here:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;versionsort::ver_sort(codes)
+## [1] &amp;quot;1.1&amp;quot;  &amp;quot;1.2&amp;quot;  &amp;quot;1.10&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It works a little differently than other sorts I’ve mentioned before, as it splits the string on separators first (which are sequences of anything that is not a number or a letter), only then separating numbers and non-numbers (i.e. letters). All separators are equal, which gives a little more predictable behavior with inconsistent separators:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;versionsort::ver_sort(weird_codes)
+## [1] &amp;quot;1.3-2&amp;quot; &amp;quot;1.3.4&amp;quot; &amp;quot;1.3-6&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;versionsort is still a Work-In-Progress, which means that it lacks &lt;code&gt;decreasing&lt;/code&gt; and &lt;code&gt;na_last&lt;/code&gt; parameters, but this whole analysis serves partially to define requirements for future development (more in soon-to-be-published versionsort Dev Plan).&lt;/p&gt;
+&lt;p&gt;There’s one convenient utility versionsort has, though – the pair of functions named &lt;code&gt;ver_latest()&lt;/code&gt; and &lt;code&gt;ver_oldest()&lt;/code&gt;. They return &lt;code&gt;max()&lt;/code&gt; and &lt;code&gt;min()&lt;/code&gt; for version codes, respectively, without the need for sorting the whole vector:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;versionsort::ver_latest(codes)
+## [1] &amp;quot;1.10&amp;quot;
+versionsort::ver_oldest(codes)
+## [1] &amp;quot;1.1&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Stay tuned for the new, improved versionsort!&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;semantic-version-codes&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Semantic version codes&lt;/h2&gt;
+&lt;p&gt;All these solutions have one thing in common – they don’t detect semantic version codes. There are, however, R packages with this functionality; I’ve found two, described below.&lt;/p&gt;
+&lt;div id=&#34;using-semver&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using semver&lt;/h3&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/johndharrison/semver&#34;&gt;semver&lt;/a&gt; is the most used R package for handling semantic version codes. It relies heavily on &lt;a href=&#34;https://github.com/zmarko/semver&#34;&gt;C++ semver&lt;/a&gt; implementation under the hood, but it results in a wide range of functionalities: there are many methods for parsed semantic codes, &lt;code&gt;sort()&lt;/code&gt; included:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;semver_codes &amp;lt;- semver::parse_version(
+  c(&amp;quot;1.6.0-dev&amp;quot;, &amp;quot;1.5.10&amp;quot;, &amp;quot;1.5.1&amp;quot;, &amp;quot;1.6.0&amp;quot;)
+)
+sort(semver_codes)
+## [1] Maj: 1 Min: 5 Pat: 1
+## 
+## [2] Maj: 1 Min: 5 Pat: 10
+## 
+## [3] Maj: 1 Min: 6 Pat: 0 Pre: dev
+## 
+## [4] Maj: 1 Min: 6 Pat: 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Operators as well:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;semver_codes[1:3] &amp;lt; semver_codes[2:4]
+## [1] FALSE FALSE  TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can use &lt;code&gt;max()&lt;/code&gt; and &lt;code&gt;min()&lt;/code&gt; too:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;max(semver_codes)
+## Maj: 1 Min: 6 Pat: 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This package has the most functionality of them all…&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;semver::parse_version(&amp;quot;1.0-10&amp;quot;)
+## Error in parse_ptr(version): invalid character encountered: -&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;…but is nonetheless limited to semantic version codes.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;using-semverutils&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Using semverutils&lt;/h3&gt;
+&lt;p&gt;Sorting numeric codes is not possible in &lt;a href=&#34;https://github.com/ajwtech/semverutils&#34;&gt;semverutils&lt;/a&gt;. You can only check if a version code is higher than others by calling:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;v_code &amp;lt;- semverutils::semVer$new(c(&amp;quot;1.6.0-dev&amp;quot;))
+v_code$higherThanAll(c(&amp;quot;1.5.10&amp;quot;, &amp;quot;1.6.0&amp;quot;, &amp;quot;1.5.1&amp;quot;))
+## [1] TRUE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Unfortunately, the answer isn’t even correct, since &lt;code&gt;&#34;1.6.0-dev&#34;&lt;/code&gt; precedes &lt;code&gt;&#34;1.6.0&#34;&lt;/code&gt; due to being a pre-release version.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;conclusion&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;There are a few ways to sort version codes. If your version codes are simple and well-behaved, &lt;code&gt;base::numeric_version()&lt;/code&gt; should be enough. If you need to handle semantic version codes, use &lt;a href=&#34;https://github.com/johndharrison/semver&#34;&gt;semver&lt;/a&gt;. Otherwise, there is no best solution, but &lt;a href=&#34;https://github.com/turtletopia/versionsort&#34;&gt;versionsort&lt;/a&gt; is the closest you can get, especially after the next big update is published.&lt;/p&gt;
+&lt;p&gt;Missed a package? Described one incorrectly? Contact us &lt;a href=&#34;https://twitter.com/Rturtletopia&#34;&gt;on Twitter&lt;/a&gt; or make an issue &lt;a href=&#34;https://github.com/turtletopia/turtletopia.github.io/issues&#34;&gt;on Github&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
     </item>
     
     <item>
@@ -22,7 +169,180 @@
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid>
-      <description>Preface Use case and naive solution A quick recap of environments Environments in Shiny Solution 1: Create an environment for each observer Solution 2: Inject the constants Solution 3 (or solution suggestion): Utilize Shiny modules Summary   Preface I’ve been recently working a lot in Shiny, and I’ve constantly been stumbling across new problems. Many of them seemed interesting enough for me to want to write an article.</description>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;preface&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Preface&lt;/h1&gt;
+&lt;p&gt;I’ve been recently working a lot in Shiny, and I’ve constantly been stumbling across new problems. Many of them seemed interesting enough for me to want to write an article. However, in the course of the work, I found that I had too much to write about… so I decided to break it down into a series of smaller articles linked to each other.&lt;/p&gt;
+&lt;p&gt;I’ll start with something simple: creating some objects in a loop. If you think it’s too easy, wait a minute; you may be surprised! This seemingly easy task will be an excuse to understand how certain things in R and shiny work underneath, even though we ignore it daily.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;use-case-and-naive-solution&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Use case and naive solution&lt;/h1&gt;
+&lt;p&gt;Let’s start with some simple examples. Like all simple examples, it may feel highly artificial, but at least it is not very complex. Let’s say that we want to have an app that has four numeric inputs. The first input allows the user to select an &lt;em&gt;Important Number&lt;/em&gt;. Other inputs… well, they are not used. But we want them to have their values updated every time the &lt;em&gt;Important Number&lt;/em&gt; is updated. And we want to have separate observers to handle them (yes, I know that one observer would work here as well… but I told you this might feel artificial!). Their values are calculated via some calculations which are entirely irrelevant right now.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(shiny)
+# side note: all functions which are not prepended with scope operator 
+# are either from base R or from the `shiny` package
+
+do_calculations &amp;lt;- function(important, other) {
+  # this is totally random
+  (important * other * 2^5 + important - 7 * other) %% 101
+}
+
+ui &amp;lt;- fluidPage(
+  numericInput(&amp;quot;important&amp;quot;, &amp;quot;Select important number&amp;quot;, 
+               min = 0, max = 100, value = 42),
+  numericInput(&amp;quot;var_1&amp;quot;, &amp;quot;Select input 1&amp;quot;, 
+               min = 0, max = 100, value = 0),
+  numericInput(&amp;quot;var_2&amp;quot;, &amp;quot;Select input 2&amp;quot;, 
+               min = 0, max = 100, value = 0),
+  numericInput(&amp;quot;var_3&amp;quot;, &amp;quot;Select input 3&amp;quot;, 
+               min = 0, max = 100, value = 0)
+)
+
+server &amp;lt;- function(input, output, session) {
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_1&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 1)
+    )
+  })
+
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_2&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 2)
+    )
+  })
+
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = &amp;quot;var_3&amp;quot;,
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], 3)
+    )
+  })
+}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;peek_1.gif&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Simple version of the app.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it – in UI and server. UI first, since it seems more manageable. We are R users, so we should make &lt;em&gt;real&lt;/em&gt; loops only when there are no other means. Thus we are using good old &lt;code&gt;lapply&lt;/code&gt;, as it is even simpler than trying to use &lt;em&gt;for&lt;/em&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui &amp;lt;- fluidPage(
+  numericInput(&amp;quot;important&amp;quot;, &amp;quot;Select important number&amp;quot;, 
+               min = 0, max = 100, value = 42),
+  lapply(1:3, function(i) {
+    numericInput(inputId = paste0(&amp;quot;var_&amp;quot;, i), paste0(&amp;quot;Select input &amp;quot;, i), 
+                 min = 0, max = 100, value = 0)
+  })
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Okay, this is simple, indeed. It works as it did without the loop; you can check on your own if you don’t believe me.&lt;/p&gt;
+&lt;p&gt;Now it’s time for the server. Here we are calling &lt;code&gt;observer&lt;/code&gt; mainly for its side effect (i.e. registration of observers), so the &lt;code&gt;for&lt;/code&gt; loop might be more appropriate.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;server &amp;lt;- function(input, output, session) {
+  for (i in 1:3) {
+    observe({
+      updateSliderInput(
+        session = session,
+        inputId = paste0(&amp;quot;var_&amp;quot;, i),
+        value = do_calculations(input[[&amp;quot;important&amp;quot;]], i)
+      )
+    })
+  }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And now – something strange happens! Only the last of the observers works as expected; others seem off. If you know at first glance what happens there – congrats; you are good at R and Shiny. If you don’t know, then we need to understand what environments are relevant for Shiny.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;a-quick-recap-of-environments&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;A quick recap of environments&lt;/h1&gt;
+&lt;p&gt;Each R expression is evaluated in some &lt;strong&gt;environment&lt;/strong&gt;. An environment can be considered a list of names with associated values. There are, however, some differences, of which two are the most important:&lt;/p&gt;
+&lt;p&gt;Firstly, each environment contains a &lt;strong&gt;reference to its parent&lt;/strong&gt;, so they create a tree-like structure. One exception to this rule is the &lt;em&gt;empty environment&lt;/em&gt; which does not have a parent and serves as the root of the whole hierarchy.&lt;/p&gt;
+&lt;p&gt;Secondly, &lt;strong&gt;environments are mutable&lt;/strong&gt;. If you pass an environment to a function and mutate some objects inside, the values in the environments are also changed for the external viewer.&lt;/p&gt;
+&lt;p&gt;Every time we create an object in R and assign its value to some time, we bind this object within some environment. Calls from the console or scripts at the top-level assign objects to &lt;em&gt;the global environment&lt;/em&gt;. Creating variables inside a function assigns them to an &lt;em&gt;execution environment&lt;/em&gt;. Each &lt;em&gt;package&lt;/em&gt; also has its environment, where all its functions and objects are available.&lt;/p&gt;
+&lt;p&gt;When we want to access some variable, it is first sought in the &lt;em&gt;evaluation environment&lt;/em&gt;, i.e. the environment where this call is performed. If no object of this name is found, it is sought down the &lt;strong&gt;search path&lt;/strong&gt;: in the parent environment of the calling env, then in the parent of the parent, etc., down to the empty env. At the start of the R session, base packages are inserted into this hierarchy, so those objects are accessible from the global environment. Additionally, every time we use &lt;code&gt;library&lt;/code&gt;, the environment of the loaded package is inserted into the path. That explains why we have access to all the functions and objects from the console. That also explains why objects in the global environment are visible from within the function called in the global environment.&lt;/p&gt;
+&lt;p&gt;One more thing worth mentioning – in R, we can manage the time of evaluation of the code. If a function is provided with an expression, there are means to suspend the evaluation of its arguments. Then we can modify it or evaluate it later.&lt;/p&gt;
+&lt;p&gt;I won’t go into the details of how to do it right now (but don’t worry, I like the topic too much not to tell more about it). If you want to get new knowledge or refresh the one that you’ve got, you can see &lt;a href=&#34;https://adv-r.hadley.nz/environments.html&#34;&gt;a chapter in Advanced R by Hadley Wickham&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;environments-in-shiny&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Environments in Shiny&lt;/h1&gt;
+&lt;p&gt;Environments are super crazy functional. The fact that they exist does Shiny work at all. And they are also the reason why our &lt;em&gt;for&lt;/em&gt; loop did not work. That is, of course, only a part of the whole picture, but such complicated topics are easier to swallow in smaller bits.&lt;/p&gt;
+&lt;p&gt;We need to focus on what happens when the app starts (e.g. when function &lt;code&gt;shinyApp(ui, server)&lt;/code&gt; is called). Somewhere in the guts of Shiny, the &lt;code&gt;server&lt;/code&gt; function is called. Just as with any other function, it has its execution environment. This environment is provided with &lt;code&gt;input&lt;/code&gt; and &lt;code&gt;output&lt;/code&gt; lists of reactive values; it also has the global environment as its ancestor (and therefore, it has access to any loaded packages). When the code inside this function is executed, objects specified by the user are created. Significantly, all reactive objects are made, and the user can modify &lt;code&gt;input&lt;/code&gt; and &lt;code&gt;output&lt;/code&gt; reactive values. Also, our objects of focus – observers – are registered.&lt;/p&gt;
+&lt;p&gt;The most crucial point is: when the &lt;code&gt;server&lt;/code&gt; function is executed, and R stumbles upon the &lt;code&gt;observer&lt;/code&gt; call, it &lt;strong&gt;does not&lt;/strong&gt; evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in &lt;code&gt;reactive&lt;/code&gt;’s, &lt;code&gt;render&lt;/code&gt;’s, etc., but we skip them in the other part as they do not appear in our example.&lt;/p&gt;
+&lt;p&gt;Now goes the neat part: during the application runtime, code provided to &lt;code&gt;observer&lt;/code&gt; is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the &lt;code&gt;i&lt;/code&gt; variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it &lt;strong&gt;does not&lt;/strong&gt; work.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_exp.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Expected situation&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Stating it once again: every time the observer is called, &lt;code&gt;i&lt;/code&gt; is being sought in the current or enclosing environments. But that introduces the question: shouldn’t that mean that &lt;code&gt;i&lt;/code&gt; is missing and calling &lt;code&gt;i&lt;/code&gt; raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate &lt;strong&gt;is not destroyed&lt;/strong&gt; after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, &lt;code&gt;i&lt;/code&gt; exists in the server environment and has the value &lt;code&gt;3&lt;/code&gt;. See the diagram below.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_actual.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Actual situation&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;As a side note, I want to add that there is also the topic of visibility of Shiny objects between users’ sessions. It is covered by &lt;a href=&#34;https://shiny.rstudio.com/articles/scoping.html&#34;&gt;an article on the official Shiny webpage&lt;/a&gt;. I strongly recommend reading it.&lt;/p&gt;
+&lt;p&gt;Since we already know what happens, we must learn how to get around it. There are at least a few solutions.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-1-create-an-environment-for-each-observer&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 1: Create an environment for each observer&lt;/h1&gt;
+&lt;p&gt;I told you that the code in observers etc., is evaluated in the server environment. It is true &lt;strong&gt;by default&lt;/strong&gt;. There are ways of changing it, even straightforward ways. &lt;code&gt;observer&lt;/code&gt; function has a parameter &lt;code&gt;env&lt;/code&gt;, which allows us to set the evaluation environment.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;for (i in 1:3) {
+  env &amp;lt;- new.env()
+  env[[&amp;quot;i&amp;quot;]] &amp;lt;- i
+    
+  observe({
+    updateSliderInput(
+      session = session,
+      inputId = paste0(&amp;quot;var_&amp;quot;, i),
+      value = do_calculations(input[[&amp;quot;important&amp;quot;]], i)
+    )
+  }, env = env)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the &lt;code&gt;i&lt;/code&gt; to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own &lt;code&gt;i&lt;/code&gt; object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers’ quoted code; they are kept together with code. The concept is illustrated in the diagram below.&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;observer_envs.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Solution with the creation of environments&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;We can also do the same with a small change. &lt;code&gt;new.env()&lt;/code&gt; call can be replaced with &lt;code&gt;rlang::env()&lt;/code&gt;. &lt;em&gt;rlang&lt;/em&gt; is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is &lt;a href=&#34;https://rlang.r-lib.org/&#34;&gt;the project webpage&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-2-inject-the-constants&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 2: Inject the constants&lt;/h1&gt;
+&lt;p&gt;Speaking of rlang… The second solution employs rlang’s features and does something very clever: it replaces a variable with a constant.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;for (i in 1:3) {
+  rlang::inject({
+    observe({
+      updateSliderInput(
+        session = session,
+        inputId = paste0(&amp;quot;var_&amp;quot;, !!i),
+        value = do_calculations(input[[&amp;quot;important&amp;quot;]], !!i)
+      )
+    })
+  })
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Beautiful, isn’t it? This code looks almost the same as the code from the not-working approach of simple iteration. The first difference is prepending &lt;code&gt;i&lt;/code&gt; variable appearances with the &lt;code&gt;!!&lt;/code&gt; symbol (&lt;em&gt;bang-bang&lt;/em&gt;, as ones say, or more professionally: &lt;em&gt;unquotation symbol&lt;/em&gt;). The second is wrapping the whole observer with the &lt;code&gt;rlang::inject&lt;/code&gt; function. This function replaces everything prepended by an unquotation symbol with the value of the symbol. That operates on the level of expression. Before &lt;code&gt;observer&lt;/code&gt; is called, both appearances of &lt;code&gt;i&lt;/code&gt; are replaced with the current value of &lt;code&gt;i&lt;/code&gt;. Only after that the observer is called, and modified code is saved instead. You have to admit: this is elegant. It also makes the code work as we expected the original code to work, that is, without creating additional environments.&lt;/p&gt;
+&lt;p&gt;This solution is possible with base R, but the code is significantly less appealing and easy to understand, so we will only stick to it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-3-or-solution-suggestion-utilize-shiny-modules&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/h1&gt;
+&lt;p&gt;Finally, there is one more solution. If you are already familiar with &lt;em&gt;shiny modules&lt;/em&gt; then it should be clear that you can use them. I will not provide the code yet, mainly because it seems to me that many things have already happened today. But don’t worry – I have a lot to say about the modules too. We will come back to it. Those that know how they work can write code using modules as homework. Those that do not know should read some introduction to shiny modules.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Summary&lt;/h1&gt;
+&lt;p&gt;When environments and modification of expressions come into play, even as simple as loops may get complicated, I wanted to show you that coming across them in R (especially in Shiny) is easy. Without a slightly more profound understanding of it, they might seem illogical and not rarely impossible to overcome. Having the additional knowledge and ability to use such tools as rlang might allow you to make your code better and cleaner. And sometimes working at all.&lt;/p&gt;
+&lt;/div&gt;
+</description>
     </item>
     
     <item>
@@ -31,9 +351,15 @@
       <pubDate>Fri, 01 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/2022/07/01/hello-world/</guid>
-      <description>Hi all!
-I think it would be some aberration to start a programming blog with a post with any other title than &amp;ldquo;Hello world&amp;rdquo;&amp;hellip;
-I am Dominik. I am a software developer and Data Science student (with the time of graduation approaching with high velocity). My friend Laura and I are passionate about programming in R. We love creating tools and playing with language to please others and ourselves (in any order).</description>
+      <description>&lt;p&gt;Hi all!&lt;/p&gt;
+&lt;p&gt;I think it would be some aberration to start a programming blog with a post with any other title than &amp;ldquo;Hello world&amp;rdquo;&amp;hellip;&lt;/p&gt;
+&lt;p&gt;I am Dominik. I am a software developer and Data Science student (with the time of graduation approaching with high velocity). My friend Laura and I are passionate about programming in R. We love creating tools and playing with language to please others and ourselves (in any order).&lt;/p&gt;
+&lt;p&gt;This blog is meant for us to write about R.&lt;/p&gt;
+&lt;p&gt;(Probably not only R, but hey, this is the language we have the most experience with)&lt;/p&gt;
+&lt;p&gt;We will publish here information about the open-source stuff we make. We will show some obstacles we have stumbled upon and our ways around them. We will praise the language and complain about it. We will share other cool toys we have found and love using. &lt;del&gt;We will rock you&lt;/del&gt;.&lt;/p&gt;
+&lt;p&gt;You can find some of our packages in our &lt;a href=&#34;https://github.com/turtletopia&#34;&gt;GitHub organization&lt;/a&gt;. Soon there will be many rearrangements, and we will focus on finally turning our recent ideas into flesh.&lt;/p&gt;
+&lt;p&gt;Stay tuned!&lt;/p&gt;
+</description>
     </item>
     
     <item>
@@ -42,9 +368,12 @@ I am Dominik. I am a software developer and Data Science student (with the time 
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
       <guid>/about/</guid>
-      <description>Hey, Laura and Dominik here!
-We&amp;rsquo;ve studied and worked together on several R projects in many domains over the last few years. There were shiny apps, machine learning, bioinformatics, Rcpp, data visualization&amp;hellip; we can&amp;rsquo;t even list it all. And the time has come to share that knowledge.
-We want to have a few types of blog posts: some talking about our experiences with certain packages/frameworks (looking at you, shiny!), some sharing obscure knowledge and R facts, some showing how to implement something in a given framework, and some giving an overview of existing solutions to certain problems.</description>
+      <description>&lt;p&gt;Hey, Laura and Dominik here!&lt;/p&gt;
+&lt;p&gt;We&amp;rsquo;ve studied and worked together on several R projects in many domains over the last few years. There were shiny apps, machine learning, bioinformatics, Rcpp, data visualization&amp;hellip; we can&amp;rsquo;t even list it all. And the time has come to share that knowledge.&lt;/p&gt;
+&lt;p&gt;We want to have a few types of blog posts: some talking about our experiences with certain packages/frameworks (looking at you, shiny!), some sharing obscure knowledge and R facts, some showing how to implement something in a given framework, and some giving an overview of existing solutions to certain problems. And maybe an occasional rambling about other languages (especially C++ due to the existence of Rcpp) as well.&lt;/p&gt;
+&lt;p&gt;If you have an idea for a post (especially How To and Overview post types), tag us &lt;a href=&#34;https://twitter.com/Rturtletopia&#34;&gt;on Twitter&lt;/a&gt; or make an issue &lt;a href=&#34;https://github.com/turtletopia/turtletopia.github.io/issues&#34;&gt;on Github&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;This blog uses a &lt;a href=&#34;https://github.com/rstudio/blogdown&#34;&gt;blogdown&lt;/a&gt; framework.&lt;/p&gt;
+</description>
     </item>
     
   </channel>
