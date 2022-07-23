@@ -4,7 +4,8 @@ author: Dominik Rafacz
 date: '2022-07-09'
 slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
 categories: ['Tutorial']
-tags: ['R', 'Shiny', 'reactivity', 'environments']
+tags: ['r', 'tutorial', 'shiny', 'reactivity', 'environments', 'rlang']
+Description: "Reactivity and non-standard evaluation in Shiny can cause many difficulties if one is not familiar with their technical basis. In the first episode of a series on this, I will show how a simple loop can be not-so-trivial to make and how to deal with it."
 output:
   blogdown::html_page:
     toc: true
