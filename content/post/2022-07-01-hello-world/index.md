@@ -4,7 +4,7 @@ author: Dominik Rafacz
 date: '2022-07-01'
 slug: hello-world
 categories: ["Organisational"]
-tags: []
+tags: ['organisational']
 Description: "We will publish here information about the open-source stuff we make. We will show some obstacles we have stumbled upon and our ways around them. We will praise the language and complain about it. We will share other cool toys we have found and love using. ~~We will rock you~~."
 ---
 
