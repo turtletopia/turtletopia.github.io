@@ -30,7 +30,7 @@ Since we all do it and we all consider it to be a kind of inappropriate practice
 
 # How to eat ice cream and why you should do it.
 
-The most basic usage is straightforward. The library's primary function is `ic()`, which takes an argument of any time, prints its value to the screen and returns it invisibly.
+The most basic usage is straightforward. The library's primary function is `ic()`, which takes an argument of any kind, prints its value to the screen and returns it invisibly.
 
 ```{r}
 library(icecream)
@@ -169,7 +169,7 @@ call_stack <- trace$call
 # getting length of the call stack:
 num_calls <- length(call_stack)
 
-# accessing the one-but-last call (to omit the `ic` call) and extracting parent reference:
+# accessing the second-to-last call (to omit the `ic` call) and extracting parent reference:
 parent_ref <- call_stack[[num_calls - 1]][[1]]
 
 # extracting location from the reference:

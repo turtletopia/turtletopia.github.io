@@ -26,7 +26,7 @@ Description: "Icecream is a tool which may serve as a more sophisticated replace
 </div>
 <div id="how-to-eat-ice-cream-and-why-you-should-do-it." class="section level1">
 <h1>How to eat ice cream and why you should do it.</h1>
-<p>The most basic usage is straightforward. The library’s primary function is <code>ic()</code>, which takes an argument of any time, prints its value to the screen and returns it invisibly.</p>
+<p>The most basic usage is straightforward. The library’s primary function is <code>ic()</code>, which takes an argument of any kind, prints its value to the screen and returns it invisibly.</p>
 <pre class="r"><code>library(icecream)
 
 ic(12)</code></pre>
@@ -119,7 +119,7 @@ call_stack &lt;- trace$call
 # getting length of the call stack:
 num_calls &lt;- length(call_stack)
 
-# accessing the one-but-last call (to omit the `ic` call) and extracting parent reference:
+# accessing the second-to-last call (to omit the `ic` call) and extracting parent reference:
 parent_ref &lt;- call_stack[[num_calls - 1]][[1]]
 
 # extracting location from the reference:
