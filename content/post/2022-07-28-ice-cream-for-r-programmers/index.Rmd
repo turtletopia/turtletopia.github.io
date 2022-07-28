@@ -1,0 +1,188 @@
+---
+title: Ice Cream for R Programmers
+author: Dominik Rafacz
+date: '2022-07-28'
+slug: ice-cream-for-r-programmers
+categories: ["Turtletools"]
+tags: ["r", "turtletools", "code style", "packages", "debugging"]
+Description: "Icecream is a tool which may serve as a more sophisticated replacement of using print while debugging."
+---
+
+# What and why ice cream is.
+
+This post - perhaps contrary to the headline - will not be about eating ice cream. It will, however, be about something we all do too. About something we do too often, even though we shouldn't. About debugging with a print. 
+
+Let's face it, it happens to us. We have a rich arsenal to fight bugs. We have error messages, advanced tracebacks from rlang, classic `browser()` and `debug()` functions, logging utilities or IDE built-in breakpoints. And yet. In our code, there happen to be code snippets scattered here and there like the following:
+
+```r
+some_advanced_function <- function(x) {
+  print("HERE")
+  y <- other_function(x)
+  print(y)
+  more_calculations()
+  print("I HOPE IT GETS THERE!!!!")
+}
+```
+
+We're all lazy and that's why we use **print-driven debugging** (and I'm sure I'll expand on the laziness at another time). (It's funny that acutely lazy evaluation is an acutely brilliant solution.) All the other solutions mentioned above require a little more effort, whereas adding `print()` call to the code is almost effortless. **Almost**. As it usually turns out, the devil is in the detail.
+
+Since we all do it and we all consider it to be a kind of inappropriate practice, perhaps it would be worth taking some steps to make it more appropriate after all? And at the same time pay even more tribute to our laziness? That was the idea behind the developer of the [Python library IceCream](https://github.com/gruns/icecream). And this is the idea that guided me and [Lewin Appleton-Fox](https://github.com/lewinfox) in creating [R version of icecream](https://github.com/lewinfox/icecream).
+
+# How to eat ice cream and why you should do it.
+
+The most basic usage is very simple. The main function of the library is `ic()` which takes an argument of any time, prints its value to the screen and returns it invisibly.
+
+```{r}
+library(icecream)
+
+ic(12)
+```
+
+We can immediately see the first advantage over print: **typing "ic"" is faster than typing "print"**. Since we are here because we like make our life more convenient, that might be important to one.
+
+That would be useless, though, if we could not include it within a function. And of course, we can do it. We are going to reuse the previous example, but replace the `print()` calls with `ic()`. And let's pack the function and other functions into external file called `external.R`.
+
+```r
+# external.R
+
+other_function <- function(x) x * 5 - 7
+more_calculations <- function() NULL
+
+some_advanced_function <- function(x) {
+  ic("HERE")
+  y <- other_function(x)
+  ic(y)
+  more_calculations()
+  ic("I HOPE IT GETS THERE!!!!")
+}
+
+```
+
+```r
+source("external.R")
+some_advanced_function(42)
+```
+
+```
+## ℹ ic| `"HERE"`: chr "HERE"
+## ℹ ic| `y`: num 203
+## ℹ ic| `"I HOPE IT GETS THERE!!!!"`: chr "I HOPE IT GETS THERE!!!!"
+```
+That works good. And you can also see another reason to use `ic()`: **it automatically prints expression alongside its value**. That might be very useful, especially if we have lots of prints and don't want to check which one corresponds to which value.
+
+But, as you have probably noticed, this verbose printing introduces redundancy when we are printing *HERE* etc. Well, that is on purpose. With icecream *you don't need to provide message to get the context*. Let's modify the function slightly and remove those locator messages.
+
+```r
+# external_2.R
+
+some_advanced_function_2 <- function(x) {
+  ic()
+  y <- other_function(x)
+  ic(y)
+  more_calculations()
+  ic()
+}
+```
+
+```r
+source("external_2.R")
+some_advanced_function_2(42)
+```
+
+```
+ℹ ic| `some_advanced_function_2()` in external_2.R:3:2
+ℹ ic| `y`: num 203
+ℹ ic| `some_advanced_function_2()` in external_2.R:7:2
+```
+
+Now you can see that `ic()` is even more clever! **It includes as precise information about file and position in file as possible if you call it without arguments.** This context inclusion makes debugging even more seamless! 
+
+When the context of file is not available (e.g. when calling a function created from a console), an environment of the source is printed:
+
+```{r}
+a_function <- function(x) {
+  x + 2
+  ic()
+}
+
+a_function(0)
+```
+
+(*Side note:* I need to admit that I lied a little with the above code: actually, compiling this code with R markdown does not preserve the file names when sourcing. The output is pasted manually, because that is what would result in calling it from console. knitr removes references when calling `source` and we have not found a way around it so far. But that is not a concern, since Rmd documents are usually final results.)
+
+What is the biggest problem with *print-driven debugging*? Our memory. If we forget to remove those `print()`s, then it might be a problem. Especially when, being really irritated, we include some curse words here. And then send it like this to the client (I have not done that, but my colleague has...). Thankfully, `ic()` is a help here! It is enough to call:
+
+```{r eval=FALSE}
+ic_disable()
+```
+
+to disable all the `ic()` calls. They behave just like a normal `identity()` now. There is a counterpart, `ic_enable()` which does the opposite. If you are, for example, building a shiny app, you can enable and disable `ic()` conditionally depending on whether your app is in development or production mode. Additionally, using `ic()` when building a package is a safety net on its own: if you don't import the `ic()` function and rely solely on loading the library externally, the package will not pass checks.
+
+Last and not least, there is a **dose of customization possibilities.** You can, e.g. change the function used to peek and number of lines printed, as you can see in the chunk below:
+
+```{r}
+# standard settings:
+ic(mtcars)
+
+# modified settings:
+options(icecream.max.lines = 5)
+options(icecream.peeking.function = head)
+
+ic(mtcars)
+```
+
+# A few words on ice cream production.
+
+The inner workings of icecream is quite curious and I encourage you heavily to explore [the code](https://github.com/lewinfox/icecream/blob/master/R/ic.R), if you want to see [rlang](https://rlang.r-lib.org/) in action. To give you a glimpse, I will comment on a few snippets of code. 
+
+Using `ic()` is possible at all, because we can suspend evaluation of arguments:
+
+```r
+ic <- function(x) {
+  # capture the input to allow us to work with the expression and value separately
+  q <- rlang::enquo(x)
+  ...
+}
+```
+
+Now, `q` holds **the expression** alongside with its **evaluation environment**. We can easily transform it into string by **deparsing it**:
+
+```
+deparsed_expression <- rlang::expr_deparse(rlang::quo_get_expr(q))
+```
+
+To get the value of the expression, we can enforce **evaluation**:
+
+```
+x <- rlang::eval_tidy(q)
+```
+
+Getting the precise location of `ic()` call is more tricky. We can do it, however, with usage of rlang functions for analysing the **stack of calls**:
+
+```r
+# this code is simplified and not guaranteed to always work
+
+# inspecting the traceback and extracting the call stack:
+trace <- rlang::trace_back()
+call_stack <- trace$call
+
+# getting length of the call stack:
+num_calls <- length(call_stack)
+
+# accessing the one-but-last call (to omit the `ic` call) and extracting parent reference:
+parent_ref <- call_stack[[num_calls - 1]][[1]]
+
+# extracting location from the reference:
+ref <- attr(call_stack[[num_calls]], "srcref")
+loc <- rlang:::src_loc(ref)
+```
+
+Notice that `rlang:::src_loc()` is not an exported function, as it is not meant for end users of the package. We allowed ourselves to borrow the code of the function as it is crucial for our package.
+
+# Future plans for ice cream industry and conclusion.
+
+If you do practice using print to debug your programs, do it with class. That is what icecream offers. Less typing, convenient information printing, inclusion of context, easy disabling and customization are its main advantages. The package is still under development and our current goal is to fully implement functionalities of original Python version. I encourage to you to give it a try!
+
+---
+
+If you have any suggestions for the [icecream](https://github.com/lewinfox/icecream), do not hesitate to leave an issue on our repo. 
