@@ -5,7 +5,9 @@ date: '2022-07-28'
 slug: ice-cream-for-r-programmers
 categories: ["Turtletools"]
 tags: ["r", "turtletools", "code style", "packages", "debugging"]
-Description: "Icecream is a tool which may serve as a more sophisticated replacement of using print while debugging."
+description: "Icecream is a tool which may serve as a more sophisticated replacement of using print while debugging."
+images: 
+  - icecream.png
 ---
 
 # What and why ice cream is.
