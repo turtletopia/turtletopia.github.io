@@ -44,6 +44,8 @@ params:
     DevDiary: "#FABC2AB0"
     Turtletools: "#52489CB0"
     Default: "#EEEEEEB0"
+  images:
+    - images/logo.png
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
