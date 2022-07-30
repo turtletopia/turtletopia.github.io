@@ -2,7 +2,7 @@ baseurl: /
 languageCode: en-us
 title: "Turtletopia: a blog about programming in R"
 theme: hugo-lithium
-googleAnalytics: ''
+googleAnalytics: 'G-2SKRPRGMM0'
 disqusShortname: ''
 ignoreFiles:
   - \.Rmd$
@@ -44,8 +44,16 @@ params:
     DevDiary: "#FABC2AB0"
     Turtletools: "#52489CB0"
     Default: "#EEEEEEB0"
+  images:
+    - images/logo.png
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
     renderer:
       unsafe: yes
+privacy:
+  googleAnalytics:
+    anonymizeIP: false
+    disable: false
+    respectDoNotTrack: true
+    useSessionStorage: false
