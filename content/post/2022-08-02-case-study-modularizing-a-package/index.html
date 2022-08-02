@@ -1,0 +1,40 @@
+---
+title: 'Case Study: Modularizing a Package'
+author: Laura Bakala
+date: 2022-08-04
+slug: case-study-modularizing-a-package
+categories: []
+tags: []
+description: ""
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#origins-of-deepdep">Origins of deepdep</a></li>
+<li><a href="#separation-of-woodendesc">Separation of woodendesc</a></li>
+<li><a href="#modularization-of-tidysq">Modularization of tidysq</a></li>
+</ul>
+</div>
+
+<p>“Would it be possible…?”, “I think it would be nice if…”, “Can you implement…?”.</p>
+<p>User feedback is a reliable source of valuable ideas for package improvement, but it’s easy to get too eager and implement everything the users want, especially when you’ve only started making a name for yourself. Me and Dominik have fallen victim to that too.</p>
+<div id="origins-of-deepdep" class="section level2">
+<h2>Origins of deepdep</h2>
+<p>Our package <a href="https://github.com/DominikRafacz/deepdep">deepdep</a> was initially created as a university project. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.</p>
+<p>Fast forward a few years and a question came up regarding using repository mirror other than the CRAN mirror we hardcoded. The function in question? <code>get_available_packages()</code>. We’ve exchanged a few messages and it turned out that <code>get_available_packages()</code> only served as a safeguard against using other mirrors within <code>deepdep()</code> itself.</p>
+<p>In fact, the whole backend that downloads the data needed a rewrite. <code>get_dependencies()</code> tried to provide a unified API for retrieving dependencies from different sources and <code>get_descriptions()</code> did the same for DESCRIPTION… but they ended messy and counterintuitive. The user could only get data from CRAN, CRAN and Bioconductor, or from the local library that was first in <code>.localPaths()</code>. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.</p>
+<p>The other issue made us realize that the plotting feature is optional to some; that the key feature is collecting dependency data in a table, which only needs a small fraction of dependencies (<a href="https://github.com/r-lib/httr">httr</a> and <a href="https://github.com/jeroen/jsonlite">jsonlite</a>). We moved a lot of previous Imports to Suggests (<a href="https://github.com/tidyverse/ggplot2">ggplot2</a>, <a href="https://github.com/thomasp85/ggraph">ggraph</a>, <a href="https://github.com/schochastics/graphlayouts">graphlayouts</a>, <a href="https://github.com/igraph/rigraph">igraph</a>, and <a href="https://github.com/r-lib/scales">scales</a>), lightening deepdep significantly… but that’s a topic for another post.</p>
+<p>It was time to ask ourselves: “what does «deepdep» mean to us?”. The answer was: “it’s a package that helps with analyzing and vizualizing hierarchy of package dependencies”. No more, no less. The functions that extracted dependencies of a package or a DESCRIPTION file were just tools to accomplish that goal. They were exported because “we couldn’t let a good function go to waste”, not because they presented a functionality we wanted to provide. If a user would want to use one of these, they’d have to install the whole deepdep; it would be like installing ggplot2 for <code>cut_interval()</code> and <code>cut_width()</code> instead of plotting.</p>
+<p>The time has come for a separation.</p>
+</div>
+<div id="separation-of-woodendesc" class="section level2">
+<h2>Separation of woodendesc</h2>
+</div>
+<div id="modularization-of-tidysq" class="section level2">
+<h2>Modularization of tidysq</h2>
+<!-- (sth about tidysq and tidysqfiles and removing sq_encode()) -->
+</div>
