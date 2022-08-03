@@ -4,8 +4,8 @@ author: Laura Bakala
 date: 2022-08-04
 slug: case-study-modularizing-a-package
 categories: []
-tags: []
-description: ""
+tags: ["r", "modularization", "dependencies", "dependency optimizing"]
+description: "An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq."
 output:
   blogdown::html_page:
     toc: true
@@ -31,10 +31,95 @@ The time has come for a separation.
 
 ## Separation of woodendesc
 
+The idea is to modularize -- to allow the user to install what they want. If they want to retrieve a list of dependencies for one package or a list of available packages in a repository, they should not need to install deepdep. They should be able to install a separate package that deepdep imports: [woodendesc](https://github.com/turtletopia/woodendesc).
 
+This package is a complete rewrite of these functionalities, but much more flexible and much more potent. To show the difference, this is how you'd get packages available on CRAN and Bioconductor in old deepdep:
 
+```{r pkgs_deepdep}
+# Hey, a wild R 4.1.0 pipe appeared!
+deepdep::get_available_packages(bioc = TRUE) |>
+  head()
+```
 
+You can't do much more than that. The only other option is to get locally available packages. This is the signature of the function:
+
+```{r pkgs_deepdep_impl, eval=FALSE}
+get_available_packages <- function(
+  bioc = FALSE, local = FALSE, reset_cache = FALSE
+) {
+  # Implementation goes here
+}
+```
+
+But woodendesc goes three steps further. There are functions for many different sources of packages, each of them optimized for minimal network usage and maximal cache utilization:
+
+```{r wood_x_packages, eval=FALSE}
+# Simple CRAN extractor
+woodendesc::wood_cran_packages()
+# Allows `release` parameter to query old releases
+woodendesc::wood_bioc_packages()
+# The user can specify different paths
+woodendesc::wood_local_packages()
+# Functions below not possible in old deepdep:
+woodendesc::wood_runiverse_packages("turtletopia")
+woodendesc::wood_url_packages("http://www.omegahat.net/R")
+woodendesc::wood_core_packages()
+```
+
+And if you'd want a single function like `get_available_packages()`? Easy, just call `wood_packages()` with specified repos (by default it only queries CRAN):
+
+```{r wood_packages}
+woodendesc::wood_packages(c("bioc", "cran")) |>
+  head()
+```
+
+You can do it with all the sources above and even pass most parameters:
+
+```{r wood_packages_params}
+woodendesc::wood_packages(
+  c("bioc@1.5", "core", "runiverse@turtletopia",
+    "http://www.omegahat.net/R", "local#all")
+) |>
+  head()
+```
+
+Now, you can see why'd we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they'd overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing, because the alternative is to include this code within deepdep itself -- so it'd have to be tested and maintained anyways.
+
+But sometimes modularizing is a bit extra.
+
+## A new package is not always the answer
+
+If you have a function if your package that doesn't fit the general idea, don't rush to move it into a separate package. There's one important question to ask before:
+
+"Will it be used by anything else than my package?"
+
+And don't be proactive here. If your answer is: "not right now, but perhaps in the future...", just wait for the future. Keep the function in the package until the time comes and simply remove or deprecate it then (depending on how popular it gets).
+
+There's one such functionality in deepdep: `get_downloads()` and `plot_downloads()`. Analyzing download statistics is not exactly the goal of deepdep, but there's no point in making it into a separate package; these two don't introduce any new dependencies nor do they crowd the namespace. And no-one expressed any interest in having it separate from deepdep yet.
+
+Besides, nobody [creates a package around a single function](https://github.com/eddelbuettel/digest).
 
 ## Modularization of tidysq
 
-<!-- (sth about tidysq and tidysqfiles and removing sq_encode()) -->
+You might have noticed that woodendesc consists of functions that served as a backbone of deepdep, while querying and plotting download statistics is more of an extension. There's one package we've created that was planned to be extended since the beginning: [tidysq](https://github.com/BioGenies/tidysq).
+
+It's a package that compresses biological sequences (e.g. DNA/RNA) through coding each letter with less bits (3 in DNA/RNA case). We've included a few basic operations like reversing, subsetting, translating to amino acids, and reading a FASTA file -- the most common file format for biological sequences. We've intentionally omitted many more advanced functions, though.
+
+Why? Because there are countless functions and algorithms we could implement and that'd make tidysq huge. Instead, we'd gone the route of modularization. The idea is to have tidysq with the base functionality and several packages depending on tidysq, oriented towards certain aspects of working with biological sequences.
+
+For example, if we were to create a set of `read_x()` and `write_x()` functions for various formats like FASTQ or BAM/SAM, we'd place it in a separate package that'd have tidysq in Depends (and LinkingTo) fields. We'd call it something like "tidysqfiles" to signify that it's an extension to tidysq.
+
+(We may or may not be working on such a package.)
+
+If you want to see a real-life example of a package ecosystem, see [mlr3 and mlr3verse](https://mlr3verse.mlr-org.com).
+
+## Summary
+
+In short, there are two cases where modularization should be considered:
+
+1. **the backend to the main functionality grows and overshadows the rest of the package** -- create a set of logically related backend functions, move them into a new package, and add that package to Imports of the old one;
+1. **there's an optional functionality that requires additional imports or significantly increases the weight of the package** -- collect several such functionalities so that they are somewhat related, move them into a new package, and add old package to the Imports/Depends field of the new one.
+
+Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are to few functionalities for a new package. Sometimes copying a function or two isn't a sin.
+
+Do you want to borrow [a code that shows an install prompt for missing package](https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R)?
