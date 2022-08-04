@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Turtletools on Turtletopia: a blog about programming in R</title>
-    <link>/categories/turtletools/</link>
-    <description>Recent content in Turtletools on Turtletopia: a blog about programming in R</description>
+    <title>dependencies on Turtletopia: a blog about programming in R</title>
+    <link>/tags/dependencies/</link>
+    <description>Recent content in dependencies on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/categories/turtletools/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/dependencies/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Case Study: Modularizing a Package</title>
       <link>/2022/08/04/case-study-modularizing-a-package/</link>
@@ -102,141 +102,6 @@ woodendesc::wood_core_packages()&lt;/code&gt;&lt;/pre&gt;
 &lt;/ol&gt;
 &lt;p&gt;Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are too few functionalities for a new package. Sometimes copying a function or two isn’t a sin.&lt;/p&gt;
 &lt;p&gt;Do you want to borrow &lt;a href=&#34;https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R&#34;&gt;a code that shows an install prompt for a missing package&lt;/a&gt;?&lt;/p&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Ice Cream for R Programmers</title>
-      <link>/2022/07/28/ice-cream-for-r-programmers/</link>
-      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/2022/07/28/ice-cream-for-r-programmers/</guid>
-      <description>
-
-
-&lt;div id=&#34;what-and-why-ice-cream-is.&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;What and why ice cream is.&lt;/h1&gt;
-&lt;p&gt;This post - perhaps contrary to the headline - will not be about eating ice cream. It will, however, be about something we all do too. About something, we do too often, even though we shouldn’t. About debugging with a &lt;code&gt;print()&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Let’s face it; it happens to us. We have a rich arsenal to fight bugs. We have error messages, advanced tracebacks from rlang, classic &lt;code&gt;browser()&lt;/code&gt; and &lt;code&gt;debug()&lt;/code&gt; functions, logging utilities or IDE built-in breakpoints. And yet. In our code, there happen to be code snippets scattered here and there like the following:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;some_advanced_function &amp;lt;- function(x) {
-  print(&amp;quot;HERE&amp;quot;)
-  y &amp;lt;- other_function(x)
-  print(y)
-  more_calculations()
-  print(&amp;quot;I HOPE IT GETS THERE!!!!&amp;quot;)
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We’re all lazy, and that’s why we use &lt;strong&gt;print-driven debugging&lt;/strong&gt; (and I’m sure I’ll expand on the laziness at another time). (It’s funny that acutely lazy evaluation is an acutely brilliant solution.) All the other solutions mentioned above require a little more effort, whereas adding a &lt;code&gt;print()&lt;/code&gt; call to the code is almost effortless. &lt;strong&gt;Almost&lt;/strong&gt;. As it usually turns out, the devil is in the detail.&lt;/p&gt;
-&lt;p&gt;Since we all do it and we all consider it to be a kind of inappropriate practice, perhaps it would be worth taking some steps to make it more appropriate after all? And at the same time, pay even more tribute to our laziness? That was the idea behind the developer of the &lt;a href=&#34;https://github.com/gruns/icecream&#34;&gt;Python library IceCream&lt;/a&gt;. And this is the idea that guided me and &lt;a href=&#34;https://github.com/lewinfox&#34;&gt;Lewin Appleton-Fox&lt;/a&gt; in creating &lt;a href=&#34;https://github.com/lewinfox/icecream&#34;&gt;R version of icecream&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;how-to-eat-ice-cream-and-why-you-should-do-it.&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;How to eat ice cream and why you should do it.&lt;/h1&gt;
-&lt;p&gt;The most basic usage is straightforward. The library’s primary function is &lt;code&gt;ic()&lt;/code&gt;, which takes an argument of any kind, prints its value to the screen and returns it invisibly.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(icecream)
-
-ic(12)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ℹ ic| `12`: num 12&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We can immediately see the first advantage over print: &lt;strong&gt;typing &lt;code&gt;ic()&lt;/code&gt; is faster than typing “print”&lt;/strong&gt;. Since we are here because we like to make our life more convenient, that might be important to one.&lt;/p&gt;
-&lt;p&gt;That would be useless, though, if we could not include it within a function. And of course, we can do it. We will reuse the previous example but replace the &lt;code&gt;print()&lt;/code&gt; calls with &lt;code&gt;ic()&lt;/code&gt;. And let’s pack the function and other functions into an external file called &lt;code&gt;external.R&lt;/code&gt;.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# external.R
-
-other_function &amp;lt;- function(x) x * 5 - 7
-more_calculations &amp;lt;- function() NULL
-
-some_advanced_function &amp;lt;- function(x) {
-  ic(&amp;quot;HERE&amp;quot;)
-  y &amp;lt;- other_function(x)
-  ic(y)
-  more_calculations()
-  ic(&amp;quot;I HOPE IT GETS THERE!!!!&amp;quot;)
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;external.R&amp;quot;)
-some_advanced_function(42)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ℹ ic| `&amp;quot;HERE&amp;quot;`: chr &amp;quot;HERE&amp;quot;
-## ℹ ic| `y`: num 203
-## ℹ ic| `&amp;quot;I HOPE IT GETS THERE!!!!&amp;quot;`: chr &amp;quot;I HOPE IT GETS THERE!!!!&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;That works well. And you can also see another reason to use &lt;code&gt;ic()&lt;/code&gt;: &lt;strong&gt;it automatically prints expression alongside its value&lt;/strong&gt;. That might be very useful, especially if we have many prints and don’t want to check which one corresponds to which value.&lt;/p&gt;
-&lt;p&gt;But, as you have probably noticed, this verbose printing introduces redundancy when printing &lt;em&gt;HERE&lt;/em&gt; etc. Well, that is on purpose. With icecream &lt;em&gt;you don’t need to provide a message to get the context&lt;/em&gt;. Let’s modify the function slightly and remove those locator messages.&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# external_2.R
-
-some_advanced_function_2 &amp;lt;- function(x) {
-  ic()
-  y &amp;lt;- other_function(x)
-  ic(y)
-  more_calculations()
-  ic()
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;source(&amp;quot;external_2.R&amp;quot;)
-some_advanced_function_2(42)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;ℹ ic| `some_advanced_function_2()` in external_2.R:3:2
-ℹ ic| `y`: num 203
-ℹ ic| `some_advanced_function_2()` in external_2.R:7:2&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now you can see that &lt;code&gt;ic()&lt;/code&gt; is even more clever! &lt;strong&gt;It includes as precise information about the file and position in the file as possible if you call it without arguments.&lt;/strong&gt; This context inclusion makes debugging even more seamless!&lt;/p&gt;
-&lt;p&gt;When the context of the file is not available (e.g. when calling a function created from a console), an environment of the source is printed:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;a_function &amp;lt;- function(x) {
-  x + 2
-  ic()
-}
-
-a_function(0)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ℹ ic| `a_function()` in &amp;lt;env: global&amp;gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(&lt;em&gt;Side note:&lt;/em&gt; I need to admit that I lied a little with the above code: compiling this code with R markdown does not preserve the file names when sourcing. The output is pasted manually because that would call it from the console. knitr removes references when calling &lt;code&gt;source&lt;/code&gt;, and we have not found a way around it. But that is not a concern since Rmd documents are usually final results.)&lt;/p&gt;
-&lt;p&gt;What is the biggest problem with &lt;em&gt;print-driven debugging&lt;/em&gt;? Our memory. It might be a problem if we forget to remove those &lt;code&gt;print()&lt;/code&gt;s. Especially when, being irritated, we include some curse words here. And then send it to the client (anticipating questions: I have not done that, but my colleague has…). Thankfully, &lt;code&gt;ic()&lt;/code&gt; is help here! It is enough to call:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ic_disable()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;to disable all the &lt;code&gt;ic()&lt;/code&gt; calls. They behave just like a regular &lt;code&gt;identity()&lt;/code&gt; now. There is a counterpart, &lt;code&gt;ic_enable()&lt;/code&gt;, which does the opposite. If you are, for example, building a shiny app, you can enable and disable &lt;code&gt;ic()&lt;/code&gt; conditionally depending on whether your app is in development or production mode. Additionally, using &lt;code&gt;ic()&lt;/code&gt; when building a package is a safety net. If you don’t import the &lt;code&gt;ic()&lt;/code&gt; function and rely solely on loading the library externally, the package will not pass checks.&lt;/p&gt;
-&lt;p&gt;Last and not least, there is a &lt;strong&gt;dose of customization possibilities.&lt;/strong&gt; You can e.g. change the function used to peek and the number of lines printed, as you can see in the chunk below:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# standard settings:
-ic(mtcars)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ℹ ic| `mtcars`: data.frame [32 x 11]: $&amp;#39;mpg&amp;#39;: dbl [32], $&amp;#39;cyl&amp;#39;: dbl [32], ...&lt;/code&gt;&lt;/pre&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# modified settings:
-options(icecream.max.lines = 5)
-options(icecream.peeking.function = head)
-
-ic(mtcars)&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## ℹ ic| `mtcars`: 
-## mpg cyl disp  hp drat    wt  qsec vs am gear carb
-## Mazda RX4         21.0   6  160 110 3.90 2.620 16.46  0  1    4    4
-## Mazda RX4 Wag     21.0   6  160 110 3.90 2.875 17.02  0  1    4    4
-## Datsun 710        22.8   4  108  93 3.85 2.320 18.61  1  1    4    1
-## Hornet 4 Drive    21.4   6  258 110 3.08 3.215 19.44  1  0    3    1&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;div id=&#34;a-few-words-on-ice-cream-production.&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;A few words on ice cream production.&lt;/h1&gt;
-&lt;p&gt;The inner workings of icecream are pretty curious, and I encourage you heavily to explore &lt;a href=&#34;https://github.com/lewinfox/icecream/blob/master/R/ic.R&#34;&gt;the code&lt;/a&gt; if you want to see &lt;a href=&#34;https://rlang.r-lib.org/&#34;&gt;rlang&lt;/a&gt; in action. I will comment on a few code snippets to give you a glimpse.&lt;/p&gt;
-&lt;p&gt;Using &lt;code&gt;ic()&lt;/code&gt; is possible because we can suspend the evaluation of arguments:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ic &amp;lt;- function(x) {
-  # capture the input to allow us to work with the expression and value separately
-  q &amp;lt;- rlang::enquo(x)
-  ...
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now, &lt;code&gt;q&lt;/code&gt; holds &lt;strong&gt;the expression&lt;/strong&gt; alongside with its &lt;strong&gt;evaluation environment&lt;/strong&gt;. We can quickly transform it into a string by &lt;strong&gt;deparsing it&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;deparsed_expression &amp;lt;- rlang::expr_deparse(rlang::quo_get_expr(q))&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;To get the value of the expression, we can enforce &lt;strong&gt;evaluation&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;x &amp;lt;- rlang::eval_tidy(q)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Getting the precise location of the &lt;code&gt;ic()&lt;/code&gt; call is more tricky. We can do it, however, with the usage of rlang functions for analyzing the &lt;strong&gt;stack of calls&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# this code is simplified and not guaranteed always to work
-
-# inspecting the traceback and extracting the call stack:
-trace &amp;lt;- rlang::trace_back()
-call_stack &amp;lt;- trace$call
-
-# getting length of the call stack:
-num_calls &amp;lt;- length(call_stack)
-
-# accessing the second-to-last call (to omit the `ic` call) and extracting parent reference:
-parent_ref &amp;lt;- call_stack[[num_calls - 1]][[1]]
-
-# extracting location from the reference:
-ref &amp;lt;- attr(call_stack[[num_calls]], &amp;quot;srcref&amp;quot;)
-loc &amp;lt;- rlang:::src_loc(ref)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Notice that &lt;code&gt;rlang:::src_loc()&lt;/code&gt; is not an exported function, as it is not meant for end users of the package. We allowed ourselves to borrow the code of the function as it is crucial for our package.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;plans-for-the-ice-cream-industry-and-conclusion.&#34; class=&#34;section level1&#34;&gt;
-&lt;h1&gt;Plans for the ice cream industry and conclusion.&lt;/h1&gt;
-&lt;p&gt;If you practice using print to debug your programs, do it with class. That is what icecream offers. Its main advantages are less typing, convenient information printing, the inclusion of context, easy disabling and customization. The package is still under development, and our current goal is to fully implement the original Python version’s functionalities. I encourage you to give it a try!&lt;/p&gt;
-&lt;hr /&gt;
-&lt;p&gt;If you have any suggestions for the &lt;a href=&#34;https://github.com/lewinfox/icecream&#34;&gt;icecream&lt;/a&gt;, do not hesitate to leave an issue on our repo.&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>

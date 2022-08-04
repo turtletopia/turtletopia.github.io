@@ -6,7 +6,70 @@
     <description>Recent content in Tags on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>deepdep</title>
+      <link>/tags/deepdep/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/deepdep/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dependencies</title>
+      <link>/tags/dependencies/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/dependencies/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>dependency optimizing</title>
+      <link>/tags/dependency-optimizing/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/dependency-optimizing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>modularization</title>
+      <link>/tags/modularization/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/modularization/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>r</title>
+      <link>/tags/r/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tidysq</title>
+      <link>/tags/tidysq/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/tidysq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>woodendesc</title>
+      <link>/tags/woodendesc/</link>
+      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/woodendesc/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>code style</title>
       <link>/tags/code-style/</link>
@@ -31,15 +94,6 @@
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/packages/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>r</title>
-      <link>/tags/r/</link>
-      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/r/</guid>
       <description></description>
     </item>
     

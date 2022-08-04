@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <script src="https://cdn.jsdelivr.net/gh/sprucejoy/cookie-consent-autoblock-gdpr/cookie-consent.js" crossorigin="anonymous"></script>
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.99.1" />
+
+
+<title>Case Study: Modularizing a Package - Turtletopia: a blog about programming in R</title>
+<meta property="og:title" content="Case Study: Modularizing a Package - Turtletopia: a blog about programming in R">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+  <meta property="description" content="An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq.">
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+<link rel="stylesheet" href="/css/custom.css">
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="/images/logo.png"/>
+
+<meta name="twitter:title" content="Case Study: Modularizing a Package"/>
+<meta name="twitter:description" content="An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq."/>
+
+<meta property="og:title" content="Case Study: Modularizing a Package" />
+<meta property="og:description" content="An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/2022/08/04/case-study-modularizing-a-package/" /><meta property="og:image" content="/images/logo.png"/><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-08-04T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-08-04T00:00:00+00:00" />
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2SKRPRGMM0"></script>
+<script>
+var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+var doNotTrack = (dnt == "1" || dnt == "yes");
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-2SKRPRGMM0', { 'anonymize_ip': false });
+}
+</script>
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/turtletopia">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/Rturtletopia">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">7 min read</span>
+    
+
+    <h1 class="article-title">Case Study: Modularizing a Package</h1>
+    
+    
+    <span class="article-author">Laura Bakala</span>
+    <br>
+    
+
+    <div class="article-categories">
+  
+    
+      
+    
+      
+        <span class="category" style="background-color: #FABC2AB0; ">Essay</span>
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <span class="category" style="background-color: #52489CB0; ">Turtletools</span>
+      
+    
+      
+    
+  
+</div>
+
+
+    
+    <span class="article-date">2022-08-04</span>
+    
+
+    <div class="article-content">
+      
+
+<div id="TOC">
+<ul>
+<li><a href="#origins-of-deepdep" id="toc-origins-of-deepdep">Origins of deepdep</a></li>
+<li><a href="#separation-of-woodendesc" id="toc-separation-of-woodendesc">Separation of woodendesc</a></li>
+<li><a href="#a-new-package-is-not-always-the-answer" id="toc-a-new-package-is-not-always-the-answer">A new package is not always the answer</a></li>
+<li><a href="#modularization-of-tidysq" id="toc-modularization-of-tidysq">Modularization of tidysq</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
+</ul>
+</div>
+
+<p>“Would it be possible…?”, “I think it would be nice if…”, “Can you implement…?”.</p>
+<p>User feedback is a reliable source of valuable ideas for package improvement, but it’s easy to get too eager and implement everything the users want, especially when you’ve only started making a name for yourself. I and Dominik have fallen victim to that too.</p>
+<div id="origins-of-deepdep" class="section level2">
+<h2>Origins of deepdep</h2>
+<p>Our package <a href="https://github.com/DominikRafacz/deepdep">deepdep</a> was initially created as a university project. There were four of initial authors: the two of us and our colleagues, Hubert and Szymon. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.</p>
+<p>Fast forward a few years and a question came up regarding using a repository mirror other than the CRAN mirror we hardcoded. The function in question? <code>get_available_packages()</code>. We’ve exchanged a few messages and it turned out that <code>get_available_packages()</code> only served as a safeguard against using other mirrors within <code>deepdep()</code> itself.</p>
+<p>In fact, the whole backend that downloads the data needed a rewrite. <code>get_dependencies()</code> tried to provide a unified API for retrieving dependencies from different sources and <code>get_descriptions()</code> did the same for DESCRIPTION… but they ended up messy and counterintuitive. The user could only get data from CRAN, CRAN with Bioconductor, or from the local library that was first in <code>.localPaths()</code>. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.</p>
+<p>The other issue made us realize that the plotting feature is optional to some; that the key feature is collecting dependency data in a table, which only needs a small fraction of dependencies (<a href="https://github.com/r-lib/httr">httr</a> and <a href="https://github.com/jeroen/jsonlite">jsonlite</a>). We moved a lot of previous Imports to Suggests (<a href="https://github.com/tidyverse/ggplot2">ggplot2</a>, <a href="https://github.com/thomasp85/ggraph">ggraph</a>, <a href="https://github.com/schochastics/graphlayouts">graphlayouts</a>, <a href="https://github.com/igraph/rigraph">igraph</a>, and <a href="https://github.com/r-lib/scales">scales</a>), lightening deepdep significantly… but that’s a topic for another post.</p>
+<p>It was time to ask ourselves: “what does «deepdep» mean to us?”. The answer was: “it’s a package that helps with analyzing and visualizing hierarchy of package dependencies”. No more, no less. The functions that extracted dependencies of a package or a DESCRIPTION file were just tools to accomplish that goal. They were exported because “we couldn’t let a good function go to waste”, not because they presented a functionality we wanted to provide. If a user would want to use one of these, they’d have to install the whole deepdep; it would be like installing ggplot2 for <code>cut_interval()</code> and <code>cut_width()</code> instead of plotting.</p>
+<p>The time has come for a separation.</p>
+</div>
+<div id="separation-of-woodendesc" class="section level2">
+<h2>Separation of woodendesc</h2>
+<p>The idea is to modularize – to allow the user to install what they want. If they want to retrieve a list of dependencies for one package or a list of available packages in a repository, they should not need to install deepdep. They should be able to install a separate package that deepdep imports: <a href="https://github.com/turtletopia/woodendesc">woodendesc</a>.</p>
+<p>This package is a complete rewrite of these functionalities, but much more flexible and much more potent. To show the difference, this is how you’d get packages available on CRAN and Bioconductor in old deepdep:</p>
+<pre class="r"><code># Hey, a wild R 4.1.0 pipe appeared!
+deepdep::get_available_packages(bioc = TRUE) |&gt;
+  head()</code></pre>
+<pre><code>## [1] &quot;A3&quot;        &quot;a4&quot;        &quot;a4Base&quot;    &quot;a4Classif&quot; &quot;a4Core&quot;    &quot;a4Preproc&quot;</code></pre>
+<p>You can’t do much more than that. The only other option is to get locally available packages. This is the signature of the function:</p>
+<pre class="r"><code>get_available_packages &lt;- function(
+  bioc = FALSE, local = FALSE, reset_cache = FALSE
+) {
+  # Implementation goes here
+}</code></pre>
+<p>But woodendesc goes three steps further. There are functions for many different sources of packages, each of them optimized for minimal network usage and maximal cache utilization:</p>
+<pre class="r"><code># Simple CRAN extractor
+woodendesc::wood_cran_packages()
+# Allows `release` parameter to query old releases
+woodendesc::wood_bioc_packages()
+# The user can specify different paths
+woodendesc::wood_local_packages()
+# Functions below not possible in old deepdep:
+woodendesc::wood_runiverse_packages(&quot;turtletopia&quot;)
+woodendesc::wood_url_packages(&quot;http://www.omegahat.net/R&quot;)
+woodendesc::wood_core_packages()</code></pre>
+<p>And if you’d want a single function like <code>get_available_packages()</code>? Easy, just call <code>wood_packages()</code> with specified repos (by default it only queries CRAN):</p>
+<pre class="r"><code>woodendesc::wood_packages(c(&quot;bioc&quot;, &quot;cran&quot;)) |&gt;
+  head()</code></pre>
+<pre><code>## [1] &quot;A3&quot;        &quot;a4&quot;        &quot;a4Base&quot;    &quot;a4Classif&quot; &quot;a4Core&quot;    &quot;a4Preproc&quot;</code></pre>
+<p>You can do it with all the sources above and even pass most parameters:</p>
+<pre class="r"><code>woodendesc::wood_packages(
+  c(&quot;bioc@1.5&quot;, &quot;core&quot;, &quot;runiverse@turtletopia&quot;,
+    &quot;http://www.omegahat.net/R&quot;, &quot;local#all&quot;)
+) |&gt;
+  head()</code></pre>
+<pre><code>## [1] &quot;00LOCK-lubridate&quot; &quot;aCGH&quot;             &quot;affy&quot;             &quot;affycomp&quot;        
+## [5] &quot;affydata&quot;         &quot;affylmGUI&quot;</code></pre>
+<p>Now, you can see why’d we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they’d overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing because the alternative is to include this code within deepdep itself – so it’d have to be tested and maintained anyways.</p>
+<p>But sometimes modularizing is a bit extra.</p>
+</div>
+<div id="a-new-package-is-not-always-the-answer" class="section level2">
+<h2>A new package is not always the answer</h2>
+<p>If you have a function if your package that doesn’t fit the general idea, don’t rush to move it into a separate package. There’s one important question to ask before:</p>
+<p>“Will it be used by anything else than my package?”</p>
+<p>And don’t be proactive here. If your answer is: “not right now, but perhaps in the future…”, just wait for the future. Keep the function in the package until the time comes and simply remove or deprecate it then (depending on how popular it gets).</p>
+<p>There’s one such functionality in deepdep: <code>get_downloads()</code> and <code>plot_downloads()</code>. Analyzing download statistics is not exactly the goal of deepdep, but there’s no point in making it into a separate package; these two don’t introduce any new dependencies nor do they crowd the namespace. And no one expressed any interest in having it separate from deepdep yet.</p>
+<p>Besides, nobody <a href="https://github.com/eddelbuettel/digest">creates a package around a single function</a>.</p>
+</div>
+<div id="modularization-of-tidysq" class="section level2">
+<h2>Modularization of tidysq</h2>
+<p>You might have noticed that woodendesc consists of functions that served as a backbone of deepdep while querying and plotting download statistics are more of an extension. There’s one package we’ve created that was planned to be extended since the beginning: <a href="https://github.com/BioGenies/tidysq">tidysq</a>.</p>
+<p>It’s a package that compresses biological sequences (e.g. DNA/RNA) by coding each letter with fewer bits (3 in DNA/RNA case). We’ve included a few basic operations like reversing, subsetting, translating to amino acids, and reading a FASTA file – the most common file format for biological sequences. We’ve intentionally omitted many more advanced functions, though.</p>
+<p>Why? Because there are countless functions and algorithms we could implement and that’d make tidysq huge. Instead, we’d gone the route of modularization. The idea is to have tidysq with the base functionality and several packages depending on tidysq, oriented towards certain aspects of working with biological sequences.</p>
+<p>For example, if we were to create a set of <code>read_x()</code> and <code>write_x()</code> functions for various formats like FASTQ or BAM/SAM, we’d place it in a separate package that’d have tidysq in Depends (and LinkingTo) fields. We’d call it something like “tidysqfiles” to signify that it’s an extension to tidysq.</p>
+<p>(We may or may not be working on such a package.)</p>
+<p>If you want to see a real-life example of a package ecosystem, see <a href="https://mlr3verse.mlr-org.com">mlr3 and mlr3verse</a>.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>In short, there are two cases where modularization should be considered:</p>
+<ol style="list-style-type: decimal">
+<li><strong>the backend to the main functionality grows and overshadows the rest of the package</strong> – create a set of logically related backend functions, move them into a new package, and add that package to Imports of the old one;</li>
+<li><strong>there’s an optional functionality that requires additional imports or significantly increases the weight of the package</strong> – collect several such functionalities so that they are somewhat related, move them into a new package, and add the old package to the Imports/Depends field of the new one.</li>
+</ol>
+<p>Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are too few functionalities for a new package. Sometimes copying a function or two isn’t a sin.</p>
+<p>Do you want to borrow <a href="https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R">a code that shows an install prompt for a missing package</a>?</p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+          <li>
+            <a href="https://www.r-bloggers.com/" target="_blank">R-bloggers</a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2SKRPRGMM0"></script>
+<script>
+var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+var doNotTrack = (dnt == "1" || dnt == "yes");
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-2SKRPRGMM0', { 'anonymize_ip': false });
+}
+</script>
+
+  </body>
+</html>
+
