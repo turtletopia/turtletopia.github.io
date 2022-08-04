@@ -3,8 +3,8 @@ title: 'Case Study: Modularizing a Package'
 author: Laura Bakala
 date: 2022-08-04
 slug: case-study-modularizing-a-package
-categories: []
-tags: ["r", "modularization", "dependencies", "dependency optimizing"]
+categories: ["Essay", "Turtletools"]
+tags: ["r", "modularization", "dependencies", "dependency optimizing", "deepdep", "woodendesc", "tidysq"]
 description: "An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq."
 output:
   blogdown::html_page:
@@ -14,11 +14,11 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#origins-of-deepdep">Origins of deepdep</a></li>
-<li><a href="#separation-of-woodendesc">Separation of woodendesc</a></li>
-<li><a href="#a-new-package-is-not-always-the-answer">A new package is not always the answer</a></li>
-<li><a href="#modularization-of-tidysq">Modularization of tidysq</a></li>
-<li><a href="#summary">Summary</a></li>
+<li><a href="#origins-of-deepdep" id="toc-origins-of-deepdep">Origins of deepdep</a></li>
+<li><a href="#separation-of-woodendesc" id="toc-separation-of-woodendesc">Separation of woodendesc</a></li>
+<li><a href="#a-new-package-is-not-always-the-answer" id="toc-a-new-package-is-not-always-the-answer">A new package is not always the answer</a></li>
+<li><a href="#modularization-of-tidysq" id="toc-modularization-of-tidysq">Modularization of tidysq</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
 </ul>
 </div>
 
@@ -26,7 +26,7 @@ output:
 <p>User feedback is a reliable source of valuable ideas for package improvement, but it’s easy to get too eager and implement everything the users want, especially when you’ve only started making a name for yourself. I and Dominik have fallen victim to that too.</p>
 <div id="origins-of-deepdep" class="section level2">
 <h2>Origins of deepdep</h2>
-<p>Our package <a href="https://github.com/DominikRafacz/deepdep">deepdep</a> was initially created as a university project. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.</p>
+<p>Our package <a href="https://github.com/DominikRafacz/deepdep">deepdep</a> was initially created as a university project. There were four of initial authors: the two of us and our colleagues, Hubert and Szymon. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.</p>
 <p>Fast forward a few years and a question came up regarding using a repository mirror other than the CRAN mirror we hardcoded. The function in question? <code>get_available_packages()</code>. We’ve exchanged a few messages and it turned out that <code>get_available_packages()</code> only served as a safeguard against using other mirrors within <code>deepdep()</code> itself.</p>
 <p>In fact, the whole backend that downloads the data needed a rewrite. <code>get_dependencies()</code> tried to provide a unified API for retrieving dependencies from different sources and <code>get_descriptions()</code> did the same for DESCRIPTION… but they ended up messy and counterintuitive. The user could only get data from CRAN, CRAN with Bioconductor, or from the local library that was first in <code>.localPaths()</code>. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.</p>
 <p>The other issue made us realize that the plotting feature is optional to some; that the key feature is collecting dependency data in a table, which only needs a small fraction of dependencies (<a href="https://github.com/r-lib/httr">httr</a> and <a href="https://github.com/jeroen/jsonlite">jsonlite</a>). We moved a lot of previous Imports to Suggests (<a href="https://github.com/tidyverse/ggplot2">ggplot2</a>, <a href="https://github.com/thomasp85/ggraph">ggraph</a>, <a href="https://github.com/schochastics/graphlayouts">graphlayouts</a>, <a href="https://github.com/igraph/rigraph">igraph</a>, and <a href="https://github.com/r-lib/scales">scales</a>), lightening deepdep significantly… but that’s a topic for another post.</p>
@@ -68,7 +68,8 @@ woodendesc::wood_core_packages()</code></pre>
     &quot;http://www.omegahat.net/R&quot;, &quot;local#all&quot;)
 ) |&gt;
   head()</code></pre>
-<pre><code>## [1] &quot;aCGH&quot;      &quot;ade4&quot;      &quot;affy&quot;      &quot;affycomp&quot;  &quot;affydata&quot;  &quot;affylmGUI&quot;</code></pre>
+<pre><code>## [1] &quot;00LOCK-lubridate&quot; &quot;aCGH&quot;             &quot;affy&quot;             &quot;affycomp&quot;        
+## [5] &quot;affydata&quot;         &quot;affylmGUI&quot;</code></pre>
 <p>Now, you can see why’d we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they’d overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing because the alternative is to include this code within deepdep itself – so it’d have to be tested and maintained anyways.</p>
 <p>But sometimes modularizing is a bit extra.</p>
 </div>

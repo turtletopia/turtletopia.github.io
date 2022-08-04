@@ -3,8 +3,8 @@ title: 'Case Study: Modularizing a Package'
 author: Laura Bakala
 date: 2022-08-04
 slug: case-study-modularizing-a-package
-categories: []
-tags: ["r", "modularization", "dependencies", "dependency optimizing"]
+categories: ["Essay", "Turtletools"]
+tags: ["r", "modularization", "dependencies", "dependency optimizing", "deepdep", "woodendesc", "tidysq"]
 description: "An essay on modularization -- when to do or not to do it, and how we used it in deepdep and tidysq."
 output:
   blogdown::html_page:
@@ -17,7 +17,7 @@ User feedback is a reliable source of valuable ideas for package improvement, bu
 
 ## Origins of deepdep
 
-Our package [deepdep](https://github.com/DominikRafacz/deepdep) was initially created as a university project. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.
+Our package [deepdep](https://github.com/DominikRafacz/deepdep) was initially created as a university project. There were four of initial authors: the two of us and our colleagues, Hubert and Szymon. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.
 
 Fast forward a few years and a question came up regarding using a repository mirror other than the CRAN mirror we hardcoded. The function in question? `get_available_packages()`. We've exchanged a few messages and it turned out that `get_available_packages()` only served as a safeguard against using other mirrors within `deepdep()` itself.
 
