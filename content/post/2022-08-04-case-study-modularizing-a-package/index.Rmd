@@ -13,19 +13,19 @@ output:
 
 "Would it be possible…?", "I think it would be nice if…", "Can you implement…?".
 
-User feedback is a reliable source of valuable ideas for package improvement, but it's easy to get too eager and implement everything the users want, especially when you've only started making a name for yourself. Me and Dominik have fallen victim to that too.
+User feedback is a reliable source of valuable ideas for package improvement, but it's easy to get too eager and implement everything the users want, especially when you've only started making a name for yourself. I and Dominik have fallen victim to that too.
 
 ## Origins of deepdep
 
 Our package [deepdep](https://github.com/DominikRafacz/deepdep) was initially created as a university project. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.
 
-Fast forward a few years and a question came up regarding using repository mirror other than the CRAN mirror we hardcoded. The function in question? `get_available_packages()`. We've exchanged a few messages and it turned out that `get_available_packages()` only served as a safeguard against using other mirrors within `deepdep()` itself.
+Fast forward a few years and a question came up regarding using a repository mirror other than the CRAN mirror we hardcoded. The function in question? `get_available_packages()`. We've exchanged a few messages and it turned out that `get_available_packages()` only served as a safeguard against using other mirrors within `deepdep()` itself.
 
-In fact, the whole backend that downloads the data needed a rewrite. `get_dependencies()` tried to provide a unified API for retrieving dependencies from different sources and `get_descriptions()` did the same for DESCRIPTION... but they ended messy and counterintuitive. The user could only get data from CRAN, CRAN and Bioconductor, or from the local library that was first in `.localPaths()`. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.
+In fact, the whole backend that downloads the data needed a rewrite. `get_dependencies()` tried to provide a unified API for retrieving dependencies from different sources and `get_descriptions()` did the same for DESCRIPTION... but they ended up messy and counterintuitive. The user could only get data from CRAN, CRAN with Bioconductor, or from the local library that was first in `.localPaths()`. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.
 
 The other issue made us realize that the plotting feature is optional to some; that the key feature is collecting dependency data in a table, which only needs a small fraction of dependencies ([httr](https://github.com/r-lib/httr) and [jsonlite](https://github.com/jeroen/jsonlite)). We moved a lot of previous Imports to Suggests ([ggplot2](https://github.com/tidyverse/ggplot2), [ggraph](https://github.com/thomasp85/ggraph), [graphlayouts](https://github.com/schochastics/graphlayouts), [igraph](https://github.com/igraph/rigraph), and [scales](https://github.com/r-lib/scales)), lightening deepdep significantly... but that's a topic for another post.
 
-It was time to ask ourselves: "what does «deepdep» mean to us?". The answer was: "it's a package that helps with analyzing and vizualizing hierarchy of package dependencies". No more, no less. The functions that extracted dependencies of a package or a DESCRIPTION file were just tools to accomplish that goal. They were exported because "we couldn't let a good function go to waste", not because they presented a functionality we wanted to provide. If a user would want to use one of these, they'd have to install the whole deepdep; it would be like installing ggplot2 for `cut_interval()` and `cut_width()` instead of plotting.
+It was time to ask ourselves: "what does «deepdep» mean to us?". The answer was: "it's a package that helps with analyzing and visualizing hierarchy of package dependencies". No more, no less. The functions that extracted dependencies of a package or a DESCRIPTION file were just tools to accomplish that goal. They were exported because "we couldn't let a good function go to waste", not because they presented a functionality we wanted to provide. If a user would want to use one of these, they'd have to install the whole deepdep; it would be like installing ggplot2 for `cut_interval()` and `cut_width()` instead of plotting.
 
 The time has come for a separation.
 
@@ -83,7 +83,7 @@ woodendesc::wood_packages(
   head()
 ```
 
-Now, you can see why'd we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they'd overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing, because the alternative is to include this code within deepdep itself -- so it'd have to be tested and maintained anyways.
+Now, you can see why'd we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they'd overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing because the alternative is to include this code within deepdep itself -- so it'd have to be tested and maintained anyways.
 
 But sometimes modularizing is a bit extra.
 
@@ -95,15 +95,15 @@ If you have a function if your package that doesn't fit the general idea, don't 
 
 And don't be proactive here. If your answer is: "not right now, but perhaps in the future...", just wait for the future. Keep the function in the package until the time comes and simply remove or deprecate it then (depending on how popular it gets).
 
-There's one such functionality in deepdep: `get_downloads()` and `plot_downloads()`. Analyzing download statistics is not exactly the goal of deepdep, but there's no point in making it into a separate package; these two don't introduce any new dependencies nor do they crowd the namespace. And no-one expressed any interest in having it separate from deepdep yet.
+There's one such functionality in deepdep: `get_downloads()` and `plot_downloads()`. Analyzing download statistics is not exactly the goal of deepdep, but there's no point in making it into a separate package; these two don't introduce any new dependencies nor do they crowd the namespace. And no one expressed any interest in having it separate from deepdep yet.
 
 Besides, nobody [creates a package around a single function](https://github.com/eddelbuettel/digest).
 
 ## Modularization of tidysq
 
-You might have noticed that woodendesc consists of functions that served as a backbone of deepdep, while querying and plotting download statistics is more of an extension. There's one package we've created that was planned to be extended since the beginning: [tidysq](https://github.com/BioGenies/tidysq).
+You might have noticed that woodendesc consists of functions that served as a backbone of deepdep while querying and plotting download statistics are more of an extension. There's one package we've created that was planned to be extended since the beginning: [tidysq](https://github.com/BioGenies/tidysq).
 
-It's a package that compresses biological sequences (e.g. DNA/RNA) through coding each letter with less bits (3 in DNA/RNA case). We've included a few basic operations like reversing, subsetting, translating to amino acids, and reading a FASTA file -- the most common file format for biological sequences. We've intentionally omitted many more advanced functions, though.
+It's a package that compresses biological sequences (e.g. DNA/RNA) by coding each letter with fewer bits (3 in DNA/RNA case). We've included a few basic operations like reversing, subsetting, translating to amino acids, and reading a FASTA file -- the most common file format for biological sequences. We've intentionally omitted many more advanced functions, though.
 
 Why? Because there are countless functions and algorithms we could implement and that'd make tidysq huge. Instead, we'd gone the route of modularization. The idea is to have tidysq with the base functionality and several packages depending on tidysq, oriented towards certain aspects of working with biological sequences.
 
@@ -118,8 +118,8 @@ If you want to see a real-life example of a package ecosystem, see [mlr3 and mlr
 In short, there are two cases where modularization should be considered:
 
 1. **the backend to the main functionality grows and overshadows the rest of the package** -- create a set of logically related backend functions, move them into a new package, and add that package to Imports of the old one;
-1. **there's an optional functionality that requires additional imports or significantly increases the weight of the package** -- collect several such functionalities so that they are somewhat related, move them into a new package, and add old package to the Imports/Depends field of the new one.
+1. **there's an optional functionality that requires additional imports or significantly increases the weight of the package** -- collect several such functionalities so that they are somewhat related, move them into a new package, and add the old package to the Imports/Depends field of the new one.
 
-Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are to few functionalities for a new package. Sometimes copying a function or two isn't a sin.
+Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are too few functionalities for a new package. Sometimes copying a function or two isn't a sin.
 
-Do you want to borrow [a code that shows an install prompt for missing package](https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R)?
+Do you want to borrow [a code that shows an install prompt for a missing package](https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R)?
