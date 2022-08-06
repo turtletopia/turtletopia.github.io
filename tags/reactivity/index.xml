@@ -6,25 +6,28 @@
     <description>Recent content in reactivity on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/reactivity/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/reactivity/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
-      <title>Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1</title>
+      <title>Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid>
-      <description>
+      <guid>/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid><description>
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -84,7 +87,7 @@ server &amp;lt;- function(input, output, session) {
 
 shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;peek_1.gif&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/peek_1.gif&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Simple version of the app.&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it – in UI and server. UI first, since it seems more manageable. We are R users, so we should make &lt;em&gt;real&lt;/em&gt; loops only when there are no other means. Thus we are using good old &lt;code&gt;lapply&lt;/code&gt;, as it is even simpler than trying to use &lt;em&gt;for&lt;/em&gt;.&lt;/p&gt;
@@ -128,12 +131,12 @@ shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The most crucial point is: when the &lt;code&gt;server&lt;/code&gt; function is executed, and R stumbles upon the &lt;code&gt;observer&lt;/code&gt; call, it &lt;strong&gt;does not&lt;/strong&gt; evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in &lt;code&gt;reactive&lt;/code&gt;’s, &lt;code&gt;render&lt;/code&gt;’s, etc., but we skip them in the other part as they do not appear in our example.&lt;/p&gt;
 &lt;p&gt;Now goes the neat part: during the application runtime, code provided to &lt;code&gt;observer&lt;/code&gt; is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the &lt;code&gt;i&lt;/code&gt; variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it &lt;strong&gt;does not&lt;/strong&gt; work.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_exp.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/observer_exp.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Expected situation&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;Stating it once again: every time the observer is called, &lt;code&gt;i&lt;/code&gt; is being sought in the current or enclosing environments. But that introduces the question: shouldn’t that mean that &lt;code&gt;i&lt;/code&gt; is missing and calling &lt;code&gt;i&lt;/code&gt; raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate &lt;strong&gt;is not destroyed&lt;/strong&gt; after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, &lt;code&gt;i&lt;/code&gt; exists in the server environment and has the value &lt;code&gt;3&lt;/code&gt;. See the diagram below.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_actual.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/observer_actual.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Actual situation&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;As a side note, I want to add that there is also the topic of visibility of Shiny objects between users’ sessions. It is covered by &lt;a href=&#34;https://shiny.rstudio.com/articles/scoping.html&#34;&gt;an article on the official Shiny webpage&lt;/a&gt;. I strongly recommend reading it.&lt;/p&gt;
@@ -156,7 +159,7 @@ shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the &lt;code&gt;i&lt;/code&gt; to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own &lt;code&gt;i&lt;/code&gt; object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers’ quoted code; they are kept together with code. The concept is illustrated in the diagram below.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_envs.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/observer_envs.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Solution with the creation of environments&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;We can also do the same with a small change. &lt;code&gt;new.env()&lt;/code&gt; call can be replaced with &lt;code&gt;rlang::env()&lt;/code&gt;. &lt;em&gt;rlang&lt;/em&gt; is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is &lt;a href=&#34;https://rlang.r-lib.org/&#34;&gt;the project webpage&lt;/a&gt;.&lt;/p&gt;

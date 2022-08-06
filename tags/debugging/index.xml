@@ -6,14 +6,18 @@
     <description>Recent content in debugging on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/debugging/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
-      <title>Ice Cream for R Programmers</title>
+      <title>Ice Cream for R Programmers</title><enclosure url="/2022/07/28/ice-cream-for-r-programmers/icecream.png" type="image/jpg"></enclosure>
+      
       <link>/2022/07/28/ice-cream-for-r-programmers/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/07/28/ice-cream-for-r-programmers/</guid>
-      <description>
+      <guid>/2022/07/28/ice-cream-for-r-programmers/</guid><description>
 
 
 &lt;div id=&#34;what-and-why-ice-cream-is.&#34; class=&#34;section level1&#34;&gt;

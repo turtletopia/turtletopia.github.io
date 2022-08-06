@@ -6,22 +6,25 @@
     <description>Recent content in Turtletools on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/categories/turtletools/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/turtletools/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
-      <title>Case Study: Modularizing a Package</title>
+      <title>Case Study: Modularizing a Package</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/2022/08/04/case-study-modularizing-a-package/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/08/04/case-study-modularizing-a-package/</guid>
-      <description>
+      <guid>/2022/08/04/case-study-modularizing-a-package/</guid><description>
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#origins-of-deepdep&#34; id=&#34;toc-origins-of-deepdep&#34;&gt;Origins of deepdep&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#separation-of-woodendesc&#34; id=&#34;toc-separation-of-woodendesc&#34;&gt;Separation of woodendesc&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#a-new-package-is-not-always-the-answer&#34; id=&#34;toc-a-new-package-is-not-always-the-answer&#34;&gt;A new package is not always the answer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#modularization-of-tidysq&#34; id=&#34;toc-modularization-of-tidysq&#34;&gt;Modularization of tidysq&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34; id=&#34;toc-summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/08/04/case-study-modularizing-a-package/#origins-of-deepdep&#34; id=&#34;toc-origins-of-deepdep&#34;&gt;Origins of deepdep&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/08/04/case-study-modularizing-a-package/#separation-of-woodendesc&#34; id=&#34;toc-separation-of-woodendesc&#34;&gt;Separation of woodendesc&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/08/04/case-study-modularizing-a-package/#a-new-package-is-not-always-the-answer&#34; id=&#34;toc-a-new-package-is-not-always-the-answer&#34;&gt;A new package is not always the answer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/08/04/case-study-modularizing-a-package/#modularization-of-tidysq&#34; id=&#34;toc-modularization-of-tidysq&#34;&gt;Modularization of tidysq&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;/2022/08/04/case-study-modularizing-a-package/#summary&#34; id=&#34;toc-summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -107,12 +110,12 @@ woodendesc::wood_core_packages()&lt;/code&gt;&lt;/pre&gt;
     </item>
     
     <item>
-      <title>Ice Cream for R Programmers</title>
+      <title>Ice Cream for R Programmers</title><enclosure url="/2022/07/28/ice-cream-for-r-programmers/icecream.png" type="image/jpg"></enclosure>
+      
       <link>/2022/07/28/ice-cream-for-r-programmers/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/07/28/ice-cream-for-r-programmers/</guid>
-      <description>
+      <guid>/2022/07/28/ice-cream-for-r-programmers/</guid><description>
 
 
 &lt;div id=&#34;what-and-why-ice-cream-is.&#34; class=&#34;section level1&#34;&gt;

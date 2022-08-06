@@ -6,50 +6,49 @@
     <description>Recent content in Categories on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
-      <title>Essay</title>
+      <title>Essay</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/essay/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/categories/essay/</guid>
-      <description></description>
+      <guid>/categories/essay/</guid><description></description>
     </item>
     
     <item>
-      <title>Turtletools</title>
+      <title>Turtletools</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/turtletools/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/categories/turtletools/</guid>
-      <description></description>
+      <guid>/categories/turtletools/</guid><description></description>
     </item>
     
     <item>
-      <title>Overview</title>
+      <title>Overview</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/overview/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/categories/overview/</guid>
-      <description></description>
+      <guid>/categories/overview/</guid><description></description>
     </item>
     
     <item>
-      <title>Tutorial</title>
+      <title>Tutorial</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/tutorial/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/categories/tutorial/</guid>
-      <description></description>
+      <guid>/categories/tutorial/</guid><description></description>
     </item>
     
     <item>
-      <title>Organisational</title>
+      <title>Organisational</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/organisational/</link>
       <pubDate>Fri, 01 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/categories/organisational/</guid>
-      <description></description>
+      <guid>/categories/organisational/</guid><description></description>
     </item>
     
   </channel>

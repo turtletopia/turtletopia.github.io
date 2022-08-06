@@ -6,194 +6,177 @@
     <description>Recent content in Tags on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
     <item>
-      <title>deepdep</title>
+      <title>deepdep</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/deepdep/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/deepdep/</guid>
-      <description></description>
+      <guid>/tags/deepdep/</guid><description></description>
     </item>
     
     <item>
-      <title>dependencies</title>
+      <title>dependencies</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/dependencies/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/dependencies/</guid>
-      <description></description>
+      <guid>/tags/dependencies/</guid><description></description>
     </item>
     
     <item>
-      <title>dependency optimizing</title>
+      <title>dependency optimizing</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/dependency-optimizing/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/dependency-optimizing/</guid>
-      <description></description>
+      <guid>/tags/dependency-optimizing/</guid><description></description>
     </item>
     
     <item>
-      <title>modularization</title>
+      <title>modularization</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/modularization/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/modularization/</guid>
-      <description></description>
+      <guid>/tags/modularization/</guid><description></description>
     </item>
     
     <item>
-      <title>r</title>
+      <title>r</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/r/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/r/</guid>
-      <description></description>
+      <guid>/tags/r/</guid><description></description>
     </item>
     
     <item>
-      <title>tidysq</title>
+      <title>tidysq</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/tidysq/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/tidysq/</guid>
-      <description></description>
+      <guid>/tags/tidysq/</guid><description></description>
     </item>
     
     <item>
-      <title>woodendesc</title>
+      <title>woodendesc</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/woodendesc/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/woodendesc/</guid>
-      <description></description>
+      <guid>/tags/woodendesc/</guid><description></description>
     </item>
     
     <item>
-      <title>code style</title>
+      <title>code style</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/code-style/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/code-style/</guid>
-      <description></description>
+      <guid>/tags/code-style/</guid><description></description>
     </item>
     
     <item>
-      <title>debugging</title>
+      <title>debugging</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/debugging/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/debugging/</guid>
-      <description></description>
+      <guid>/tags/debugging/</guid><description></description>
     </item>
     
     <item>
-      <title>packages</title>
+      <title>packages</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/packages/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/packages/</guid>
-      <description></description>
+      <guid>/tags/packages/</guid><description></description>
     </item>
     
     <item>
-      <title>turtletools</title>
+      <title>turtletools</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/turtletools/</link>
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/turtletools/</guid>
-      <description></description>
+      <guid>/tags/turtletools/</guid><description></description>
     </item>
     
     <item>
-      <title>natural sort</title>
+      <title>natural sort</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/natural-sort/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/natural-sort/</guid>
-      <description></description>
+      <guid>/tags/natural-sort/</guid><description></description>
     </item>
     
     <item>
-      <title>overview</title>
+      <title>overview</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/overview/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/overview/</guid>
-      <description></description>
+      <guid>/tags/overview/</guid><description></description>
     </item>
     
     <item>
-      <title>sorting</title>
+      <title>sorting</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/sorting/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/sorting/</guid>
-      <description></description>
+      <guid>/tags/sorting/</guid><description></description>
     </item>
     
     <item>
-      <title>version codes</title>
+      <title>version codes</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/version-codes/</link>
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/version-codes/</guid>
-      <description></description>
+      <guid>/tags/version-codes/</guid><description></description>
     </item>
     
     <item>
-      <title>environments</title>
+      <title>environments</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/environments/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/environments/</guid>
-      <description></description>
+      <guid>/tags/environments/</guid><description></description>
     </item>
     
     <item>
-      <title>reactivity</title>
+      <title>reactivity</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/reactivity/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/reactivity/</guid>
-      <description></description>
+      <guid>/tags/reactivity/</guid><description></description>
     </item>
     
     <item>
-      <title>rlang</title>
+      <title>rlang</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/rlang/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/rlang/</guid>
-      <description></description>
+      <guid>/tags/rlang/</guid><description></description>
     </item>
     
     <item>
-      <title>shiny</title>
+      <title>shiny</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/shiny/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/shiny/</guid>
-      <description></description>
+      <guid>/tags/shiny/</guid><description></description>
     </item>
     
     <item>
-      <title>tutorial</title>
+      <title>tutorial</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/tutorial/</link>
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/tutorial/</guid>
-      <description></description>
+      <guid>/tags/tutorial/</guid><description></description>
     </item>
     
     <item>
-      <title>organisational</title>
+      <title>organisational</title><enclosure url="/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/organisational/</link>
       <pubDate>Fri, 01 Jul 2022 00:00:00 +0000</pubDate>
       
-      <guid>/tags/organisational/</guid>
-      <description></description>
+      <guid>/tags/organisational/</guid><description></description>
     </item>
     
   </channel>
