@@ -12,6 +12,7 @@ ignoreFiles:
   - \.utf8\.md$
 permalinks:
   post: /:year/:month/:day/:slug/
+realativeURLs: true
 menu:
   main:
     - name: About
@@ -46,6 +47,7 @@ params:
     Default: "#EEEEEEB0"
   images:
     - images/logo.png
+  realativeURLs: true
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
