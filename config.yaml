@@ -12,7 +12,7 @@ ignoreFiles:
   - \.utf8\.md$
 permalinks:
   post: /:year/:month/:day/:slug/
-realativeURLs: true
+relativeURLs: true
 menu:
   main:
     - name: About
@@ -47,12 +47,12 @@ params:
     Default: "#EEEEEEB0"
   images:
     - images/logo.png
-  realativeURLs: true
+  relativeURLs: true
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
     renderer:
-      unsafe: yes
+      unsafe: true
 privacy:
   googleAnalytics:
     anonymizeIP: false
