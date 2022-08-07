@@ -48,6 +48,7 @@ params:
   images:
     - images/logo.png
   relativeURLs: true
+  address: https://turtletopia.github.io
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:
