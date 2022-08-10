@@ -17,33 +17,33 @@ tags: ["essay", "operator", "function", "magrittr", "rlang", "tidysq", "language
 >
 > By two percent signs I found me prisoner; (...)
 >
-> ~ Francesco Petrarch, Sonnet 61. Translated by by Joseph Auslander. Possibly with some spicing it up by me 
+> ~ Francesco Petrarch, Sonnet 61. Translated by  Joseph Auslander. Possibly with some spicing it up by me 
 
 # Subject and addressee of the poem
 
-Custom infix functions are one of my favorite features in R. This article is my love letter to them. But first, quick recap. 
+Custom infix functions are one of my favorite features in R. This article is my love letter to them. But first, a quick recap. 
 
-For those that are unfamiliar with the terminology, *infix function* is a function `fun` which is called using `infix notation`, e.g. `x fun y` instead of `fun(x, y)`. They are also called *infix operators* by base R and I am going to use those terms interchangeably, as well as term *infixes*. There is a lot of infix operators in base R used very frequently, i.e. arithmetic or logical operators. We use them so often that we usually forget that they are functions. And that we can **call them just like regular functions**.
+For those unfamiliar with the terminology, *infix function* is a function `fun` which is called using `infix notation`, e.g., `x fun y` instead of `fun(x, y)`. Those functions are also called *infix operators* by base R, and I will use those terms and name *infixes* interchangeably. There are a lot of infix operators in base R used very frequently, i.e., arithmetic or logical operators. We use them so often that we usually forget that they are functions. And that we can **call them just like regular functions**.
 
 ```{r}
 23 + 19
 `+`(23, 19)
 ```
 
-As you may have noticed, when calling such function in a non-infix-manner, we need to use backticks around the operator itself to avoid calling it in a regular manner.
+As you may have noticed, when calling such a function in a non-infix-manner, we need to use backticks around the operator to avoid calling it regularly.
 
-To prove that they share a lot of common behavior with functions, I am going to demonstrate you how to **redefine them just like regular functions**. We can, for example, make `+` operator work like a multiplication.
+To prove that they share a lot of typical behavior with functions, I am going to demonstrate to you how to **redefine them just like regular functions**. We can, for example, make the `+` operator work like a multiplication.
 
 ```{r}
 `+` <- function(lhs, rhs) lhs * rhs
 23 + 19
 ```
 
-Let it ring out loud: **you should not do that at all**. Overriding default behavior of functions may be really dangerous, as it interferes with other chunks of code that were using the operator. I showed this trick only for demonstration purposes.
+Let it ring out loud: **you should not do that at all**. Overriding the default behavior of functions may be dangerous, as it interferes with other chunks of code using the operator. I showed this trick only for demonstration purposes.
 
-(Side note: you might be aware that some packages actually change the default behavior of operators, e.g. `ggplot2` has its own `+` for joining plot elements. However, this is slightly different situation. They do not create whole new function, but only add a *method* for *generic function*. They not *override* the behavior, but more like *overload* it.)
+(Side note: you might be aware that some packages change the default behavior of operators, e.g., `ggplot2` has its own `+` for joining plot elements. However, this is a slightly different situation. They do not create a whole new function but only add a *method* for *generic function*. They do not *override* the behavior, but more like *overload* it.)
 
-Additional remark to make: in this assignment call backticks are also necessary. Alternative is using quotes, but it is inadvisable and its presence in the language is completely due to the legacy reasons. You can read more about it in [Hadley's book](https://adv-r.hadley.nz/names-values.html#non-syntactic). In [another chapter](https://adv-r.hadley.nz/functions.html?q=infix#infix-functions) you can also find more about infix functions.
+Additional remark to make: in this assignment call, backticks are also necessary. An alternative is using quotes, but it is inadvisable, and its presence in the language is entirely due to legacy reasons. You can read more about it in [Hadley's book](https://adv-r.hadley.nz/names-values.html#non-syntactic). In [another chapter](https://adv-r.hadley.nz/functions.html?q=infix#infix-functions), you can find more about infix functions.
 
 ```{r include=FALSE}
 rm("+")
@@ -51,13 +51,13 @@ rm("+")
 
 Once again: **do not override built-in infix functions**. BUT. **Create custom infix functions!**
 
-R allows for creating your own operators using double **percent signs**. There are actually a few shipped with the base R packages, including inclusion operator `%in%` (pun intended) or matrix multiplication operator `%*%`. But more can be created. And we will explore it in next section.
+R allows for creating your operators using double **percent signs**. A few shipped with the base R packages, including inclusion operator `%in%` (pun intended) or matrix multiplication operator `%*%`. But You can create more. And we will explore it in the next section.
 
 # Enumeration is an important stylistic device
 
 ## Piping operators
 
-The most widely know example is piping operator: `%>%`. I assume that you are familiar with it. If not, [you better get to know dplyr package](https://dplyr.tidyverse.org/). Pipe itself comes from [magrittr](https://magrittr.tidyverse.org/) package, but dplyr show its real strength and greatest advantage of using custom operators: **custom infixes make code more readable**. When we apply operations one by one it makes more sense to write those operations in order of application, not in the inverse order, as we do without infix operators. The shape of the operator itself is also important, as it suggest the direction of the data flow. For me it is more natural to read and understand
+The most widely known example is the piping operator: `%>%`. I assume that you are familiar with it. If not, [you better get to know the dplyr package](https://dplyr.tidyverse.org/). The pipe comes from [magrittr](https://magrittr.tidyverse.org/) package, but dplyr shows its natural strength and the most significant advantage of using custom operators: **custom infixes make code more readable**. When we apply operations one by one, it makes more sense to write those operations in order of application, not inverse order, as we do without infix operators. The operator's shape is also essential, as it suggests the direction of the data flow. For me, it is more natural to read and understand
 
 ```r
 x %>% 
@@ -73,11 +73,11 @@ rather than
 fun_3(fun_2(fun_1(x)))
 ```
 
-In fact, it became so popular that R 4.1.0 included its own pipe, `|>`. However, I am not going to dwell more on that, because lots have already been said on pipes by others. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out, if you don't know them!
+It became so popular that R 4.1.0 included its pipe, `|>`. However, I will not dwell more on that because others have already said a lot about pipes. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out if you don't know them!
 
 ## NULL-default operator
 
-Another great and simple function is `%||%`. It is exported by *rlang* package (it's the turtleblog after all", so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is really simple and quite clearly explains what the function is intended to do.
+Another tremendous and straightforward function is `%||%`. It is exported by the *rlang* package (it's the turtleblog after all", so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is straightforward and clearly explains what the function is intended to do.
 
 ```{r}
 `%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
@@ -86,11 +86,11 @@ Another great and simple function is `%||%`. It is exported by *rlang* package (
 NULL %||% 10
 ```
 
-This one comes really handy when you have optional `NULL`s returned by function or possibly `NULL` parameters of function or named arguments of function. In the code it looks way clearer than expansion of the function definition itself. I usually do not export such a helper function to the end user. But it is worth repeating that **readability of your code for yourself should be as important as readability for others**. If such infixes help you, then you should definitely use them.
+This one comes in handy when you have optional `NULL`s returned by a function or possibly `NULL` parameters of the function or named function arguments. In the code, it looks way more straightforward than the expansion of the function definition itself. I usually do not export such a helper function to the end user. But it is worth repeating that **readability of your code for yourself should be as important as readability for others**. If such infixes help you, then you should use them.
 
 ## NULL-propagating operator
 
-Let's stay with `NULL`-related functions for a little longer. Now it is time for my own creation. When I build packages or shiny apps it happens quite often that I need to apply some function to some object, but if it is `NULL` I simply need to return `NULL`. For those situations I created `%?>%` operator:
+Let's stay with `NULL`-related functions for a little longer. Now it is time for my creation. When I build packages or shiny apps, it happens quite often that I need to apply some function to some object, but if it is `NULL`, I need to return `NULL`. For those situations, I created the `%?>%` operator:
 
 ```{r}
 `%?>%` <- function(lhs, rhs) if (is.null(lhs)) NULL else rhs(lhs)
@@ -99,11 +99,11 @@ Let's stay with `NULL`-related functions for a little longer. Now it is time for
 NULL %?>% exp
 ```
 
-This is actually some modification of a regular pipe, but serves a specific purpose. It simplified my code significantly and I love it for its **conciseness**.
+This one is some modification of a standard pipe but serves a specific purpose. It simplified my code significantly, and I love it for its **conciseness**.
 
 ## Motif inclusion operator
 
-Now, example from one of our packages, *tidysq*. This is a package for tidy processing of biological sequences. Here we implemented `%has%` operator that checks for presence of specific motif in sequences.
+Now, an example from one of our packages, *tidysq*. It is a package for the tidy processing of biological sequences. Here we implemented the `%has%` operator that checks for the presence of specific motifs in sequences.
 
 ```{r message=FALSE}
 library(tidysq)
@@ -112,7 +112,7 @@ sq(c("AAAA", "AGCA", "CGCG", "TTCG")) %has% "GC"
 
 ```
 
-Me and Laura found it very in line with tidyverse philosophy of code being readable and understandable by others. This can be especially seen in `dplyr` processing pipes.
+Laura and I found it very in line with the tidyverse philosophy of code being readable and understandable by others. It can be especially seen in `dplyr` processing pipes.
 
 ```{r message=FALSE}
 library(dplyr)
@@ -128,7 +128,7 @@ tibble(
 
 ## Ternary if operator
 
-Finally, one fancy trick! Have you programmed in any language that contains ternary if operator? E.g. in C++ it looks like this:
+Finally, one fancy trick! Have you programmed in any language that contains ternary if operator? E.g., in C++, it looks like this:
 
 ```c++
 (1 > 0) ? 'A' : 'B'
@@ -136,9 +136,9 @@ Finally, one fancy trick! Have you programmed in any language that contains tern
 // would return 'A'
 ```
 
-If expression on lhs of `?` is TRUE, value between `?` and `:` is returned. Otherwise, value after `:` is returned. Why using it over regular if-else? It is an *expression*, while regular `if` in C and C++ is not an expression. Thus, result of this expression can be assigned to any variable.
+If the expression on LHS of `?` is TRUE, a value between `?` and `:` is returned. Otherwise, the value after `:` is returned. Why use it over regular if-else? It is an *expression*, while standard `if` in C and C++ is not an expression. Thus, the user can assign the result of this expression to any variable.
 
-Do you miss it in R? Probably not. In R `if` is an expression, so we have:
+Do you miss it in R? Probably not. In R, `if` is an expression, so we have:
 
 ```{r}
 if (1 > 0) "A" else "B"
@@ -150,26 +150,26 @@ But what if we *really* wanted to have something in R more like in C++? Here you
 `%?%` <- function(lhs, rhs) {
   values <- rlang::enexpr(rhs)
   if (values[[1]] != as.symbol(":"))
-    stop("RHS for `%?%` operator has to be in form of '*:*' where '*' are any expressions")
+    stop("RHS for `%?%` operator has to be in the form of '*:*' where '*' are any expressions")
   if (lhs) rlang::eval_bare(values[[2]]) else rlang::eval_bare(values[[3]])
 }
 
 (1 > 0) %?% "A" : "B"
 ```
 
-It did it only because *I can*. 
+I did it only because *I can*. 
 
-As you can see, I also abused the `:` operator. Not overrode, *abused*. Inside the function rhs argument is in form `expr:expr`. Normally that would result in range. But here I used the **non-standard evaluation**, using `rlang::enexpr()` and `ralng::eval_bare()` to actually stop R from doing what it usually does. I will probably go into detail about it some other time, right now enjoy the fanciness.
+As you can see, I also abused the `:` operator; not overrode: *abused*. Inside the function, the RHS argument is in the form `expr:expr`. Normally that would result in range. But here I used the **non-standard evaluation**, using `rlang::enexpr()` and `ralng::eval_bare()` to actually stop R from doing what it usually does. I will probably go into detail about it some other time; right now, enjoy the fanciness.
 
 ## Remark about precedence
 
-One thing to remember: **operators have specific precedence**. Those that have been programming for longer know that well from autopsy, those that have just started programming *will* get to know that. Custom infix functions obey those rules as well and you sometimes may get surprised. You can check that operators provided by me may sometimes be misleading and require parentheses to work properly. It is worth to check out [R operator precedence manual page](https://rdrr.io/r/base/Syntax.html) when in doubt.
+One thing to remember: **operators have specific precedence**. Those that have been programming for longer know that well from an autopsy. Those that have just started programming *will* get to know that. Custom infix functions obey those rules as well, and you sometimes may get surprised. You can check that the operators I provided may sometimes be misleading and require parentheses to work correctly. It is worth checking out [R operator precedence manual page](https://rdrr.io/r/base/Syntax.html) when in doubt.
 
 # The strange sibling of my love
 
-As a side note I wanted to mention one operator I was not aware of before writing the article. Or: I was not fully aware what lies underneath it.
+As a side note, I wanted to mention one operator I was unaware of before writing the article. Or: I was not fully aware of what lies underneath it.
 
-Have you came across `:=` operator in R? Simply `:=`, with no `%` around it. If you are using data.table or some rlang magic then probably you have seen it. So have I. However, I took it for granted that the reason for its operator existence is due to non-standard evaluation, since it is always used within some specific context (similarly to my previously shown `%?%` operator). I was astonished to find out that I can actually define this
+Have you come across `:=` operator in R? `:=`, with no `%` around it? You probably have seen if you are using *data.table* or some rlang magic. So have I. However, I took it for granted that its operator existence is due to non-standard evaluation since it is always used within some specific context (similarly to my previously shown `%?%` operator). I was astonished to find out that I can define this.
 
 You can write something like this.
 
@@ -180,9 +180,9 @@ You can write something like this.
 
 And *it works*. 
 
-I told you earlier that overriding built-in operators is a *big no-no*. What is the difference with this one. Well, **there is no such operator in base R!** It turns out that `:=` is reserved due to legacy reasons and parser still treats it as a single operator. (You can try creating similar functions for other strings -- you won't make R treat them as infix operators without percent signs, they need to be reserved.) Yet `:=` has no definition in base. You can read more on [the SO thread about this operator](https://stackoverflow.com/questions/32817780/what-is-the-r-assignment-operator-for).
+I told you earlier that overriding built-in operators is a *big no-no*. What is the difference with this one? Well, **there is no such operator in base R!** It turns out that `:=` is reserved for legacy reasons, and the parser still treats it as a single operator. (You can try creating similar functions for other strings -- you won't make R treat them as infix operators without percent signs, they need to be reserved.) Yet `:=` has no definition in base. You can read more on [the SO thread about this operator](https://stackoverflow.com/questions/32817780/what-is-the-r-assignment-operator-for).
 
-If you want to be fancy, you can assign classic assignment operator to this one and make others wonder how.
+If you want to be fancy, you can assign a classic assignment operator to this one and make others wonder how.
 
 ```{r}
 `:=` <- `<-`
@@ -193,4 +193,4 @@ a := 3
 
 # Send the letter!
 
-The ability to create your own inter-argument operators is a very elegant addition to the language. They can make the code much more readable, and in some cases definitely shorter. I strongly encourage you to take advantage of the language's possibilities and play around with it. Since it's your working tool, let's make using it as enjoyable as possible!
+The ability to create your custom inter-argument operators is an exquisite addition to the language. They can make the code much more readable and, usually, shorter. I strongly encourage you to take advantage of the language's possibilities and play around with it. Since it's your working tool, let's make using it as enjoyable as possible!
