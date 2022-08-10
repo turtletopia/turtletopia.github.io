@@ -41,6 +41,8 @@ To prove that they share a lot of common behavior with functions, I am going to 
 
 Let it ring out loud: **you should not do that at all**. Overriding default behavior of functions may be really dangerous, as it interferes with other chunks of code that were using the operator. I showed this trick only for demonstration purposes.
 
+(Side note: you might be aware that some packages actually change the default behavior of operators, e.g. `ggplot2` has its own `+` for joining plot elements. However, this is slightly different situation. They do not create whole new function, but only add a *method* for *generic function*. They not *override* the behavior, but more like *overload* it.)
+
 Additional remark to make: in this assignment call backticks are also necessary. Alternative is using quotes, but it is inadvisable and its presence in the language is completely due to the legacy reasons. You can read more about it in [Hadley's book](https://adv-r.hadley.nz/names-values.html#non-syntactic). In [another chapter](https://adv-r.hadley.nz/functions.html?q=infix#infix-functions) you can also find more about infix functions.
 
 ```{r include=FALSE}
@@ -49,7 +51,7 @@ rm("+")
 
 Once again: **do not override built-in infix functions**. BUT. **Create custom infix functions!**
 
-R allows for creating your own operators using double **percent signs**. There are actually a few shipped with the base R packages, including inclusion operator `%in%` (pun intended) or matrix multiplication operator `%x%`. But more can be created. And we will explore it in next section.
+R allows for creating your own operators using double **percent signs**. There are actually a few shipped with the base R packages, including inclusion operator `%in%` (pun intended) or matrix multiplication operator `%*%`. But more can be created. And we will explore it in next section.
 
 # Enumeration is an important stylistic device
 
@@ -71,11 +73,11 @@ rather than
 fun_3(fun_2(fun_1(x)))
 ```
 
-I am not going to dwell more on that, because lots have already been said on pipes by others. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out, if you don't know them!
+In fact, it became so popular that R 4.1.0 included its own pipe, `|>`. However, I am not going to dwell more on that, because lots have already been said on pipes by others. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out, if you don't know them!
 
 ## NULL-default operator
 
-Another great and simple function is `%||%`. It is exported by *rlang* package (we are on our blog, so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is really simple and quite clearly explains what the function is intended to do.
+Another great and simple function is `%||%`. It is exported by *rlang* package (it's the turtleblog after all", so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is really simple and quite clearly explains what the function is intended to do.
 
 ```{r}
 `%||%` <- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
@@ -123,8 +125,6 @@ tibble(
   filter(sequence %has% "LL")
 
 ```
-
-%has%
 
 ## Ternary if operator
 

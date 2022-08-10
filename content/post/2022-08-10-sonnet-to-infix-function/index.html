@@ -37,9 +37,10 @@ tags: ["essay", "operator", "function", "magrittr", "rlang", "tidysq", "language
 23 + 19</code></pre>
 <pre><code>## [1] 437</code></pre>
 <p>Let it ring out loud: <strong>you should not do that at all</strong>. Overriding default behavior of functions may be really dangerous, as it interferes with other chunks of code that were using the operator. I showed this trick only for demonstration purposes.</p>
+<p>(Side note: you might be aware that some packages actually change the default behavior of operators, e.g. <code>ggplot2</code> has its own <code>+</code> for joining plot elements. However, this is slightly different situation. They do not create whole new function, but only add a <em>method</em> for <em>generic function</em>. They not <em>override</em> the behavior, but more like <em>overload</em> it.)</p>
 <p>Additional remark to make: in this assignment call backticks are also necessary. Alternative is using quotes, but it is inadvisable and its presence in the language is completely due to the legacy reasons. You can read more about it in <a href="https://adv-r.hadley.nz/names-values.html#non-syntactic">Hadley’s book</a>. In <a href="https://adv-r.hadley.nz/functions.html?q=infix#infix-functions">another chapter</a> you can also find more about infix functions.</p>
 <p>Once again: <strong>do not override built-in infix functions</strong>. BUT. <strong>Create custom infix functions!</strong></p>
-<p>R allows for creating your own operators using double <strong>percent signs</strong>. There are actually a few shipped with the base R packages, including inclusion operator <code>%in%</code> (pun intended) or matrix multiplication operator <code>%x%</code>. But more can be created. And we will explore it in next section.</p>
+<p>R allows for creating your own operators using double <strong>percent signs</strong>. There are actually a few shipped with the base R packages, including inclusion operator <code>%in%</code> (pun intended) or matrix multiplication operator <code>%*%</code>. But more can be created. And we will explore it in next section.</p>
 </div>
 <div id="enumeration-is-an-important-stylistic-device" class="section level1">
 <h1>Enumeration is an important stylistic device</h1>
@@ -53,11 +54,11 @@ tags: ["essay", "operator", "function", "magrittr", "rlang", "tidysq", "language
 </code></pre>
 <p>rather than</p>
 <pre class="r"><code>fun_3(fun_2(fun_1(x)))</code></pre>
-<p>I am not going to dwell more on that, because lots have already been said on pipes by others. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out, if you don’t know them!</p>
+<p>In fact, it became so popular that R 4.1.0 included its own pipe, <code>|&gt;</code>. However, I am not going to dwell more on that, because lots have already been said on pipes by others. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out, if you don’t know them!</p>
 </div>
 <div id="null-default-operator" class="section level2">
 <h2>NULL-default operator</h2>
-<p>Another great and simple function is <code>%||%</code>. It is exported by <em>rlang</em> package (we are on our blog, so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is really simple and quite clearly explains what the function is intended to do.</p>
+<p>Another great and simple function is <code>%||%</code>. It is exported by <em>rlang</em> package (it’s the turtleblog after all”, so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is really simple and quite clearly explains what the function is intended to do.</p>
 <pre class="r"><code>`%||%` &lt;- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
 
 34 %||% 8</code></pre>
@@ -98,7 +99,6 @@ tibble(
 ##   &lt;int&gt; &lt;ami_bsc&gt; 
 ## 1     2 KLLCVN &lt;6&gt;
 ## 2     4 LLLY   &lt;4&gt;</code></pre>
-<p>%has%</p>
 </div>
 <div id="ternary-if-operator" class="section level2">
 <h2>Ternary if operator</h2>
