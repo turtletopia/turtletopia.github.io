@@ -1,0 +1,149 @@
+---
+title: Sonnet to infix function
+author: Dominik Rafacz
+date: '2022-08-10'
+slug: sonnet-to-infix-function
+categories: ["Essay"]
+tags: ["essay", "operator", "function", "magrittr", "rlang", "tidysq", "language feature", "NSE"]
+---
+
+
+
+<div id="some-poetry-for-the-programmers" class="section level1">
+<h1>Some poetry for the programmers</h1>
+<blockquote>
+<p>Blest be the day, and blest be the month and year,</p>
+<p>Season and hour and very moment blest,</p>
+<p>The lovely IDE where first possessed</p>
+<dl>
+<dt>By two percent signs I found me prisoner; (…)</dt>
+<dd>
+<p>Francesco Petrarch, Sonnet 61. Translated by Joseph Auslander. Possibly with some spicing it up by me</p>
+</dd>
+</dl>
+</blockquote>
+</div>
+<div id="subject-and-addressee-of-the-poem" class="section level1">
+<h1>Subject and addressee of the poem</h1>
+<p>Custom infix functions are one of my favorite features in R. This article is my love letter to them. But first, a quick recap.</p>
+<p>For those unfamiliar with the terminology, <em>infix function</em> is a function <code>fun</code> which is called using <code>infix notation</code>, e.g., <code>x fun y</code> instead of <code>fun(x, y)</code>. Those functions are also called <em>infix operators</em> by base R, and I will use those terms and name <em>infixes</em> interchangeably. There are a lot of infix operators in base R used very frequently, i.e., arithmetic or logical operators. We use them so often that we usually forget that they are functions. And that we can <strong>call them just like regular functions</strong>.</p>
+<pre class="r"><code>23 + 19</code></pre>
+<pre><code>## [1] 42</code></pre>
+<pre class="r"><code>`+`(23, 19)</code></pre>
+<pre><code>## [1] 42</code></pre>
+<p>As you may have noticed, when calling such a function in a non-infix-manner, we need to use backticks around the operator to avoid calling it regularly.</p>
+<p>To prove that they share a lot of typical behavior with functions, I am going to demonstrate to you how to <strong>redefine them just like regular functions</strong>. We can, for example, make the <code>+</code> operator work like a multiplication.</p>
+<pre class="r"><code>`+` &lt;- function(lhs, rhs) lhs * rhs
+23 + 19</code></pre>
+<pre><code>## [1] 437</code></pre>
+<p>Let it ring out loud: <strong>you should not do that at all</strong>. Overriding the default behavior of functions may be dangerous, as it interferes with other chunks of code using the operator. I showed this trick only for demonstration purposes.</p>
+<p>(Side note: you might be aware that some packages change the default behavior of operators, e.g., <code>ggplot2</code> has its own <code>+</code> for joining plot elements. However, this is a slightly different situation. They do not create a whole new function but only add a <em>method</em> for <em>generic function</em>. They do not <em>override</em> the behavior, but more like <em>overload</em> it.)</p>
+<p>Additional remark to make: in this assignment call, backticks are also necessary. An alternative is using quotes, but it is inadvisable, and its presence in the language is entirely due to legacy reasons. You can read more about it in <a href="https://adv-r.hadley.nz/names-values.html#non-syntactic">Hadley’s book</a>. In <a href="https://adv-r.hadley.nz/functions.html?q=infix#infix-functions">another chapter</a>, you can find more about infix functions.</p>
+<p>Once again: <strong>do not override built-in infix functions</strong>. BUT. <strong>Create custom infix functions!</strong></p>
+<p>R allows for creating your operators using double <strong>percent signs</strong>. A few shipped with the base R packages, including inclusion operator <code>%in%</code> (pun intended) or matrix multiplication operator <code>%*%</code>. But You can create more. And we will explore it in the next section.</p>
+</div>
+<div id="enumeration-is-an-important-stylistic-device" class="section level1">
+<h1>Enumeration is an important stylistic device</h1>
+<div id="piping-operators" class="section level2">
+<h2>Piping operators</h2>
+<p>The most widely known example is the piping operator: <code>%&gt;%</code>. I assume that you are familiar with it. If not, <a href="https://dplyr.tidyverse.org/">you better get to know the dplyr package</a>. The pipe comes from <a href="https://magrittr.tidyverse.org/">magrittr</a> package, but dplyr shows its natural strength and the most significant advantage of using custom operators: <strong>custom infixes make code more readable</strong>. When we apply operations one by one, it makes more sense to write those operations in order of application, not inverse order, as we do without infix operators. The operator’s shape is also essential, as it suggests the direction of the data flow. For me, it is more natural to read and understand</p>
+<pre class="r"><code>x %&gt;% 
+  fun_1 %&gt;% 
+  fun_2 %&gt;% 
+  fun_3
+</code></pre>
+<p>rather than</p>
+<pre class="r"><code>fun_3(fun_2(fun_1(x)))</code></pre>
+<p>It became so popular that R 4.1.0 included its pipe, <code>|&gt;</code>. However, I will not dwell more on that because others have already said a lot about pipes. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out if you don’t know them!</p>
+</div>
+<div id="null-default-operator" class="section level2">
+<h2>NULL-default operator</h2>
+<p>Another tremendous and straightforward function is <code>%||%</code>. It is exported by the <em>rlang</em> package (it’s the turtleblog after all”, so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is straightforward and clearly explains what the function is intended to do.</p>
+<pre class="r"><code>`%||%` &lt;- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
+
+34 %||% 8</code></pre>
+<pre><code>## [1] 34</code></pre>
+<pre class="r"><code>NULL %||% 10</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>This one comes in handy when you have optional <code>NULL</code>s returned by a function or possibly <code>NULL</code> parameters of the function or named function arguments. In the code, it looks way more straightforward than the expansion of the function definition itself. I usually do not export such a helper function to the end user. But it is worth repeating that <strong>readability of your code for yourself should be as important as readability for others</strong>. If such infixes help you, then you should use them.</p>
+</div>
+<div id="null-propagating-operator" class="section level2">
+<h2>NULL-propagating operator</h2>
+<p>Let’s stay with <code>NULL</code>-related functions for a little longer. Now it is time for my creation. When I build packages or shiny apps, it happens quite often that I need to apply some function to some object, but if it is <code>NULL</code>, I need to return <code>NULL</code>. For those situations, I created the <code>%?&gt;%</code> operator:</p>
+<pre class="r"><code>`%?&gt;%` &lt;- function(lhs, rhs) if (is.null(lhs)) NULL else rhs(lhs)
+
+7 %?&gt;% exp</code></pre>
+<pre><code>## [1] 1096.633</code></pre>
+<pre class="r"><code>NULL %?&gt;% exp</code></pre>
+<pre><code>## NULL</code></pre>
+<p>This one is some modification of a standard pipe but serves a specific purpose. It simplified my code significantly, and I love it for its <strong>conciseness</strong>.</p>
+</div>
+<div id="motif-inclusion-operator" class="section level2">
+<h2>Motif inclusion operator</h2>
+<p>Now, an example from one of our packages, <em>tidysq</em>. It is a package for the tidy processing of biological sequences. Here we implemented the <code>%has%</code> operator that checks for the presence of specific motifs in sequences.</p>
+<pre class="r"><code>library(tidysq)
+
+sq(c(&quot;AAAA&quot;, &quot;AGCA&quot;, &quot;CGCG&quot;, &quot;TTCG&quot;)) %has% &quot;GC&quot;</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE FALSE</code></pre>
+<p>Laura and I found it very in line with the tidyverse philosophy of code being readable and understandable by others. It can be especially seen in <code>dplyr</code> processing pipes.</p>
+<pre class="r"><code>library(dplyr)
+
+tibble(
+  id = 1:4,
+  sequence = c(&quot;LVGWEK&quot;, &quot;KLLCVN&quot;, &quot;ER&quot;, &quot;LLLY&quot;)
+ ) %&gt;%
+  mutate(sequence = sq(sequence)) %&gt;%
+  filter(sequence %has% &quot;LL&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 2
+##      id sequence  
+##   &lt;int&gt; &lt;ami_bsc&gt; 
+## 1     2 KLLCVN &lt;6&gt;
+## 2     4 LLLY   &lt;4&gt;</code></pre>
+</div>
+<div id="ternary-if-operator" class="section level2">
+<h2>Ternary if operator</h2>
+<p>Finally, one fancy trick! Have you programmed in any language that contains ternary if operator? E.g., in C++, it looks like this:</p>
+<pre class="cpp"><code>(1 &gt; 0) ? &#39;A&#39; : &#39;B&#39;
+
+// would return &#39;A&#39;</code></pre>
+<p>If the expression on LHS of <code>?</code> is TRUE, a value between <code>?</code> and <code>:</code> is returned. Otherwise, the value after <code>:</code> is returned. Why use it over regular if-else? It is an <em>expression</em>, while standard <code>if</code> in C and C++ is not an expression. Thus, the user can assign the result of this expression to any variable.</p>
+<p>Do you miss it in R? Probably not. In R, <code>if</code> is an expression, so we have:</p>
+<pre class="r"><code>if (1 &gt; 0) &quot;A&quot; else &quot;B&quot;</code></pre>
+<pre><code>## [1] &quot;A&quot;</code></pre>
+<p>But what if we <em>really</em> wanted to have something in R more like in C++? Here you go!</p>
+<pre class="r"><code>`%?%` &lt;- function(lhs, rhs) {
+  values &lt;- rlang::enexpr(rhs)
+  if (values[[1]] != as.symbol(&quot;:&quot;))
+    stop(&quot;RHS for `%?%` operator has to be in the form of &#39;*:*&#39; where &#39;*&#39; are any expressions&quot;)
+  if (lhs) rlang::eval_bare(values[[2]]) else rlang::eval_bare(values[[3]])
+}
+
+(1 &gt; 0) %?% &quot;A&quot; : &quot;B&quot;</code></pre>
+<pre><code>## [1] &quot;A&quot;</code></pre>
+<p>I did it only because <em>I can</em>.</p>
+<p>As you can see, I also abused the <code>:</code> operator; not overrode: <em>abused</em>. Inside the function, the RHS argument is in the form <code>expr:expr</code>. Normally that would result in range. But here I used the <strong>non-standard evaluation</strong>, using <code>rlang::enexpr()</code> and <code>ralng::eval_bare()</code> to actually stop R from doing what it usually does. I will probably go into detail about it some other time; right now, enjoy the fanciness.</p>
+</div>
+<div id="remark-about-precedence" class="section level2">
+<h2>Remark about precedence</h2>
+<p>One thing to remember: <strong>operators have specific precedence</strong>. Those that have been programming for longer know that well from an autopsy. Those that have just started programming <em>will</em> get to know that. Custom infix functions obey those rules as well, and you sometimes may get surprised. You can check that the operators I provided may sometimes be misleading and require parentheses to work correctly. It is worth checking out <a href="https://rdrr.io/r/base/Syntax.html">R operator precedence manual page</a> when in doubt.</p>
+</div>
+</div>
+<div id="the-strange-sibling-of-my-love" class="section level1">
+<h1>The strange sibling of my love</h1>
+<p>As a side note, I wanted to mention one operator I was unaware of before writing the article. Or: I was not fully aware of what lies underneath it.</p>
+<p>Have you come across <code>:=</code> operator in R? <code>:=</code>, with no <code>%</code> around it? You probably have seen if you are using <em>data.table</em> or some rlang magic. So have I. However, I took it for granted that its operator existence is due to non-standard evaluation since it is always used within some specific context (similarly to my previously shown <code>%?%</code> operator). I was astonished to find out that I can define this.</p>
+<p>You can write something like this.</p>
+<pre class="r"><code>`:=` &lt;- function(lhs, rhs) lhs + 5 * rhs
+2 := 2</code></pre>
+<pre><code>## [1] 12</code></pre>
+<p>And <em>it works</em>.</p>
+<p>I told you earlier that overriding built-in operators is a <em>big no-no</em>. What is the difference with this one? Well, <strong>there is no such operator in base R!</strong> It turns out that <code>:=</code> is reserved for legacy reasons, and the parser still treats it as a single operator. (You can try creating similar functions for other strings – you won’t make R treat them as infix operators without percent signs, they need to be reserved.) Yet <code>:=</code> has no definition in base. You can read more on <a href="https://stackoverflow.com/questions/32817780/what-is-the-r-assignment-operator-for">the SO thread about this operator</a>.</p>
+<p>If you want to be fancy, you can assign a classic assignment operator to this one and make others wonder how.</p>
+<pre class="r"><code>`:=` &lt;- `&lt;-`
+a := 3</code></pre>
+<p>(But seriously: don’t do it.)</p>
+</div>
+<div id="send-the-letter" class="section level1">
+<h1>Send the letter!</h1>
+<p>The ability to create your custom inter-argument operators is an exquisite addition to the language. They can make the code much more readable and, usually, shorter. I strongly encourage you to take advantage of the language’s possibilities and play around with it. Since it’s your working tool, let’s make using it as enjoyable as possible!</p>
+</div>
