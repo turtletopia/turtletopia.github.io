@@ -6,7 +6,7 @@
     <description>Recent content in Categories on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Essay</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
       <link>/categories/essay/</link>
-      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
       
       <guid>/categories/essay/</guid><description></description>
     </item>

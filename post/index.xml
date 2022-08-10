@@ -6,10 +6,159 @@
     <description>Recent content in Posts on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Sonnet to infix function</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/2022/08/10/sonnet-to-infix-function/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/08/10/sonnet-to-infix-function/</guid><description>
+
+
+&lt;div id=&#34;some-poetry-for-the-programmers&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Some poetry for the programmers&lt;/h1&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Blest be the day, and blest be the month and year,&lt;/p&gt;
+&lt;p&gt;Season and hour and very moment blest,&lt;/p&gt;
+&lt;p&gt;The lovely IDE where first possessed&lt;/p&gt;
+&lt;dl&gt;
+&lt;dt&gt;By two percent signs I found me prisoner; (…)&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;Francesco Petrarch, Sonnet 61. Translated by Joseph Auslander. Possibly with some spicing it up by me&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div id=&#34;subject-and-addressee-of-the-poem&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Subject and addressee of the poem&lt;/h1&gt;
+&lt;p&gt;Custom infix functions are one of my favorite features in R. This article is my love letter to them. But first, a quick recap.&lt;/p&gt;
+&lt;p&gt;For those unfamiliar with the terminology, &lt;em&gt;infix function&lt;/em&gt; is a function &lt;code&gt;fun&lt;/code&gt; which is called using &lt;code&gt;infix notation&lt;/code&gt;, e.g., &lt;code&gt;x fun y&lt;/code&gt; instead of &lt;code&gt;fun(x, y)&lt;/code&gt;. Those functions are also called &lt;em&gt;infix operators&lt;/em&gt; by base R, and I will use those terms and name &lt;em&gt;infixes&lt;/em&gt; interchangeably. There are a lot of infix operators in base R used very frequently, i.e., arithmetic or logical operators. We use them so often that we usually forget that they are functions. And that we can &lt;strong&gt;call them just like regular functions&lt;/strong&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;23 + 19&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 42&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`+`(23, 19)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 42&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;As you may have noticed, when calling such a function in a non-infix-manner, we need to use backticks around the operator to avoid calling it regularly.&lt;/p&gt;
+&lt;p&gt;To prove that they share a lot of typical behavior with functions, I am going to demonstrate to you how to &lt;strong&gt;redefine them just like regular functions&lt;/strong&gt;. We can, for example, make the &lt;code&gt;+&lt;/code&gt; operator work like a multiplication.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`+` &amp;lt;- function(lhs, rhs) lhs * rhs
+23 + 19&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 437&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Let it ring out loud: &lt;strong&gt;you should not do that at all&lt;/strong&gt;. Overriding the default behavior of functions may be dangerous, as it interferes with other chunks of code using the operator. I showed this trick only for demonstration purposes.&lt;/p&gt;
+&lt;p&gt;(Side note: you might be aware that some packages change the default behavior of operators, e.g., &lt;code&gt;ggplot2&lt;/code&gt; has its own &lt;code&gt;+&lt;/code&gt; for joining plot elements. However, this is a slightly different situation. They do not create a whole new function but only add a &lt;em&gt;method&lt;/em&gt; for &lt;em&gt;generic function&lt;/em&gt;. They do not &lt;em&gt;override&lt;/em&gt; the behavior, but more like &lt;em&gt;overload&lt;/em&gt; it.)&lt;/p&gt;
+&lt;p&gt;Additional remark to make: in this assignment call, backticks are also necessary. An alternative is using quotes, but it is inadvisable, and its presence in the language is entirely due to legacy reasons. You can read more about it in &lt;a href=&#34;https://adv-r.hadley.nz/names-values.html#non-syntactic&#34;&gt;Hadley’s book&lt;/a&gt;. In &lt;a href=&#34;https://adv-r.hadley.nz/functions.html?q=infix#infix-functions&#34;&gt;another chapter&lt;/a&gt;, you can find more about infix functions.&lt;/p&gt;
+&lt;p&gt;Once again: &lt;strong&gt;do not override built-in infix functions&lt;/strong&gt;. BUT. &lt;strong&gt;Create custom infix functions!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;R allows for creating your operators using double &lt;strong&gt;percent signs&lt;/strong&gt;. A few shipped with the base R packages, including inclusion operator &lt;code&gt;%in%&lt;/code&gt; (pun intended) or matrix multiplication operator &lt;code&gt;%*%&lt;/code&gt;. But You can create more. And we will explore it in the next section.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;enumeration-is-an-important-stylistic-device&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Enumeration is an important stylistic device&lt;/h1&gt;
+&lt;div id=&#34;piping-operators&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Piping operators&lt;/h2&gt;
+&lt;p&gt;The most widely known example is the piping operator: &lt;code&gt;%&amp;gt;%&lt;/code&gt;. I assume that you are familiar with it. If not, &lt;a href=&#34;https://dplyr.tidyverse.org/&#34;&gt;you better get to know the dplyr package&lt;/a&gt;. The pipe comes from &lt;a href=&#34;https://magrittr.tidyverse.org/&#34;&gt;magrittr&lt;/a&gt; package, but dplyr shows its natural strength and the most significant advantage of using custom operators: &lt;strong&gt;custom infixes make code more readable&lt;/strong&gt;. When we apply operations one by one, it makes more sense to write those operations in order of application, not inverse order, as we do without infix operators. The operator’s shape is also essential, as it suggests the direction of the data flow. For me, it is more natural to read and understand&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;x %&amp;gt;% 
+  fun_1 %&amp;gt;% 
+  fun_2 %&amp;gt;% 
+  fun_3
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;rather than&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;fun_3(fun_2(fun_1(x)))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;It became so popular that R 4.1.0 included its pipe, &lt;code&gt;|&amp;gt;&lt;/code&gt;. However, I will not dwell more on that because others have already said a lot about pipes. I only want to mention, what is often forgotten by newcomers, that magrittr offer more than one type of pipe. Go check them out if you don’t know them!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;null-default-operator&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;NULL-default operator&lt;/h2&gt;
+&lt;p&gt;Another tremendous and straightforward function is &lt;code&gt;%||%&lt;/code&gt;. It is exported by the &lt;em&gt;rlang&lt;/em&gt; package (it’s the turtleblog after all”, so rlang mention is obligatory), but other packages borrow this idea to avoid dependency. The code is straightforward and clearly explains what the function is intended to do.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`%||%` &amp;lt;- function(lhs, rhs) if (is.null(lhs)) rhs else lhs
+
+34 %||% 8&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 34&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;NULL %||% 10&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 10&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This one comes in handy when you have optional &lt;code&gt;NULL&lt;/code&gt;s returned by a function or possibly &lt;code&gt;NULL&lt;/code&gt; parameters of the function or named function arguments. In the code, it looks way more straightforward than the expansion of the function definition itself. I usually do not export such a helper function to the end user. But it is worth repeating that &lt;strong&gt;readability of your code for yourself should be as important as readability for others&lt;/strong&gt;. If such infixes help you, then you should use them.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;null-propagating-operator&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;NULL-propagating operator&lt;/h2&gt;
+&lt;p&gt;Let’s stay with &lt;code&gt;NULL&lt;/code&gt;-related functions for a little longer. Now it is time for my creation. When I build packages or shiny apps, it happens quite often that I need to apply some function to some object, but if it is &lt;code&gt;NULL&lt;/code&gt;, I need to return &lt;code&gt;NULL&lt;/code&gt;. For those situations, I created the &lt;code&gt;%?&amp;gt;%&lt;/code&gt; operator:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`%?&amp;gt;%` &amp;lt;- function(lhs, rhs) if (is.null(lhs)) NULL else rhs(lhs)
+
+7 %?&amp;gt;% exp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 1096.633&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;NULL %?&amp;gt;% exp&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## NULL&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This one is some modification of a standard pipe but serves a specific purpose. It simplified my code significantly, and I love it for its &lt;strong&gt;conciseness&lt;/strong&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;motif-inclusion-operator&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Motif inclusion operator&lt;/h2&gt;
+&lt;p&gt;Now, an example from one of our packages, &lt;em&gt;tidysq&lt;/em&gt;. It is a package for the tidy processing of biological sequences. Here we implemented the &lt;code&gt;%has%&lt;/code&gt; operator that checks for the presence of specific motifs in sequences.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidysq)
+
+sq(c(&amp;quot;AAAA&amp;quot;, &amp;quot;AGCA&amp;quot;, &amp;quot;CGCG&amp;quot;, &amp;quot;TTCG&amp;quot;)) %has% &amp;quot;GC&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] FALSE  TRUE  TRUE FALSE&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Laura and I found it very in line with the tidyverse philosophy of code being readable and understandable by others. It can be especially seen in &lt;code&gt;dplyr&lt;/code&gt; processing pipes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+
+tibble(
+  id = 1:4,
+  sequence = c(&amp;quot;LVGWEK&amp;quot;, &amp;quot;KLLCVN&amp;quot;, &amp;quot;ER&amp;quot;, &amp;quot;LLLY&amp;quot;)
+ ) %&amp;gt;%
+  mutate(sequence = sq(sequence)) %&amp;gt;%
+  filter(sequence %has% &amp;quot;LL&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## # A tibble: 2 × 2
+##      id sequence  
+##   &amp;lt;int&amp;gt; &amp;lt;ami_bsc&amp;gt; 
+## 1     2 KLLCVN &amp;lt;6&amp;gt;
+## 2     4 LLLY   &amp;lt;4&amp;gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;ternary-if-operator&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Ternary if operator&lt;/h2&gt;
+&lt;p&gt;Finally, one fancy trick! Have you programmed in any language that contains ternary if operator? E.g., in C++, it looks like this:&lt;/p&gt;
+&lt;pre class=&#34;cpp&#34;&gt;&lt;code&gt;(1 &amp;gt; 0) ? &amp;#39;A&amp;#39; : &amp;#39;B&amp;#39;
+
+// would return &amp;#39;A&amp;#39;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If the expression on LHS of &lt;code&gt;?&lt;/code&gt; is TRUE, a value between &lt;code&gt;?&lt;/code&gt; and &lt;code&gt;:&lt;/code&gt; is returned. Otherwise, the value after &lt;code&gt;:&lt;/code&gt; is returned. Why use it over regular if-else? It is an &lt;em&gt;expression&lt;/em&gt;, while standard &lt;code&gt;if&lt;/code&gt; in C and C++ is not an expression. Thus, the user can assign the result of this expression to any variable.&lt;/p&gt;
+&lt;p&gt;Do you miss it in R? Probably not. In R, &lt;code&gt;if&lt;/code&gt; is an expression, so we have:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;if (1 &amp;gt; 0) &amp;quot;A&amp;quot; else &amp;quot;B&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;A&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;But what if we &lt;em&gt;really&lt;/em&gt; wanted to have something in R more like in C++? Here you go!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`%?%` &amp;lt;- function(lhs, rhs) {
+  values &amp;lt;- rlang::enexpr(rhs)
+  if (values[[1]] != as.symbol(&amp;quot;:&amp;quot;))
+    stop(&amp;quot;RHS for `%?%` operator has to be in the form of &amp;#39;*:*&amp;#39; where &amp;#39;*&amp;#39; are any expressions&amp;quot;)
+  if (lhs) rlang::eval_bare(values[[2]]) else rlang::eval_bare(values[[3]])
+}
+
+(1 &amp;gt; 0) %?% &amp;quot;A&amp;quot; : &amp;quot;B&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;A&amp;quot;&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I did it only because &lt;em&gt;I can&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;As you can see, I also abused the &lt;code&gt;:&lt;/code&gt; operator; not overrode: &lt;em&gt;abused&lt;/em&gt;. Inside the function, the RHS argument is in the form &lt;code&gt;expr:expr&lt;/code&gt;. Normally that would result in range. But here I used the &lt;strong&gt;non-standard evaluation&lt;/strong&gt;, using &lt;code&gt;rlang::enexpr()&lt;/code&gt; and &lt;code&gt;ralng::eval_bare()&lt;/code&gt; to actually stop R from doing what it usually does. I will probably go into detail about it some other time; right now, enjoy the fanciness.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;remark-about-precedence&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Remark about precedence&lt;/h2&gt;
+&lt;p&gt;One thing to remember: &lt;strong&gt;operators have specific precedence&lt;/strong&gt;. Those that have been programming for longer know that well from an autopsy. Those that have just started programming &lt;em&gt;will&lt;/em&gt; get to know that. Custom infix functions obey those rules as well, and you sometimes may get surprised. You can check that the operators I provided may sometimes be misleading and require parentheses to work correctly. It is worth checking out &lt;a href=&#34;https://rdrr.io/r/base/Syntax.html&#34;&gt;R operator precedence manual page&lt;/a&gt; when in doubt.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-strange-sibling-of-my-love&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;The strange sibling of my love&lt;/h1&gt;
+&lt;p&gt;As a side note, I wanted to mention one operator I was unaware of before writing the article. Or: I was not fully aware of what lies underneath it.&lt;/p&gt;
+&lt;p&gt;Have you come across &lt;code&gt;:=&lt;/code&gt; operator in R? &lt;code&gt;:=&lt;/code&gt;, with no &lt;code&gt;%&lt;/code&gt; around it? You probably have seen if you are using &lt;em&gt;data.table&lt;/em&gt; or some rlang magic. So have I. However, I took it for granted that its operator existence is due to non-standard evaluation since it is always used within some specific context (similarly to my previously shown &lt;code&gt;%?%&lt;/code&gt; operator). I was astonished to find out that I can define this.&lt;/p&gt;
+&lt;p&gt;You can write something like this.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`:=` &amp;lt;- function(lhs, rhs) lhs + 5 * rhs
+2 := 2&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 12&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And &lt;em&gt;it works&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;I told you earlier that overriding built-in operators is a &lt;em&gt;big no-no&lt;/em&gt;. What is the difference with this one? Well, &lt;strong&gt;there is no such operator in base R!&lt;/strong&gt; It turns out that &lt;code&gt;:=&lt;/code&gt; is reserved for legacy reasons, and the parser still treats it as a single operator. (You can try creating similar functions for other strings – you won’t make R treat them as infix operators without percent signs, they need to be reserved.) Yet &lt;code&gt;:=&lt;/code&gt; has no definition in base. You can read more on &lt;a href=&#34;https://stackoverflow.com/questions/32817780/what-is-the-r-assignment-operator-for&#34;&gt;the SO thread about this operator&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;If you want to be fancy, you can assign a classic assignment operator to this one and make others wonder how.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;`:=` &amp;lt;- `&amp;lt;-`
+a := 3&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(But seriously: don’t do it.)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;send-the-letter&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Send the letter!&lt;/h1&gt;
+&lt;p&gt;The ability to create your custom inter-argument operators is an exquisite addition to the language. They can make the code much more readable and, usually, shorter. I strongly encourage you to take advantage of the language’s possibilities and play around with it. Since it’s your working tool, let’s make using it as enjoyable as possible!&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Case Study: Modularizing a Package</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>

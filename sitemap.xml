@@ -2,10 +2,49 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>/2022/08/04/case-study-modularizing-a-package/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/categories/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/essay/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/categories/essay/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/function/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/language-feature/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/magrittr/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/nse/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/operator/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/post/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/rlang/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/2022/08/10/sonnet-to-infix-function/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/tidysq/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/</loc>
+    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/2022/08/04/case-study-modularizing-a-package/</loc>
     <lastmod>2022-08-04T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/deepdep/</loc>
@@ -17,28 +56,13 @@
     <loc>/tags/dependency-optimizing/</loc>
     <lastmod>2022-08-04T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>/categories/essay/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/tags/modularization/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/post/</loc>
     <lastmod>2022-08-04T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/r/</loc>
     <lastmod>2022-08-04T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>/tags/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/tidysq/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/categories/turtletools/</loc>
-    <lastmod>2022-08-04T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/</loc>
     <lastmod>2022-08-04T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/woodendesc/</loc>
@@ -84,9 +108,6 @@
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/reactivity/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/rlang/</loc>
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/shiny/</loc>

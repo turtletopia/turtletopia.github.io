@@ -6,10 +6,74 @@
     <description>Recent content in Tags on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 04 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>essay</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/essay/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/essay/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>function</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/function/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/function/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>language feature</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/language-feature/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/language-feature/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>magrittr</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/magrittr/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/magrittr/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>NSE</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/nse/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/nse/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>operator</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/operator/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/operator/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>rlang</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/rlang/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/rlang/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>tidysq</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/tidysq/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/tidysq/</guid><description></description>
+    </item>
     
     <item>
       <title>deepdep</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
@@ -49,14 +113,6 @@
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/r/</guid><description></description>
-    </item>
-    
-    <item>
-      <title>tidysq</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/tags/tidysq/</link>
-      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/tidysq/</guid><description></description>
     </item>
     
     <item>
@@ -145,14 +201,6 @@
       <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/reactivity/</guid><description></description>
-    </item>
-    
-    <item>
-      <title>rlang</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/tags/rlang/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/rlang/</guid><description></description>
     </item>
     
     <item>

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>tidysq on Turtletopia: a blog about programming in R</title>
-    <link>/tags/tidysq/</link>
-    <description>Recent content in tidysq on Turtletopia: a blog about programming in R</description>
+    <title>essay on Turtletopia: a blog about programming in R</title>
+    <link>/tags/essay/</link>
+    <description>Recent content in essay on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/tidysq/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/essay/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -156,104 +156,6 @@ a := 3&lt;/code&gt;&lt;/pre&gt;
 &lt;div id=&#34;send-the-letter&#34; class=&#34;section level1&#34;&gt;
 &lt;h1&gt;Send the letter!&lt;/h1&gt;
 &lt;p&gt;The ability to create your custom inter-argument operators is an exquisite addition to the language. They can make the code much more readable and, usually, shorter. I strongly encourage you to take advantage of the language’s possibilities and play around with it. Since it’s your working tool, let’s make using it as enjoyable as possible!&lt;/p&gt;
-&lt;/div&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Case Study: Modularizing a Package</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/2022/08/04/case-study-modularizing-a-package/</link>
-      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/2022/08/04/case-study-modularizing-a-package/</guid><description>
-
-&lt;div id=&#34;TOC&#34;&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;../../2022/08/04/case-study-modularizing-a-package/#origins-of-deepdep&#34;%!s(MISSING) id=&#34;toc-origins-of-deepdep&#34;&gt;Origins of deepdep&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;../../2022/08/04/case-study-modularizing-a-package/#separation-of-woodendesc&#34;%!s(MISSING) id=&#34;toc-separation-of-woodendesc&#34;&gt;Separation of woodendesc&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;../../2022/08/04/case-study-modularizing-a-package/#a-new-package-is-not-always-the-answer&#34;%!s(MISSING) id=&#34;toc-a-new-package-is-not-always-the-answer&#34;&gt;A new package is not always the answer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;../../2022/08/04/case-study-modularizing-a-package/#modularization-of-tidysq&#34;%!s(MISSING) id=&#34;toc-modularization-of-tidysq&#34;&gt;Modularization of tidysq&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;../../2022/08/04/case-study-modularizing-a-package/#summary&#34;%!s(MISSING) id=&#34;toc-summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/div&gt;
-
-&lt;p&gt;“Would it be possible…?”, “I think it would be nice if…”, “Can you implement…?”.&lt;/p&gt;
-&lt;p&gt;User feedback is a reliable source of valuable ideas for package improvement, but it’s easy to get too eager and implement everything the users want, especially when you’ve only started making a name for yourself. I and Dominik have fallen victim to that too.&lt;/p&gt;
-&lt;div id=&#34;origins-of-deepdep&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Origins of deepdep&lt;/h2&gt;
-&lt;p&gt;Our package &lt;a href=&#34;https://github.com/DominikRafacz/deepdep&#34;&gt;deepdep&lt;/a&gt; was initially created as a university project. There were four of initial authors: the two of us and our colleagues, Hubert and Szymon. The teacher had a use case in mind (creating layered dependency plots) and we wanted to implement all that could get us a good grade. So we added everything more or less related to dependency plots that we could implement at the time.&lt;/p&gt;
-&lt;p&gt;Fast forward a few years and a question came up regarding using a repository mirror other than the CRAN mirror we hardcoded. The function in question? &lt;code&gt;get_available_packages()&lt;/code&gt;. We’ve exchanged a few messages and it turned out that &lt;code&gt;get_available_packages()&lt;/code&gt; only served as a safeguard against using other mirrors within &lt;code&gt;deepdep()&lt;/code&gt; itself.&lt;/p&gt;
-&lt;p&gt;In fact, the whole backend that downloads the data needed a rewrite. &lt;code&gt;get_dependencies()&lt;/code&gt; tried to provide a unified API for retrieving dependencies from different sources and &lt;code&gt;get_descriptions()&lt;/code&gt; did the same for DESCRIPTION… but they ended up messy and counterintuitive. The user could only get data from CRAN, CRAN with Bioconductor, or from the local library that was first in &lt;code&gt;.localPaths()&lt;/code&gt;. No handling Bioconductor only, no using CRAN as a fallback for local library, no querying other repositories (e.g. R-universe). The functions had to grow a lot if we wanted them to be as universal as possible.&lt;/p&gt;
-&lt;p&gt;The other issue made us realize that the plotting feature is optional to some; that the key feature is collecting dependency data in a table, which only needs a small fraction of dependencies (&lt;a href=&#34;https://github.com/r-lib/httr&#34;&gt;httr&lt;/a&gt; and &lt;a href=&#34;https://github.com/jeroen/jsonlite&#34;&gt;jsonlite&lt;/a&gt;). We moved a lot of previous Imports to Suggests (&lt;a href=&#34;https://github.com/tidyverse/ggplot2&#34;&gt;ggplot2&lt;/a&gt;, &lt;a href=&#34;https://github.com/thomasp85/ggraph&#34;&gt;ggraph&lt;/a&gt;, &lt;a href=&#34;https://github.com/schochastics/graphlayouts&#34;&gt;graphlayouts&lt;/a&gt;, &lt;a href=&#34;https://github.com/igraph/rigraph&#34;&gt;igraph&lt;/a&gt;, and &lt;a href=&#34;https://github.com/r-lib/scales&#34;&gt;scales&lt;/a&gt;), lightening deepdep significantly… but that’s a topic for another post.&lt;/p&gt;
-&lt;p&gt;It was time to ask ourselves: “what does «deepdep» mean to us?”. The answer was: “it’s a package that helps with analyzing and visualizing hierarchy of package dependencies”. No more, no less. The functions that extracted dependencies of a package or a DESCRIPTION file were just tools to accomplish that goal. They were exported because “we couldn’t let a good function go to waste”, not because they presented a functionality we wanted to provide. If a user would want to use one of these, they’d have to install the whole deepdep; it would be like installing ggplot2 for &lt;code&gt;cut_interval()&lt;/code&gt; and &lt;code&gt;cut_width()&lt;/code&gt; instead of plotting.&lt;/p&gt;
-&lt;p&gt;The time has come for a separation.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;separation-of-woodendesc&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Separation of woodendesc&lt;/h2&gt;
-&lt;p&gt;The idea is to modularize – to allow the user to install what they want. If they want to retrieve a list of dependencies for one package or a list of available packages in a repository, they should not need to install deepdep. They should be able to install a separate package that deepdep imports: &lt;a href=&#34;https://github.com/turtletopia/woodendesc&#34;&gt;woodendesc&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;This package is a complete rewrite of these functionalities, but much more flexible and much more potent. To show the difference, this is how you’d get packages available on CRAN and Bioconductor in old deepdep:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Hey, a wild R 4.1.0 pipe appeared!
-deepdep::get_available_packages(bioc = TRUE) |&amp;gt;
-  head()&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;A3&amp;quot;        &amp;quot;a4&amp;quot;        &amp;quot;a4Base&amp;quot;    &amp;quot;a4Classif&amp;quot; &amp;quot;a4Core&amp;quot;    &amp;quot;a4Preproc&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;You can’t do much more than that. The only other option is to get locally available packages. This is the signature of the function:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;get_available_packages &amp;lt;- function(
-  bioc = FALSE, local = FALSE, reset_cache = FALSE
-) {
-  # Implementation goes here
-}&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;But woodendesc goes three steps further. There are functions for many different sources of packages, each of them optimized for minimal network usage and maximal cache utilization:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Simple CRAN extractor
-woodendesc::wood_cran_packages()
-# Allows `release` parameter to query old releases
-woodendesc::wood_bioc_packages()
-# The user can specify different paths
-woodendesc::wood_local_packages()
-# Functions below not possible in old deepdep:
-woodendesc::wood_runiverse_packages(&amp;quot;turtletopia&amp;quot;)
-woodendesc::wood_url_packages(&amp;quot;http://www.omegahat.net/R&amp;quot;)
-woodendesc::wood_core_packages()&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;And if you’d want a single function like &lt;code&gt;get_available_packages()&lt;/code&gt;? Easy, just call &lt;code&gt;wood_packages()&lt;/code&gt; with specified repos (by default it only queries CRAN):&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;woodendesc::wood_packages(c(&amp;quot;bioc&amp;quot;, &amp;quot;cran&amp;quot;)) |&amp;gt;
-  head()&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;A3&amp;quot;        &amp;quot;a4&amp;quot;        &amp;quot;a4Base&amp;quot;    &amp;quot;a4Classif&amp;quot; &amp;quot;a4Core&amp;quot;    &amp;quot;a4Preproc&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;You can do it with all the sources above and even pass most parameters:&lt;/p&gt;
-&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;woodendesc::wood_packages(
-  c(&amp;quot;bioc@1.5&amp;quot;, &amp;quot;core&amp;quot;, &amp;quot;runiverse@turtletopia&amp;quot;,
-    &amp;quot;http://www.omegahat.net/R&amp;quot;, &amp;quot;local#all&amp;quot;)
-) |&amp;gt;
-  head()&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;## [1] &amp;quot;00LOCK-lubridate&amp;quot; &amp;quot;aCGH&amp;quot;             &amp;quot;affy&amp;quot;             &amp;quot;affycomp&amp;quot;        
-## [5] &amp;quot;affydata&amp;quot;         &amp;quot;affylmGUI&amp;quot;&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Now, you can see why’d we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they’d overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing because the alternative is to include this code within deepdep itself – so it’d have to be tested and maintained anyways.&lt;/p&gt;
-&lt;p&gt;But sometimes modularizing is a bit extra.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;a-new-package-is-not-always-the-answer&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;A new package is not always the answer&lt;/h2&gt;
-&lt;p&gt;If you have a function if your package that doesn’t fit the general idea, don’t rush to move it into a separate package. There’s one important question to ask before:&lt;/p&gt;
-&lt;p&gt;“Will it be used by anything else than my package?”&lt;/p&gt;
-&lt;p&gt;And don’t be proactive here. If your answer is: “not right now, but perhaps in the future…”, just wait for the future. Keep the function in the package until the time comes and simply remove or deprecate it then (depending on how popular it gets).&lt;/p&gt;
-&lt;p&gt;There’s one such functionality in deepdep: &lt;code&gt;get_downloads()&lt;/code&gt; and &lt;code&gt;plot_downloads()&lt;/code&gt;. Analyzing download statistics is not exactly the goal of deepdep, but there’s no point in making it into a separate package; these two don’t introduce any new dependencies nor do they crowd the namespace. And no one expressed any interest in having it separate from deepdep yet.&lt;/p&gt;
-&lt;p&gt;Besides, nobody &lt;a href=&#34;https://github.com/eddelbuettel/digest&#34;&gt;creates a package around a single function&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;modularization-of-tidysq&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Modularization of tidysq&lt;/h2&gt;
-&lt;p&gt;You might have noticed that woodendesc consists of functions that served as a backbone of deepdep while querying and plotting download statistics are more of an extension. There’s one package we’ve created that was planned to be extended since the beginning: &lt;a href=&#34;https://github.com/BioGenies/tidysq&#34;&gt;tidysq&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;It’s a package that compresses biological sequences (e.g. DNA/RNA) by coding each letter with fewer bits (3 in DNA/RNA case). We’ve included a few basic operations like reversing, subsetting, translating to amino acids, and reading a FASTA file – the most common file format for biological sequences. We’ve intentionally omitted many more advanced functions, though.&lt;/p&gt;
-&lt;p&gt;Why? Because there are countless functions and algorithms we could implement and that’d make tidysq huge. Instead, we’d gone the route of modularization. The idea is to have tidysq with the base functionality and several packages depending on tidysq, oriented towards certain aspects of working with biological sequences.&lt;/p&gt;
-&lt;p&gt;For example, if we were to create a set of &lt;code&gt;read_x()&lt;/code&gt; and &lt;code&gt;write_x()&lt;/code&gt; functions for various formats like FASTQ or BAM/SAM, we’d place it in a separate package that’d have tidysq in Depends (and LinkingTo) fields. We’d call it something like “tidysqfiles” to signify that it’s an extension to tidysq.&lt;/p&gt;
-&lt;p&gt;(We may or may not be working on such a package.)&lt;/p&gt;
-&lt;p&gt;If you want to see a real-life example of a package ecosystem, see &lt;a href=&#34;https://mlr3verse.mlr-org.com&#34;&gt;mlr3 and mlr3verse&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div id=&#34;summary&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Summary&lt;/h2&gt;
-&lt;p&gt;In short, there are two cases where modularization should be considered:&lt;/p&gt;
-&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
-&lt;li&gt;&lt;strong&gt;the backend to the main functionality grows and overshadows the rest of the package&lt;/strong&gt; – create a set of logically related backend functions, move them into a new package, and add that package to Imports of the old one;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;there’s an optional functionality that requires additional imports or significantly increases the weight of the package&lt;/strong&gt; – collect several such functionalities so that they are somewhat related, move them into a new package, and add the old package to the Imports/Depends field of the new one.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Be wary of separation if the only use case for the new package is to be imported by the old one. Avoid it if there are too few functionalities for a new package. Sometimes copying a function or two isn’t a sin.&lt;/p&gt;
-&lt;p&gt;Do you want to borrow &lt;a href=&#34;https://github.com/turtletopia/woodendesc/blob/master/R/wrrr.R&#34;&gt;a code that shows an install prompt for a missing package&lt;/a&gt;?&lt;/p&gt;
 &lt;/div&gt;
 </description>
     </item>
