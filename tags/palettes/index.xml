@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>palettes on Turtletopia: a blog about programming in R</title>
+    <link>/tags/palettes/</link>
+    <description>Recent content in palettes on Turtletopia: a blog about programming in R</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 12 Aug 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/palettes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Show Pride on Your Plots</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/2022/08/12/show-pride-on-your-plots/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/08/12/show-pride-on-your-plots/</guid><description>
+
+
+&lt;p&gt;This will be a short post, since I’m busy playing blues this week. At least the topic’s short!&lt;/p&gt;
+&lt;p&gt;It all began with a post by RainbowR on Twitter:&lt;/p&gt;
+&lt;p&gt;&lt;blockquote class=&#34;twitter-tweet&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;Alright, RainbowRs, show us your blogs/websites! Quarto/distill/blogdown/whatever - we love to see it! &lt;a href=&#34;https://t.co/SivyCaY0yi&#34;&gt;https://t.co/SivyCaY0yi&lt;/a&gt;&lt;/p&gt;&amp;mdash; RainbowR (@R_LGBTQ) &lt;a href=&#34;https://twitter.com/R_LGBTQ/status/1555450735390871552?ref_src=twsrc%5Etfw&#34;&gt;August 5, 2022&lt;/a&gt;&lt;/blockquote&gt;
+&lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
+&lt;/p&gt;
+&lt;p&gt;As a very curious person, I had to check their GitHub account. And I found a repository curiously named &lt;a href=&#34;https://github.com/r-lgbtq/pridepalettes&#34;&gt;pridepalettes&lt;/a&gt;. I was a little disappointed to find out it’s just a single script with little reusability. I hoped for a package!&lt;/p&gt;
+&lt;p&gt;A quick research showed me a few more repos with pride colors, but none I could download from CRAN. In fact, only one was a package at all!&lt;/p&gt;
+&lt;p&gt;So I took matters into my own hands and created &lt;a href=&#34;https://github.com/turtletopia/gglgbtq&#34;&gt;gglgbtq&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It would be easy to just scrape the colors of multiple flags, slap a &lt;code&gt;palette_lgbtq()&lt;/code&gt; function on top of ’em, and call it a day. But it would be barely usable. Have you ever used white for a group with default ggplot2 settings? It’d be barely visible.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# I swear it&amp;#39;s the last time I&amp;#39;d use iris dataset
+library(ggplot2)
+library(gglgbtq)
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point(size = 2) +
+  scale_color_manual(values = palette_lgbtq(&amp;quot;genderqueer&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots//2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_no_theme-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;This is why I included &lt;code&gt;theme_lgbtq()&lt;/code&gt;. Each palette has its own custom theme for increased readability (although many themes are reused across multiple palettes). Check out the difference!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Is it considered &amp;quot;another time&amp;quot; or just &amp;quot;the last use part II&amp;quot;?
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+  geom_point(size = 2) +
+  scale_color_manual(values = palette_lgbtq(&amp;quot;genderqueer&amp;quot;)) +
+  theme_lgbtq(&amp;quot;genderqueer&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots//2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_w_theme-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;The difference isn’t much, but I found this gray to be the perfect balance for most palettes that include white (which is like 85% or so of all LGBT+ flags). But there are palettes without white, like this one:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# I spent like 10 minutes sifting through the base datasets
+# but - behold! - a non-iris dataset at last
+ggplot(warpbreaks, aes(x = wool, y = breaks, fill = tension)) +
+  geom_bar(stat = &amp;quot;identity&amp;quot;, position = &amp;quot;dodge&amp;quot;) +
+  scale_fill_manual(values = palette_lgbtq(&amp;quot;pansexual&amp;quot;)) +
+  theme_lgbtq(&amp;quot;pansexual&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots//2022/08/12/show-pride-on-your-plots/index_files/figure-html/pansexual_w_theme-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;For now I included 16 palettes, but expect more (and if you want a specific flag to be included in the next release, write an issue on GitHub, strike a message on Twitter, or send a pigeon with a letter):&lt;/p&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/palettes.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;The Pride Palettes (edition gglgbtq 0.1.0)&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Like what you see? You can get it from CRAN or &lt;a href=&#34;https://github.com/turtletopia/gglgbtq&#34;&gt;GitHub&lt;/a&gt;, whichever suits you best:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;install.packages(&amp;quot;gglgbtq&amp;quot;)
+remotes::install_github(&amp;quot;turtletopia/gglgbtq&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Show us your pride plots on Twitter, we’d love to see them!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -6,10 +6,58 @@
     <description>Recent content in Tags on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 12 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ggplot2</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/ggplot2/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/ggplot2/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>lgbtq</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/lgbtq/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/lgbtq/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>palettes</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/palettes/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/palettes/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>pride</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/pride/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/pride/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>r</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/r/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/r/</guid><description></description>
+    </item>
+    
+    <item>
+      <title>turtletools</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>/tags/turtletools/</link>
+      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/turtletools/</guid><description></description>
+    </item>
     
     <item>
       <title>essay</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
@@ -108,14 +156,6 @@
     </item>
     
     <item>
-      <title>r</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/tags/r/</link>
-      <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/r/</guid><description></description>
-    </item>
-    
-    <item>
       <title>woodendesc</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
       <link>/tags/woodendesc/</link>
       <pubDate>Thu, 04 Aug 2022 00:00:00 +0000</pubDate>
@@ -145,14 +185,6 @@
       <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>/tags/packages/</guid><description></description>
-    </item>
-    
-    <item>
-      <title>turtletools</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/tags/turtletools/</link>
-      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>/tags/turtletools/</guid><description></description>
     </item>
     
     <item>
