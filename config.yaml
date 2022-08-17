@@ -1,4 +1,6 @@
-baseurl: /
+baseURL: https://turtletopia.github.io
+relativeurls: false
+canonifyurls: true
 languageCode: en-us
 title: "Turtletopia: a blog about programming in R"
 theme: hugo-lithium
@@ -48,7 +50,6 @@ params:
   images:
     - images/logo.png
   relativeURLs: true
-  address: https://turtletopia.github.io
 markup:
   defaultMarkdownHandler: goldmark
   goldmark:

@@ -6,6 +6,8 @@ slug: show-pride-on-your-plots
 categories: ["Turtletools"]
 tags: ["r", "turtletools", "ggplot2", "pride", "lgbtq", "palettes"]
 description: "Use gglgbtq to customize your plots with LGBT+ palettes and tailored themes. Pride aside, flag colors usually make good categorical palettes."
+images:
+  - palettes.png
 ---
 
 This will be a short post, since I'm busy playing blues this week. At least the topic's short!
