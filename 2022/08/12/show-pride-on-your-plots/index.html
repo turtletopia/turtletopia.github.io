@@ -13,7 +13,7 @@
 <meta property="og:title" content="Show Pride on Your Plots - Turtletopia: a blog about programming in R">
 
 
-  <link href='../../../../favicon.ico' rel='icon' type='image/x-icon'/>
+  <link href='https://turtletopia.github.io/favicon.ico' rel='icon' type='image/x-icon'/>
 
 
 
@@ -32,13 +32,13 @@
 
 
 
-<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
-<link rel="stylesheet" href="../../../../css/main.css" media="all">
+<link rel="stylesheet" href="https://turtletopia.github.io/css/fonts.css" media="all">
+<link rel="stylesheet" href="https://turtletopia.github.io/css/main.css" media="all">
 
-<link rel="stylesheet" href="../../../../css/custom.css">
+<link rel="stylesheet" href="https://turtletopia.github.io/css/custom.css">
 
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:image" content="https://turtletopia.github.io/images/logo.png"/>
+<meta name="twitter:image" content="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/palettes.png"/>
 
 <meta name="twitter:title" content="Show Pride on Your Plots"/>
 <meta name="twitter:description" content="Use gglgbtq to customize your plots with LGBT&#43; palettes and tailored themes. Pride aside, flag colors usually make good categorical palettes."/>
@@ -46,7 +46,7 @@
 <meta property="og:title" content="Show Pride on Your Plots" />
 <meta property="og:description" content="Use gglgbtq to customize your plots with LGBT&#43; palettes and tailored themes. Pride aside, flag colors usually make good categorical palettes." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="/2022/08/12/show-pride-on-your-plots/" /><meta property="og:image" content="https://turtletopia.github.io/images/logo.png"/><meta property="article:section" content="post" />
+<meta property="og:url" content="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/" /><meta property="og:image" content="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/palettes.png" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2022-08-12T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-08-12T00:00:00+00:00" />
 
@@ -71,8 +71,8 @@ if (!doNotTrack) {
     <div class="wrapper">
       <header class="header">
         <nav class="nav">
-  <a href="../../../../" class="nav-logo">
-    <img src="../../../../images/logo.png"
+  <a href="https://turtletopia.github.io/" class="nav-logo">
+    <img src="https://turtletopia.github.io/images/logo.png"
          width="50"
          height="50"
          alt="Logo">
@@ -80,7 +80,7 @@ if (!doNotTrack) {
 
   <ul class="nav-links">
     
-    <li><a href="../../../../about/">About</a></li>
+    <li><a href="https://turtletopia.github.io/about/">About</a></li>
     
     <li><a href="https://github.com/turtletopia">GitHub</a></li>
     
@@ -137,9 +137,9 @@ if (!doNotTrack) {
 
 <p>This will be a short post, since I’m busy playing blues this week. At least the topic’s short!</p>
 <p>It all began with a post by RainbowR on Twitter:</p>
-<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr">Alright, RainbowRs, show us your blogs/websites! Quarto/distill/blogdown/whatever - we love to see it! <a href="https://t.co/SivyCaY0yi">https://t.co/SivyCaY0yi</a></p>&mdash; RainbowR (@R_LGBTQ) <a href="https://twitter.com/R_LGBTQ/status/1555450735390871552?ref_src=twsrc%5Etfw">August 5, 2022</a></blockquote>
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Alright, RainbowRs, show us your blogs/websites! Quarto/distill/blogdown/whatever - we love to see it! <a href="https://t.co/SivyCaY0yi">https://t.co/SivyCaY0yi</a></p>&mdash; RainbowR (@R_LGBTQ) <a href="https://twitter.com/R_LGBTQ/status/1555450735390871552?ref_src=twsrc%5Etfw">August 5, 2022</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</p>
+
 <p>As a very curious person, I had to check their GitHub account. And I found a repository curiously named <a href="https://github.com/r-lgbtq/pridepalettes">pridepalettes</a>. I was a little disappointed to find out it’s just a single script with little reusability. I hoped for a package!</p>
 <p>A quick research showed me a few more repos with pride colors, but none I could download from CRAN. In fact, only one was a package at all!</p>
 <p>So I took matters into my own hands and created <a href="https://github.com/turtletopia/gglgbtq">gglgbtq</a>.</p>
@@ -150,14 +150,14 @@ library(gglgbtq)
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
   geom_point(size = 2) +
   scale_color_manual(values = palette_lgbtq(&quot;genderqueer&quot;))</code></pre>
-<p><img src="../../../../2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_no_theme-1.png" width="672" /></p>
+<p><img src="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_no_theme-1.png" width="672" /></p>
 <p>This is why I included <code>theme_lgbtq()</code>. Each palette has its own custom theme for increased readability (although many themes are reused across multiple palettes). Check out the difference!</p>
 <pre class="r"><code># Is it considered &quot;another time&quot; or just &quot;the last use part II&quot;?
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
   geom_point(size = 2) +
   scale_color_manual(values = palette_lgbtq(&quot;genderqueer&quot;)) +
   theme_lgbtq(&quot;genderqueer&quot;)</code></pre>
-<p><img src="../../../../2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_w_theme-1.png" width="672" /></p>
+<p><img src="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/index_files/figure-html/genderqueer_w_theme-1.png" width="672" /></p>
 <p>The difference isn’t much, but I found this gray to be the perfect balance for most palettes that include white (which is like 85% or so of all LGBT+ flags). But there are palettes without white, like this one:</p>
 <pre class="r"><code># I spent like 10 minutes sifting through the base datasets
 # but - behold! - a non-iris dataset at last
@@ -165,7 +165,7 @@ ggplot(warpbreaks, aes(x = wool, y = breaks, fill = tension)) +
   geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) +
   scale_fill_manual(values = palette_lgbtq(&quot;pansexual&quot;)) +
   theme_lgbtq(&quot;pansexual&quot;)</code></pre>
-<p><img src="../../../../2022/08/12/show-pride-on-your-plots/index_files/figure-html/pansexual_w_theme-1.png" width="672" /></p>
+<p><img src="https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/index_files/figure-html/pansexual_w_theme-1.png" width="672" /></p>
 <p>For now I included 16 palettes, but expect more (and if you want a specific flag to be included in the next release, write an issue on GitHub, strike a message on Twitter, or send a pigeon with a letter):</p>
 <div class="figure">
 <img src="palettes.png" alt="" />
@@ -187,10 +187,10 @@ remotes::install_github(&quot;turtletopia/gglgbtq&quot;)</code></pre>
       <footer class="footer">
         <ul class="footer-links">
           <li>
-            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+            <a href="https://turtletopia.github.io/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
           </li>
           <li>
-            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="https://turtletopia.github.io/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
           </li>
           <li>
             <a href="https://www.r-bloggers.com/" target="_blank">R-bloggers</a>

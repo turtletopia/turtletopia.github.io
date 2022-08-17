@@ -2,21 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>function on Turtletopia: a blog about programming in R</title>
-    <link>/tags/function/</link>
+    <link>https://turtletopia.github.io</link>
     <description>Recent content in function on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 10 Aug 2022 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/function/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://turtletopia.github.io/tags/function/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Sonnet to infix function</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>/2022/08/10/sonnet-to-infix-function/</link>
+      <link>https://turtletopia.github.io/2022/08/10/sonnet-to-infix-function/</link>
       <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
       
-      <guid>/2022/08/10/sonnet-to-infix-function/</guid><description>
+      <guid>https://turtletopia.github.io/2022/08/10/sonnet-to-infix-function/</guid>
+      <description>
 
 
 &lt;div id=&#34;some-poetry-for-the-programmers&#34; class=&#34;section level1&#34;&gt;
