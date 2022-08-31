@@ -11,6 +11,8 @@ aliases:
 output:
   blogdown::html_page:
     toc: true
+images:
+  - loop.png
 ---
 
 # Preface
