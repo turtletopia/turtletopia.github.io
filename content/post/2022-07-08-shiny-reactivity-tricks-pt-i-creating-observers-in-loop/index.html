@@ -1,11 +1,13 @@
 ---
-title: 'Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1'
+title: 'Shiny Reactivity Tricks, pt. I: Creating Observers in Loop'
 author: Dominik Rafacz
 date: '2022-07-09'
-slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
+slug: shiny-reactivity-tricks-pt-i-creating-observers-in-loop
 categories: ['Tutorial']
 tags: ['r', 'tutorial', 'shiny', 'reactivity', 'environments', 'rlang']
 Description: "Reactivity and non-standard evaluation in Shiny can cause many difficulties if one is not familiar with their technical basis. In the first episode of a series on this, I will show how a simple loop can be not-so-trivial to make and how to deal with it."
+aliases:
+  "/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/"
 output:
   blogdown::html_page:
     toc: true
@@ -14,14 +16,14 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#preface">Preface</a></li>
-<li><a href="#use-case-and-naive-solution">Use case and naive solution</a></li>
-<li><a href="#a-quick-recap-of-environments">A quick recap of environments</a></li>
-<li><a href="#environments-in-shiny">Environments in Shiny</a></li>
-<li><a href="#solution-1-create-an-environment-for-each-observer">Solution 1: Create an environment for each observer</a></li>
-<li><a href="#solution-2-inject-the-constants">Solution 2: Inject the constants</a></li>
-<li><a href="#solution-3-or-solution-suggestion-utilize-shiny-modules">Solution 3 (or solution suggestion): Utilize Shiny modules</a></li>
-<li><a href="#summary">Summary</a></li>
+<li><a href="#preface" id="toc-preface">Preface</a></li>
+<li><a href="#use-case-and-naive-solution" id="toc-use-case-and-naive-solution">Use case and naive solution</a></li>
+<li><a href="#a-quick-recap-of-environments" id="toc-a-quick-recap-of-environments">A quick recap of environments</a></li>
+<li><a href="#environments-in-shiny" id="toc-environments-in-shiny">Environments in Shiny</a></li>
+<li><a href="#solution-1-create-an-environment-for-each-observer" id="toc-solution-1-create-an-environment-for-each-observer">Solution 1: Create an environment for each observer</a></li>
+<li><a href="#solution-2-inject-the-constants" id="toc-solution-2-inject-the-constants">Solution 2: Inject the constants</a></li>
+<li><a href="#solution-3-or-solution-suggestion-utilize-shiny-modules" id="toc-solution-3-or-solution-suggestion-utilize-shiny-modules">Solution 3 (or solution suggestion): Utilize Shiny modules</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
 </ul>
 </div>
 
