@@ -1,14 +1,18 @@
 ---
-title: 'Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1'
+title: 'Shiny Reactivity Tricks, pt. I: Creating Observers in Loop'
 author: Dominik Rafacz
 date: '2022-07-09'
-slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
+slug: shiny-reactivity-tricks-pt-i-creating-observers-in-loop
 categories: ['Tutorial']
 tags: ['r', 'tutorial', 'shiny', 'reactivity', 'environments', 'rlang']
 Description: "Reactivity and non-standard evaluation in Shiny can cause many difficulties if one is not familiar with their technical basis. In the first episode of a series on this, I will show how a simple loop can be not-so-trivial to make and how to deal with it."
+aliases:
+  "/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/"
 output:
   blogdown::html_page:
     toc: true
+images:
+  - loop.png
 ---
 
 # Preface
@@ -71,7 +75,7 @@ server <- function(input, output, session) {
 shinyApp(ui, server)
 ```
 
-![Simple version of the app.](peek_1.gif)
+![Simple version of the app.](/images/observers-in-loop-peek-1.gif)
 
 It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it -- in UI and server. UI first, since it seems more manageable. We are R users, so we should make *real* loops only when there are no other means. Thus we are using good old `lapply`, as it is even simpler than trying to use *for*.
 
@@ -132,11 +136,11 @@ The most crucial point is: when the `server` function is executed, and R stumble
 
 Now goes the neat part: during the application runtime, code provided to `observer` is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the `i` variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it **does not** work.
 
-![Expected situation](observer_exp.png)
+![Expected situation](/images/observers-in-loop-observer-exp.png)
 
 Stating it once again: every time the observer is called, `i` is being sought in the current or enclosing environments. But that introduces the question: shouldn't that mean that `i` is missing and calling `i` raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate **is not destroyed** after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, `i` exists in the server environment and has the value `3`. See the diagram below.
 
-![Actual situation](observer_actual.png)
+![Actual situation](/images/observers-in-loop-observer-actual.png)
 
 As a side note, I want to add that there is also the topic of visibility of Shiny objects between users' sessions. It is covered by [an article on the official Shiny webpage](https://shiny.rstudio.com/articles/scoping.html). I strongly recommend reading it.
 
@@ -163,7 +167,7 @@ for (i in 1:3) {
 
 In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the `i` to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own `i` object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers' quoted code; they are kept together with code. The concept is illustrated in the diagram below.
 
-![Solution with the creation of environments](observer_envs.png)
+![Solution with the creation of environments](/images/observers-in-loop-observer-envs.png)
 
 We can also do the same with a small change. `new.env()` call can be replaced with `rlang::env()`. *rlang* is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is [the project webpage](https://rlang.r-lib.org/).
 

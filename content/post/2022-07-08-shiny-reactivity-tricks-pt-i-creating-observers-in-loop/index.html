@@ -1,27 +1,31 @@
 ---
-title: 'Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1'
+title: 'Shiny Reactivity Tricks, pt. I: Creating Observers in Loop'
 author: Dominik Rafacz
 date: '2022-07-09'
-slug: creating-observers-in-loop-shiny-reactivity-tricks-episode-one
+slug: shiny-reactivity-tricks-pt-i-creating-observers-in-loop
 categories: ['Tutorial']
 tags: ['r', 'tutorial', 'shiny', 'reactivity', 'environments', 'rlang']
 Description: "Reactivity and non-standard evaluation in Shiny can cause many difficulties if one is not familiar with their technical basis. In the first episode of a series on this, I will show how a simple loop can be not-so-trivial to make and how to deal with it."
+aliases:
+  "/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/"
 output:
   blogdown::html_page:
     toc: true
+images:
+  - loop.png
 ---
 
 
 <div id="TOC">
 <ul>
-<li><a href="#preface">Preface</a></li>
-<li><a href="#use-case-and-naive-solution">Use case and naive solution</a></li>
-<li><a href="#a-quick-recap-of-environments">A quick recap of environments</a></li>
-<li><a href="#environments-in-shiny">Environments in Shiny</a></li>
-<li><a href="#solution-1-create-an-environment-for-each-observer">Solution 1: Create an environment for each observer</a></li>
-<li><a href="#solution-2-inject-the-constants">Solution 2: Inject the constants</a></li>
-<li><a href="#solution-3-or-solution-suggestion-utilize-shiny-modules">Solution 3 (or solution suggestion): Utilize Shiny modules</a></li>
-<li><a href="#summary">Summary</a></li>
+<li><a href="#preface" id="toc-preface">Preface</a></li>
+<li><a href="#use-case-and-naive-solution" id="toc-use-case-and-naive-solution">Use case and naive solution</a></li>
+<li><a href="#a-quick-recap-of-environments" id="toc-a-quick-recap-of-environments">A quick recap of environments</a></li>
+<li><a href="#environments-in-shiny" id="toc-environments-in-shiny">Environments in Shiny</a></li>
+<li><a href="#solution-1-create-an-environment-for-each-observer" id="toc-solution-1-create-an-environment-for-each-observer">Solution 1: Create an environment for each observer</a></li>
+<li><a href="#solution-2-inject-the-constants" id="toc-solution-2-inject-the-constants">Solution 2: Inject the constants</a></li>
+<li><a href="#solution-3-or-solution-suggestion-utilize-shiny-modules" id="toc-solution-3-or-solution-suggestion-utilize-shiny-modules">Solution 3 (or solution suggestion): Utilize Shiny modules</a></li>
+<li><a href="#summary" id="toc-summary">Summary</a></li>
 </ul>
 </div>
 
@@ -81,7 +85,7 @@ server &lt;- function(input, output, session) {
 
 shinyApp(ui, server)</code></pre>
 <div class="figure">
-<img src="peek_1.gif" alt="" />
+<img src="/images/observers-in-loop-peek-1.gif" alt="" />
 <p class="caption">Simple version of the app.</p>
 </div>
 <p>It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it – in UI and server. UI first, since it seems more manageable. We are R users, so we should make <em>real</em> loops only when there are no other means. Thus we are using good old <code>lapply</code>, as it is even simpler than trying to use <em>for</em>.</p>
@@ -125,12 +129,12 @@ shinyApp(ui, server)</code></pre>
 <p>The most crucial point is: when the <code>server</code> function is executed, and R stumbles upon the <code>observer</code> call, it <strong>does not</strong> evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in <code>reactive</code>’s, <code>render</code>’s, etc., but we skip them in the other part as they do not appear in our example.</p>
 <p>Now goes the neat part: during the application runtime, code provided to <code>observer</code> is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the <code>i</code> variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it <strong>does not</strong> work.</p>
 <div class="figure">
-<img src="observer_exp.png" alt="" />
+<img src="/images/observers-in-loop-observer-exp.png" alt="" />
 <p class="caption">Expected situation</p>
 </div>
 <p>Stating it once again: every time the observer is called, <code>i</code> is being sought in the current or enclosing environments. But that introduces the question: shouldn’t that mean that <code>i</code> is missing and calling <code>i</code> raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate <strong>is not destroyed</strong> after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, <code>i</code> exists in the server environment and has the value <code>3</code>. See the diagram below.</p>
 <div class="figure">
-<img src="observer_actual.png" alt="" />
+<img src="/images/observers-in-loop-observer-actual.png" alt="" />
 <p class="caption">Actual situation</p>
 </div>
 <p>As a side note, I want to add that there is also the topic of visibility of Shiny objects between users’ sessions. It is covered by <a href="https://shiny.rstudio.com/articles/scoping.html">an article on the official Shiny webpage</a>. I strongly recommend reading it.</p>
@@ -153,7 +157,7 @@ shinyApp(ui, server)</code></pre>
 }</code></pre>
 <p>In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the <code>i</code> to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own <code>i</code> object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers’ quoted code; they are kept together with code. The concept is illustrated in the diagram below.</p>
 <div class="figure">
-<img src="observer_envs.png" alt="" />
+<img src="/images/observers-in-loop-observer-envs.png" alt="" />
 <p class="caption">Solution with the creation of environments</p>
 </div>
 <p>We can also do the same with a small change. <code>new.env()</code> call can be replaced with <code>rlang::env()</code>. <em>rlang</em> is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is <a href="https://rlang.r-lib.org/">the project webpage</a>.</p>
