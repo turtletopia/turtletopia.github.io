@@ -17,7 +17,7 @@ images:
 
 There was no post last week because the holiday season/master's thesis finishing season/parental pet care season is in full swing, and I've been completely crushed. This week isn't easy either, but I didn't want to leave you empty-handed when there's so much to talk about!
 
-This time I wanted to present you with another installment in the shiny tricks series. This time I'm going to show something that isn't quite as 'tricky' but can still be non-obvious to those who don't use reactivity and environments proficiently. I will tell you about factories of reactives. And the tale with starts with an example.
+This time I wanted to present you with another installment in the shiny tricks series. I'm going to show something that isn't quite as 'tricky' but can still be non-obvious to those who don't use reactivity and environments proficiently. I will tell you about factories of reactives. And the tale starts with an example.
 
 # Basic example
 
