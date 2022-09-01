@@ -6,29 +6,266 @@
     <description>Recent content in reactivity on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 09 Jul 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://turtletopia.github.io/tags/reactivity/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Creating Observers in Loop. Shiny Reactivity Tricks: Episode 1</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
+      <title>Shiny Reactivity Tricks, pt. II: Reactives Factories</title><enclosure url="factory.png" type="image/jpg"></enclosure>
       
-      <guid>https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</guid>
+      <link>https://turtletopia.github.io/2022/08/31/shiny-reactivity-tricks-pt-ii-reactives-factories/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/2022/08/31/shiny-reactivity-tricks-pt-ii-reactives-factories/</guid>
       <description>
 
 &lt;div id=&#34;TOC&#34;&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#preface&#34; id=&#34;toc-preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#basic-example&#34; id=&#34;toc-basic-example&#34;&gt;Basic example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-1-wrap-a-function-with-a-reactive.&#34; id=&#34;toc-solution-1-wrap-a-function-with-a-reactive.&#34;&gt;Solution 1: wrap a function with a reactive.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-2a-and-2b-extract-input.&#34; id=&#34;toc-solution-2a-and-2b-extract-input.&#34;&gt;Solution 2a and 2b: extract input.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-3-wrap-a-reactive-with-a-function-factory.&#34; id=&#34;toc-solution-3-wrap-a-reactive-with-a-function-factory.&#34;&gt;Solution 3: wrap a reactive with a function (factory).&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#discussion-summary&#34; id=&#34;toc-discussion-summary&#34;&gt;Discussion &amp;amp; summary&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
+&lt;div id=&#34;preface&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Preface&lt;/h1&gt;
+&lt;p&gt;There was no post last week because the holiday season/master’s thesis finishing season/parental pet care season is in full swing, and I’ve been completely crushed. This week isn’t easy either, but I didn’t want to leave you empty-handed when there’s so much to talk about!&lt;/p&gt;
+&lt;p&gt;This time I wanted to present you with another installment in the shiny tricks series. I’m going to show something that isn’t quite as ‘tricky’ but can still be non-obvious to those who don’t use reactivity and environments proficiently. I will tell you about factories of reactives. And the tale starts with an example.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;basic-example&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Basic example&lt;/h1&gt;
+&lt;p&gt;&lt;strong&gt;Remark:&lt;/strong&gt; As I often use the &lt;code&gt;shiny::reactive()&lt;/code&gt; function in this article, it will probably not have escaped you that I always wrap the first argument of this function in curly brackets. By doing so, I make it clear that the function’s argument is &lt;em&gt;an expression&lt;/em&gt;, not its &lt;em&gt;value&lt;/em&gt;. Most of the time, this is not necessary, but it is a habit of mine and helps me keep the code readable.&lt;/p&gt;
+&lt;p&gt;Suppose we have an application that accepts several numeric inputs that perform very complex transformations, then plots and outputs the result. Let’s start with an example with two inputs.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(shiny)
+
+ui &amp;lt;- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      numericInput(&amp;quot;a&amp;quot;, &amp;quot;input a&amp;quot;, 1, 0, 100, 1),
+      numericInput(&amp;quot;b&amp;quot;, &amp;quot;input b&amp;quot;, 1, 0, 100, 1)
+    ),
+    mainPanel(
+      textOutput(&amp;quot;text_a_b&amp;quot;),
+      plotOutput(&amp;quot;plot_a_b&amp;quot;)
+    )
+  )
+)
+
+server &amp;lt;- function(input, output, session) {
+  temp_val &amp;lt;- reactive({
+    c(
+      input[[&amp;quot;a&amp;quot;]] + input[[&amp;quot;b&amp;quot;]],
+      input[[&amp;quot;a&amp;quot;]]^3 * input[[&amp;quot;b&amp;quot;]],
+      27 - (input[[&amp;quot;b&amp;quot;]] + input[[&amp;quot;a&amp;quot;]])
+    )
+  })
+
+  output[[&amp;quot;text_a_b&amp;quot;]] &amp;lt;- renderText(
+    paste(temp_val(), collapse = &amp;quot; -- &amp;quot;)
+  )
+  output[[&amp;quot;plot_a_b&amp;quot;]] &amp;lt;- renderPlot(
+    plot(temp_val(), temp_val())
+  )
+}
+
+shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/reactives-factory-example.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Basic example app.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;This application takes two inputs and performs an incredibly complex calculation that, in effect, returns a three-element vector. This vector, an intermediate value, is later used for the two outputs.&lt;/p&gt;
+&lt;p&gt;Of course, again, the calculations themselves, the inputs and outputs, are not relevant or even meaningful here. It’s just my usual problem finding simple examples to demonstrate not-so-simple concepts. The only important thing is a reactive intermediate value calculated from inputs.&lt;/p&gt;
+&lt;p&gt;So far, nothing complicated. So let’s add a little spice.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ui &amp;lt;- fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      numericInput(&amp;quot;a&amp;quot;, &amp;quot;input a&amp;quot;, 1, 0, 100, 1),
+      numericInput(&amp;quot;b&amp;quot;, &amp;quot;input b&amp;quot;, 1, 0, 100, 1),
+      numericInput(&amp;quot;c&amp;quot;, &amp;quot;input c&amp;quot;, 1, 0, 100, 1),
+      numericInput(&amp;quot;d&amp;quot;, &amp;quot;input d&amp;quot;, 1, 0, 100, 1),
+      numericInput(&amp;quot;e&amp;quot;, &amp;quot;input e&amp;quot;, 1, 0, 100, 1)
+    ),
+    mainPanel(
+      textOutput(&amp;quot;text_a_b&amp;quot;),
+      plotOutput(&amp;quot;plot_a_b&amp;quot;),
+      plotOutput(&amp;quot;plot_b_d&amp;quot;),
+      tableOutput(&amp;quot;table_c_d&amp;quot;),
+      textOutput(&amp;quot;table_a_e&amp;quot;)
+    )
+  )
+)
+
+server &amp;lt;- function(input, output, session) {
+  temp_val_1 &amp;lt;- reactive({
+    c(
+      input[[&amp;quot;a&amp;quot;]] + input[[&amp;quot;b&amp;quot;]],
+      input[[&amp;quot;a&amp;quot;]]^3 * input[[&amp;quot;b&amp;quot;]],
+      27 - (input[[&amp;quot;b&amp;quot;]] + input[[&amp;quot;a&amp;quot;]])
+    )
+  })
+
+  temp_val_2 &amp;lt;- reactive({
+    c(
+      input[[&amp;quot;b&amp;quot;]] + input[[&amp;quot;d&amp;quot;]],
+      input[[&amp;quot;b&amp;quot;]]^2 * input[[&amp;quot;d&amp;quot;]],
+      8 - (input[[&amp;quot;d&amp;quot;]] + input[[&amp;quot;b&amp;quot;]])
+    )
+  })
+
+  temp_val_3 &amp;lt;- reactive({
+    c(
+      input[[&amp;quot;c&amp;quot;]] + input[[&amp;quot;d&amp;quot;]],
+      input[[&amp;quot;c&amp;quot;]] * input[[&amp;quot;d&amp;quot;]],
+      1 - (input[[&amp;quot;d&amp;quot;]] + input[[&amp;quot;c&amp;quot;]])
+    )
+  })
+
+  temp_val_4 &amp;lt;- reactive({
+    c(
+      input[[&amp;quot;a&amp;quot;]] + input[[&amp;quot;e&amp;quot;]],
+      input[[&amp;quot;a&amp;quot;]]^4 * input[[&amp;quot;e&amp;quot;]],
+      64 - (input[[&amp;quot;e&amp;quot;]] + input[[&amp;quot;a&amp;quot;]])
+    )
+  })
+
+  output[[&amp;quot;text_a_b&amp;quot;]] &amp;lt;- renderText(
+    paste(temp_val_1(), collapse = &amp;quot; -- &amp;quot;)
+  )
+  output[[&amp;quot;plot_a_b&amp;quot;]] &amp;lt;- renderPlot(
+    plot(temp_val_1(), temp_val_1())
+  )
+  output[[&amp;quot;plot_b_d&amp;quot;]] &amp;lt;- renderPlot(
+    plot(c(1, 1, 1), temp_val_2())
+  )
+  output[[&amp;quot;table_c_d&amp;quot;]] &amp;lt;- renderTable(
+    data.frame(x = temp_val_3(), e = exp(temp_val_3()))
+  )
+  output[[&amp;quot;table_a_e&amp;quot;]] &amp;lt;- renderText(temp_val_4())
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;I modified the UI and the server to do more things. Everything is centered around the very complex transformation as before, but we have more inputs, more outputs, and more temporary values. And above all: more iterations. As you may have already realized, I’m a prominent opponent of repetition in code: if there’s copy-paste somewhere, it can probably be done better. And that’s what we’re going to try to address. This code has two primary repeating rhythms: inputs and the calculation of temporary values. We can fix the first repetition very quickly, and I’ve already done similar things in &lt;a href=&#34;https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/&#34;&gt;the last part of the article series&lt;/a&gt;, so I won’t go into it this time. Let’s deal with the more exciting thing, which is the server-side repetitions.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-1-wrap-a-function-with-a-reactive.&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 1: wrap a function with a reactive.&lt;/h1&gt;
+&lt;p&gt;The thing that jumps to mind almost immediately is the creation of a function that generates these temporary values.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;
+magic_func &amp;lt;- function(name_1, name_2, param) c(
+  name_1 + name_2,
+  name_1^param * name_2,
+  param^3 - (name_2 + name_1)
+)
+
+server &amp;lt;- function(input, output, session) {
+  temp_val_1 &amp;lt;- reactive({ magic_func(input[[&amp;quot;a&amp;quot;]], input[[&amp;quot;b&amp;quot;]], 3) })
+  temp_val_2 &amp;lt;- reactive({ magic_func(input[[&amp;quot;b&amp;quot;]], input[[&amp;quot;d&amp;quot;]], 2) })
+  temp_val_3 &amp;lt;- reactive({ magic_func(input[[&amp;quot;c&amp;quot;]], input[[&amp;quot;d&amp;quot;]], 1) })
+  temp_val_4 &amp;lt;- reactive({ magic_func(input[[&amp;quot;a&amp;quot;]], input[[&amp;quot;e&amp;quot;]], 4) })
+
+  # here, put the other part of the server code...
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;This already looks much, much better! It’s more readable and less error-proof, so the advantages alone. And that’s basically where we could leave it. But if it satisfied us, we wouldn’t read any further.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-2a-and-2b-extract-input.&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 2a and 2b: extract input.&lt;/h1&gt;
+&lt;p&gt;Another thing that we can improve in this solution is to refer to the &lt;code&gt;input&lt;/code&gt; object every time there are multiple arguments to the &lt;code&gt;magic_func()&lt;/code&gt; function. So maybe we can move this reference inside the function?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;
+magic_func &amp;lt;- function(name_1, name_2, param) c(
+  input[[name_1]] + input[[name_2]],
+  input[[name_1]]^param * input[[name_2]],
+  param^3 - (input[[name_2]] + input[[name_1]])
+)
+
+server &amp;lt;- function(input, output, session) {
+  temp_val_1 &amp;lt;- reactive({ magic_func(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, 3) })
+  temp_val_2 &amp;lt;- reactive({ magic_func(&amp;quot;b&amp;quot;, &amp;quot;d&amp;quot;, 2) })
+  temp_val_3 &amp;lt;- reactive({ magic_func(&amp;quot;c&amp;quot;, &amp;quot;d&amp;quot;, 1) })
+  temp_val_4 &amp;lt;- reactive({ magic_func(&amp;quot;a&amp;quot;, &amp;quot;e&amp;quot;, 4) })
+  
+  # here, put the other part of the server code...
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/reactives-factory-error.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;Output error message.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Unfortunately, we will find that this is not enough. The &lt;code&gt;input&lt;/code&gt; object is for the interior of the function unknown. That may seem unnatural if you understand the basics of how scopes work in R – if the object is not found in the current environment, the parent environment is checked (I talked about this in &lt;a href=&#34;https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/&#34;&gt;the last part of the series&lt;/a&gt;, I refer you to it again). Here, however, this situation is not so evident because the server environment is not in the search path of the environment in which the function is defined.&lt;/p&gt;
+&lt;p&gt;That can be resolved in two ways: either move the function definition inside the server or pass an &lt;code&gt;input&lt;/code&gt; object as an additional parameter to the function. I leave the proof to the reader.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;solution-3-wrap-a-reactive-with-a-function-factory.&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Solution 3: wrap a reactive with a function (factory).&lt;/h1&gt;
+&lt;p&gt;However, we could go even further and reduce code redundancy. And this is where we want to create a reactive factory.&lt;/p&gt;
+&lt;p&gt;What is a factory of reactives? It is simply a function that creates a reactive. Every shiny user should be familiar with the primary function used to create and register reactives – namely, &lt;code&gt;shiny::reactive()&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;But this is the most general factory that exists – you pass it any expression, turning it into a reactive expression. We would like to have something more concrete, i.e. instead of writing &lt;code&gt;reactive({ fun(parameters) })&lt;/code&gt; writing &lt;code&gt;reactive_fun(parameters)&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In our case, we want to replace&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;reactive({ magic_func(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, 3) })&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;with&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;r_magic_func(&amp;quot;a&amp;quot;, &amp;quot;b&amp;quot;, 3)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Notice the &lt;code&gt;r_&lt;/code&gt; I added to the function name. Suggesting that this function returns a reactive is a good idea.&lt;/p&gt;
+&lt;p&gt;So, let’s try to make such a function!&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;r_magic_func &amp;lt;- function(name_1, name_2, param) reactive({
+  c(
+    input[[name_1]] + input[[name_2]],
+    input[[name_1]]^param * input[[name_2]],
+    param^3 - (input[[name_2]] + input[[name_1]])
+  )
+})&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Does it work? Yes… at least: almost. It will not work unless we consider our previous solution’s experiences: it needs to be either defined in the server function or take input as a separate parameter.&lt;/p&gt;
+&lt;p&gt;But what if we do not want to do either of those? We are lazy and do not want to type all the parameters that will look the same either way. Those “inputs” typed every time are annoying, but if, in addition, we have some other reactive values that we would have to pass on each time, this would be very annoying. On the other hand, defining functions within a server works for small apps but is terrible if you have an extensive, packaged application that wants to keep its code tidy and test its functions with unit tests. So how do we get around these obstacles?&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;reactive&lt;/code&gt; has additional parameters that are worth looking at. Of particular interest to us is the &lt;code&gt;env&lt;/code&gt; parameter. It indicates the environment in which the expression passed as the first parameter should be evaluated. That is usually set as the environment calling the &lt;code&gt;reactive&lt;/code&gt; function. So this is the reason why our original factory is not able to see the &lt;code&gt;input&lt;/code&gt; object – it is not in the environment calling the &lt;code&gt;reactive&lt;/code&gt;. So what happens if we replace this environment with the environment which calls our factory function?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;r_magic_func &amp;lt;- function(name_1, name_2, param) reactive({
+  c(
+    input[[name_1]] + input[[name_2]],
+    input[[name_1]]^param * input[[name_2]],
+    param^3 - (input[[name_2]] + input[[name_1]])
+  )
+}, env = rlang::caller_env())&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/reactives-factory-error-2.png&#34; alt=&#34;&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;We got a different error! That’s progress!&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Why are we getting this error this time? Since we replaced the evaluation environment with the caller environment, it can see all objects available in the server environment. Still, it cannot see the objects available inside the &lt;code&gt;r_magic_func&lt;/code&gt; – namely, name_1 (pun intended) and other parameters.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Our favorite package comes to our rescue: rlang!&lt;/strong&gt; We can use a similar idea with an injection of values just as in the &lt;a href=&#34;https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/&#34;&gt;previous tutorial&lt;/a&gt;.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;r_magic_func &amp;lt;- function(name_1, name_2, param) rlang::inject({
+  reactive({
+    c(
+      input[[!!name_1]] + input[[!!name_2]],
+      input[[!!name_1]]^(!!param) * input[[!!name_2]],
+      (!!param)^3 - (input[[!!name_2]] + input[[!!name_1]])
+    )
+  }, env = rlang::caller_env())
+})&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;And it fulfills all of our objectives! One more thing to do: if we want to take care of the &lt;code&gt;r_magic_func&lt;/code&gt;, we should ensure that this factory can also be called within other functions. So, instead of fixing the &lt;code&gt;env&lt;/code&gt; parameter of &lt;code&gt;reactive&lt;/code&gt; as the &lt;code&gt;rlang::caller_env()&lt;/code&gt;, we should make it a default parameter of &lt;code&gt;r_magic_func&lt;/code&gt;, similarly to &lt;code&gt;reactive&lt;/code&gt; itself does it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;discussion-summary&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Discussion &amp;amp; summary&lt;/h1&gt;
+&lt;p&gt;My example will probably seem too artificial and contrived to some of you. I am not writing this for the sake of the brilliance of the example but rather to teach the concept behind it. Probably many of you will find a suitable application for this method. Some may agitate that hiding the reactive behind a function is superfluous, but, in my opinion, it is just another step towards code readability. This kind of factory can be further generalized and improved, which I will discuss next time.&lt;/p&gt;
+&lt;p&gt;One more thing: modules. I still deliberately avoid using modules. What I am doing here could also be done using modules, although I think it is much less intuitive than in the last part of the series. I will also write about modules another time (ah, too many of these topics!).&lt;/p&gt;
+&lt;p&gt;I have shown you how to use tools to change the evaluation environment to control code execution and, as a result, reduce unnecessary repetitions. This is only the second step on the long road to becoming a master at using the language to its full potential. If you have any questions or comments, contact us &lt;a href=&#34;https://twitter.com/Rturtletopia&#34;&gt;on Twitter&lt;/a&gt; or make an issue &lt;a href=&#34;https://github.com/turtletopia/turtletopia.github.io/issues&#34;&gt;on Github&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Shiny Reactivity Tricks, pt. I: Creating Observers in Loop</title><enclosure url="loop.png" type="image/jpg"></enclosure>
+      
+      <link>https://turtletopia.github.io/2022/07/09/shiny-reactivity-tricks-pt-i-creating-observers-in-loop/</link>
+      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/2022/07/09/shiny-reactivity-tricks-pt-i-creating-observers-in-loop/</guid>
+      <description>
+
+&lt;div id=&#34;TOC&#34;&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;#preface&#34; id=&#34;toc-preface&#34;&gt;Preface&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#use-case-and-naive-solution&#34; id=&#34;toc-use-case-and-naive-solution&#34;&gt;Use case and naive solution&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#a-quick-recap-of-environments&#34; id=&#34;toc-a-quick-recap-of-environments&#34;&gt;A quick recap of environments&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#environments-in-shiny&#34; id=&#34;toc-environments-in-shiny&#34;&gt;Environments in Shiny&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-1-create-an-environment-for-each-observer&#34; id=&#34;toc-solution-1-create-an-environment-for-each-observer&#34;&gt;Solution 1: Create an environment for each observer&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-2-inject-the-constants&#34; id=&#34;toc-solution-2-inject-the-constants&#34;&gt;Solution 2: Inject the constants&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#solution-3-or-solution-suggestion-utilize-shiny-modules&#34; id=&#34;toc-solution-3-or-solution-suggestion-utilize-shiny-modules&#34;&gt;Solution 3 (or solution suggestion): Utilize Shiny modules&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#summary&#34; id=&#34;toc-summary&#34;&gt;Summary&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
 
@@ -88,7 +325,7 @@ server &amp;lt;- function(input, output, session) {
 
 shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;peek_1.gif&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/observers-in-loop-peek-1.gif&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Simple version of the app.&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;It works like a charm! But we can easily see that there is a lot of copypasting. And copypasting is something we should avoid. (Some other day, I would love to say something more about it in general.) If you have gone so far into the article, you probably know what I want to do: a loop. There are two prominent places to use it – in UI and server. UI first, since it seems more manageable. We are R users, so we should make &lt;em&gt;real&lt;/em&gt; loops only when there are no other means. Thus we are using good old &lt;code&gt;lapply&lt;/code&gt;, as it is even simpler than trying to use &lt;em&gt;for&lt;/em&gt;.&lt;/p&gt;
@@ -132,12 +369,12 @@ shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;The most crucial point is: when the &lt;code&gt;server&lt;/code&gt; function is executed, and R stumbles upon the &lt;code&gt;observer&lt;/code&gt; call, it &lt;strong&gt;does not&lt;/strong&gt; evaluate the code passed as the first argument. Instead, it registers the observer and stores the code for later evaluation. We are still at the start-up stage, and now Shiny only creates net reactive dependencies. No inputs are available; they appear just after somebody opens the browser and initializes the page. That also applies to all expressions enclosed in &lt;code&gt;reactive&lt;/code&gt;’s, &lt;code&gt;render&lt;/code&gt;’s, etc., but we skip them in the other part as they do not appear in our example.&lt;/p&gt;
 &lt;p&gt;Now goes the neat part: during the application runtime, code provided to &lt;code&gt;observer&lt;/code&gt; is evaluated as is in the server function execution environment. So, when seeking a variable, it looks for its value in this environment. It does not magically replace the &lt;code&gt;i&lt;/code&gt; variable with the value used in the loop iteration, as might be expected. I made a diagram (included below) which illustrates how it &lt;strong&gt;does not&lt;/strong&gt; work.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_exp.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/observers-in-loop-observer-exp.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Expected situation&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;Stating it once again: every time the observer is called, &lt;code&gt;i&lt;/code&gt; is being sought in the current or enclosing environments. But that introduces the question: shouldn’t that mean that &lt;code&gt;i&lt;/code&gt; is missing and calling &lt;code&gt;i&lt;/code&gt; raises an error? Why does it work for one of the observers? The answer is: actually, all three observers work. But they all modify the input number 3. And that is because of one quite peculiar property of R. Namely, the variable used to iterate &lt;strong&gt;is not destroyed&lt;/strong&gt; after finishing the loop execution, and it stays in the environment with the value of the last value used in the loop. In our case, &lt;code&gt;i&lt;/code&gt; exists in the server environment and has the value &lt;code&gt;3&lt;/code&gt;. See the diagram below.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_actual.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/observers-in-loop-observer-actual.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Actual situation&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;As a side note, I want to add that there is also the topic of visibility of Shiny objects between users’ sessions. It is covered by &lt;a href=&#34;https://shiny.rstudio.com/articles/scoping.html&#34;&gt;an article on the official Shiny webpage&lt;/a&gt;. I strongly recommend reading it.&lt;/p&gt;
@@ -160,7 +397,7 @@ shinyApp(ui, server)&lt;/code&gt;&lt;/pre&gt;
 }&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;In each loop iteration, we create a new environment whose parent is the server environment. Then we assign the current value of the &lt;code&gt;i&lt;/code&gt; to the environment and provide the env as a parameter for the observer. As a result, each observer has its environment with its own &lt;code&gt;i&lt;/code&gt; object. Those envs refer to server env as a parent, so all other variables are accessible. The trick is possible because those numerous envs are not used inside the observers’ quoted code; they are kept together with code. The concept is illustrated in the diagram below.&lt;/p&gt;
 &lt;div class=&#34;figure&#34;&gt;
-&lt;img src=&#34;observer_envs.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;https://turtletopia.github.io/images/observers-in-loop-observer-envs.png&#34; alt=&#34;&#34; /&gt;
 &lt;p class=&#34;caption&#34;&gt;Solution with the creation of environments&lt;/p&gt;
 &lt;/div&gt;
 &lt;p&gt;We can also do the same with a small change. &lt;code&gt;new.env()&lt;/code&gt; call can be replaced with &lt;code&gt;rlang::env()&lt;/code&gt;. &lt;em&gt;rlang&lt;/em&gt; is a package that overhauls the interface of operating on expressions and environments in R, as base R ways of doing it are messy. A minor change, but on this blog, we will demonstrate rlang features heavily, so you should get used to it. Additional source is &lt;a href=&#34;https://rlang.r-lib.org/&#34;&gt;the project webpage&lt;/a&gt;.&lt;/p&gt;

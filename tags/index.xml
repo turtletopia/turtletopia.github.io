@@ -6,10 +6,64 @@
     <description>Recent content in Tags on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://turtletopia.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>environments</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/environments/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/environments/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>r</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/r/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>reactivity</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/reactivity/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/reactivity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rlang</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/rlang/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/rlang/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>shiny</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/shiny/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/shiny/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tutorial</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/tags/tutorial/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/tags/tutorial/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>ggplot2</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
@@ -44,15 +98,6 @@
       <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
       
       <guid>https://turtletopia.github.io/tags/pride/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>r</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/r/</link>
-      <pubDate>Fri, 12 Aug 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/r/</guid>
       <description></description>
     </item>
     
@@ -116,15 +161,6 @@
       <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
       
       <guid>https://turtletopia.github.io/tags/operator/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>rlang</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/rlang/</link>
-      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/rlang/</guid>
       <description></description>
     </item>
     
@@ -242,42 +278,6 @@
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>https://turtletopia.github.io/tags/version-codes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>environments</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/environments/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/environments/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>reactivity</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/reactivity/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/reactivity/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>shiny</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/shiny/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/shiny/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>tutorial</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/tags/tutorial/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/tags/tutorial/</guid>
       <description></description>
     </item>
     

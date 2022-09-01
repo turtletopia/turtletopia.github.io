@@ -3,7 +3,40 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://turtletopia.github.io/categories/</loc>
-    <lastmod>2022-08-12T00:00:00+00:00</lastmod>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/environments/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/post/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/r/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/reactivity/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/rlang/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/shiny/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/2022/08/31/shiny-reactivity-tricks-pt-ii-reactives-factories/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/tags/tutorial/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://turtletopia.github.io/categories/tutorial/</loc>
+    <lastmod>2022-08-31T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/tags/ggplot2/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
@@ -14,28 +47,16 @@
     <loc>https://turtletopia.github.io/tags/palettes/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://turtletopia.github.io/post/</loc>
-    <lastmod>2022-08-12T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://turtletopia.github.io/tags/pride/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://turtletopia.github.io/tags/r/</loc>
-    <lastmod>2022-08-12T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://turtletopia.github.io/2022/08/12/show-pride-on-your-plots/</loc>
-    <lastmod>2022-08-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/tags/turtletools/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/categories/turtletools/</loc>
-    <lastmod>2022-08-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/</loc>
     <lastmod>2022-08-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/tags/essay/</loc>
@@ -57,9 +78,6 @@
     <lastmod>2022-08-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/tags/operator/</loc>
-    <lastmod>2022-08-10T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/rlang/</loc>
     <lastmod>2022-08-10T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/2022/08/10/sonnet-to-infix-function/</loc>
@@ -116,22 +134,7 @@
     <loc>https://turtletopia.github.io/tags/version-codes/</loc>
     <lastmod>2022-07-16T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://turtletopia.github.io/2022/07/09/creating-observers-in-loop-shiny-reactivity-tricks-episode-one/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/environments/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/reactivity/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/shiny/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/tags/tutorial/</loc>
-    <lastmod>2022-07-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://turtletopia.github.io/categories/tutorial/</loc>
+    <loc>https://turtletopia.github.io/2022/07/09/shiny-reactivity-tricks-pt-i-creating-observers-in-loop/</loc>
     <lastmod>2022-07-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://turtletopia.github.io/2022/07/01/hello-world/</loc>

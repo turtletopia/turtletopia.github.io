@@ -6,10 +6,19 @@
     <description>Recent content in Categories on Turtletopia: a blog about programming in R</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 12 Aug 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 31 Aug 2022 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://turtletopia.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tutorial</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
+      <link>https://turtletopia.github.io/categories/tutorial/</link>
+      <pubDate>Wed, 31 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://turtletopia.github.io/categories/tutorial/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Turtletools</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
@@ -35,15 +44,6 @@
       <pubDate>Sat, 16 Jul 2022 00:00:00 +0000</pubDate>
       
       <guid>https://turtletopia.github.io/categories/overview/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Tutorial</title><enclosure url="https://turtletopia.github.io/images/logo.png" type="image/jpg"></enclosure>
-      <link>https://turtletopia.github.io/categories/tutorial/</link>
-      <pubDate>Sat, 09 Jul 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://turtletopia.github.io/categories/tutorial/</guid>
       <description></description>
     </item>
     
