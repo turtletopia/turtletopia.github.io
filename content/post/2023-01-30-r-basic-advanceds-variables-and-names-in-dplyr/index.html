@@ -1,0 +1,101 @@
+---
+title: 'R Basic Advanceds: Variables and Names in dplyr'
+author: Dominik Rafacz
+date: '2023-01-30'
+slug: r-basic-advanceds-variables-and-names-in-dplyr
+categories: ['Tutorial']
+tags: ['r', 'tutorial', 'dplyr', 'environments', 'rlang']
+---
+
+
+
+<div id="intro" class="section level1">
+<h1>Intro</h1>
+<p>Hello everyone! We’ve had quite a long hiatus caused by various life things (including graduating from college, changing jobs and lawsuits), but we’re back and want to bring the blog back to life. And since the basics of advanced methods is what interests me the most, today I’m going to introduce you to a post about something that sooner or later every dplyr user will encounter.</p>
+</div>
+<div id="problem-1-symbols-treated-as-names-vs-variables-containing-strings-with-names" class="section level1">
+<h1>Problem 1: symbols treated as names vs variables containing strings with names</h1>
+<p>dplyr verbs are very convenient, because we can use <em>symbols</em> instead of constantly accessing the data with <em>strings with names</em>. E.g. compare the code for selecting columns in data frame in base R and in dplyr:</p>
+<pre class="r"><code># base
+iris[, c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)]
+
+# dplyr
+iris %&gt;%
+  select(Sepal.Length, Sepal.Width)</code></pre>
+<p>We can see the clear difference between the base style and the dplyr style:</p>
+<ul>
+<li><code>"Sepal.Length", "Sepal.Width"</code> – strings with names, they are quoted by ” or ’</li>
+<li><code>Sepal.Length, Sepal.Width</code> – symbols, they are not quoted (or quoted using ` character, if they contain spaces)</li>
+</ul>
+<p>In the second case <em>symbols</em> are used to access columns in data.frame (it is not important how that works in details, we will take care of that in another post). It is crucial to know this difference and understand it, as it might help us not to fall into the traps which I will discuss in the rest of the post.</p>
+<p>dplyr introduced this syntax, because it is simpler. Less characters to type is always nice, especially when we are using column names really often, which usually is the case.</p>
+<p>Sometimes, however, we do not know names of columns to select in advance. E.g., we have an external variable containing names of columns to select, like this:</p>
+<pre class="r"><code>my_variables &lt;- c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)</code></pre>
+<p>We can provide it to <code>select</code> directly:</p>
+<pre class="r"><code>iris %&gt;%
+  select(my_variables)</code></pre>
+<pre><code>## Note: Using an external vector in selections is ambiguous.
+## i Use `all_of(my_variables)` instead of `my_variables` to silence this message.
+## i See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
+## This message is displayed once per session.</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 3          4.7         3.2
+## 4          4.6         3.1
+## 5          5.0         3.6</code></pre>
+<p>but it throws a warning. tidyverse boasts detailed messages and it is worth always taking them into consideration. This is not recommended, as it is ambiguous. We can easily imagine situation when there is a column in data called “my_variables”. What should happen, if we have both such a column and such an external variable? Which one would be selected? The answer does not matter for us, as we want to stick to best practices.</p>
+<p>A solution suggested by authors of dplyr is to use <code>dplyr::all_of()</code>, which explicitly transforms a vector of names (or a single name) into symbols. In this way there is no ambiguity – dplyr knows that it should use columns named by vector <code>my_variables</code>, not use <code>my_variables</code> as a name of column.</p>
+<pre class="r"><code>iris %&gt;%
+  select(all_of(my_variables))</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 3          4.7         3.2
+## 4          4.6         3.1
+## 5          5.0         3.6</code></pre>
+<div id="problem-2-passing-columns-as-arguments-to-custom-functions" class="section level2">
+<h2>Problem 2: passing columns as arguments to custom functions</h2>
+<p>This difference between passing a variable name vs or symbol as a name can be especially tricky when building a function which calls dplyr verbs inside of it and is parametrized by column names. Let’s see an example:</p>
+<pre class="r"><code>my_subset &lt;- function(data, my_var) {
+  data %&gt;%
+    select(my_var)
+}</code></pre>
+<p>This might cause a lot of issues. Should we provide a string as a name (<code>my_subset(iris, "Sepal.Length")</code>) or a symbol (<code>my_subset(iris, Sepal.Length)</code>)? To answer this question, we should first be clear about our intent (it would be nice to write a few words of documentation – for other users or for ourselves in the future). Both approaches are possible, but it is better to stick to one.</p>
+<p>If we decide that we want to use names as a string (it is a common case, e.g. when building shiny app and columns are selected in inputs), then we should use previously shown trick with <code>dplyr::all_of()</code>:</p>
+<pre class="r"><code>my_subset_with_strings &lt;- function(data, my_var_as_string) {
+  data %&gt;%
+    select(all_of(my_var_as_string))
+}
+
+my_subset_with_strings(iris, c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+<p>If we want to use symbols, just like directly in dplyr functions (mostly when those columns to use are predefined, in our internal functions or analyses), we have to <em>embrace</em> the variable:</p>
+<pre class="r"><code>my_subset_with_symbols &lt;- function(data, my_var_as_symbol) {
+  data %&gt;%
+    select({{ my_var_as_symbol }})
+}
+
+my_subset_with_symbols(iris, Petal.Length)
+
+my_subset_with_symbols(iris, Petal.Length, Sepal.Width)
+
+iris %&gt;%
+  select(Petal.Length)
+
+iris %&gt;%
+  select(Petal.Length, Sepal.Width)
+
+
+my_var_as_symbol = Petal.Length
+iris %&gt;%
+  select(my_var_as_symbol)</code></pre>
+<p>In this way we let dplyr know that <code>my_var_as_symbol</code> has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: “Take what user provided in place of <code>my_var_as_symbol</code> in function call and plug it directly into <code>select</code>, without creating any intermediate variables.”. Call to <code>my_subset_with_symbols()</code> is basically replaced with what lies inside of it. You can see comparison in figure TODO.</p>
+</div>
+</div>
+<div id="problem-3-dynamic-columns-in-purrr-formulas-in-across" class="section level1">
+<h1>Problem 3: dynamic columns in purrr formulas in <code>across</code></h1>
+<p>Solutions above work fine when we provide those column names to <code>dplyr::select()</code>, <code>dplyr::filter()</code> or <code>dplyr::group_by()</code> directly. But sometimes we need a function that does something more. Let’s say we want to have a function <code>do_magic</code>, which takes as an input some data, name of column <code>special</code> and names of other columns <code>others</code>. This function subtracts column <code>special</code> from all columns <code>others</code>.</p>
+<p>We can try to do it with <code>dplyr::mutate(dplyr::across())</code>. It has a syntax <code>mutate(across(columns_to_mutate, function_to_apply))</code>. If we want to provide a custom unnamed function, we can use <em>purrr formula syntax</em>: <code>~ expression with .x</code> where <code>.x</code> is column. This (without enclosing it in a function yet) could look like:</p>
+<pre class="r"><code>iris %&gt;%
+  mutate(across(all_of(c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)), ~ .x - Petal.Length))</code></pre>
+</div>
