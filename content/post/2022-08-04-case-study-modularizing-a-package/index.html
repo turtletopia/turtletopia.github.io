@@ -14,11 +14,11 @@ output:
 
 <div id="TOC">
 <ul>
-<li><a href="#origins-of-deepdep" id="toc-origins-of-deepdep">Origins of deepdep</a></li>
-<li><a href="#separation-of-woodendesc" id="toc-separation-of-woodendesc">Separation of woodendesc</a></li>
-<li><a href="#a-new-package-is-not-always-the-answer" id="toc-a-new-package-is-not-always-the-answer">A new package is not always the answer</a></li>
-<li><a href="#modularization-of-tidysq" id="toc-modularization-of-tidysq">Modularization of tidysq</a></li>
-<li><a href="#summary" id="toc-summary">Summary</a></li>
+<li><a href="#origins-of-deepdep">Origins of deepdep</a></li>
+<li><a href="#separation-of-woodendesc">Separation of woodendesc</a></li>
+<li><a href="#a-new-package-is-not-always-the-answer">A new package is not always the answer</a></li>
+<li><a href="#modularization-of-tidysq">Modularization of tidysq</a></li>
+<li><a href="#summary">Summary</a></li>
 </ul>
 </div>
 
@@ -68,8 +68,7 @@ woodendesc::wood_core_packages()</code></pre>
     &quot;http://www.omegahat.net/R&quot;, &quot;local#all&quot;)
 ) |&gt;
   head()</code></pre>
-<pre><code>## [1] &quot;00LOCK-lubridate&quot; &quot;aCGH&quot;             &quot;affy&quot;             &quot;affycomp&quot;        
-## [5] &quot;affydata&quot;         &quot;affylmGUI&quot;</code></pre>
+<pre><code>## [1] &quot;aCGH&quot;      &quot;ade4&quot;      &quot;affy&quot;      &quot;affycomp&quot;  &quot;affydata&quot;  &quot;affylmGUI&quot;</code></pre>
 <p>Now, you can see why’d we separate these functionalities into a new package. There are analogous functions for version codes and dependencies (about 20 functions total!) and they’d overwhelm the original intent of deepdep. Adding woodendesc as a dependency of a deepdep costs nothing because the alternative is to include this code within deepdep itself – so it’d have to be tested and maintained anyways.</p>
 <p>But sometimes modularizing is a bit extra.</p>
 </div>
