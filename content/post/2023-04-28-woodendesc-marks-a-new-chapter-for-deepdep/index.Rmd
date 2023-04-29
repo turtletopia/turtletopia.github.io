@@ -1,0 +1,13 @@
+---
+title: "woodendesc Marks a New Chapter for deepdep"
+author: "Laura Bąkała"
+date: 2023-04-28
+slug: woodendesc-marks-a-new-chapter-for-deepdep
+categories: ["Turtletools"]
+tags: ["r", "turtletools", "code style", "packages", "debugging"]
+description: "Several years since its release, deepdep overhaul is long overdue. With the release of woodendesc, the time draweth near."
+images: 
+  - woodendesc.png
+---
+
+
