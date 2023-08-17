@@ -1,0 +1,159 @@
+---
+title: How RStudio "Sabotaged" My Code
+author: "Laura Bakala"
+date: 2023-08-04
+slug: how-rstudio-sabotaged-my-code
+categories: ["RStudio"]
+tags: ["r", "rstudio", "debugging", "internals", "turtletools"]
+description: "Even the simplest features may have unintended side effects."
+output:
+  blogdown::html_page:
+    toc: true
+---
+
+
+<div id="TOC">
+<ul>
+<li><a href="#the-setting">The setting</a></li>
+<li><a href="#the-mystery">The mystery</a></li>
+<li><a href="#the-investigation">The investigation</a></li>
+<li><a href="#the-solution">The solution</a></li>
+<li><a href="#the-future">The future</a></li>
+<li><a href="#todays-questions-answer">Today’s question’s answer</a></li>
+</ul>
+</div>
+
+<p>A short disclaimer first: this post isn’t meant to criticise RStudio. It’s my favourite IDE, and I’ve grown so accustomed to it that I’d have trouble trying to write R code in any other piece of software. This post is to show an unexpected interaction with one of RStudio systems that an ambitious R programmer could make use of.</p>
+<p>You’ll find a question meant as an exercise in this post; the answer is right at the bottom.</p>
+<p>Let’s get to the story setting now.</p>
+<div id="the-setting" class="section level2">
+<h2>The setting</h2>
+<p>I’ve been doing some Python coding and I needed a progress bar to keep track of processed cases. The internet recommended <a href="https://tqdm.github.io">tqdm</a>, an extremely simple-to-use package – just wrap the iterable in <code>tqdm()</code> and the progress bar will spawn upon iterating. Immediately, I started thinking about an analogous R solution.</p>
+<p>There are multiple options for including a progress bar in R – the base <code>txtProgressBar()</code> function, the <a href="https://github.com/r-lib/progress">progress</a> and <a href="https://github.com/HenrikBengtsson/progressr">progressr</a> packages, the <a href="https://cli.r-lib.org/articles/progress.html"><code>cli::cli_progress_bar()</code></a> function too… None as simple as tqdm, though.</p>
+<p>(At least that’s what I was thinking at the time.)</p>
+<p>Naturally, I had to try my hand at implementing it. You can check the <a href="https://github.com/turtletopia/aurrera">turtletopia/aurrera</a> repository for the current state of the code<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, but the key chunks are shown in this post anyways.</p>
+<p>Marking the iterable as spawning a progress bar should be as noninvasive as possible, so that all operations on the underlying object proceed as before. Injecting an attribute with a progress bar reference is not a bad idea, but it <em>slightly</em> increases the chance of name clash with an attribute given elsewhere. Let’s stick with a simple class:</p>
+<pre class="r"><code>pb &lt;- function(object) {
+  class(object) &lt;- c(&quot;aurrera_iter&quot;, class(object))
+  object
+}</code></pre>
+<p>Oh, and add progress bar initialization in there too. We won’t be getting into the details of the implementation right now, we’ll only note that only the object’s length is needed.</p>
+<pre class="r"><code>pb &lt;- function(object) {
+  initialize_bar(length(object))
+  class(object) &lt;- c(&quot;aurrera_iter&quot;, class(object))
+  object
+}</code></pre>
+<p>(<code>initialize_bar()</code> is a function that assigns a fresh bar to a global variable inside the package. Question for today: why is it a very fragile idea?)</p>
+<p>Most iterators use accessors (i.e. <code>[</code> and <code>[[</code> operators, predominately the latter) to extract elements for successive loops. It’s not true for <code>for</code> loops, but <code>lapply()</code>, <code>purrr::map()</code>, <code>Reduce()</code>, and others – they all use <code>[[</code> at some point. Thus, some signal should be emitted upon calling the extractor.</p>
+<pre class="r"><code>`[[.aurrera_iter` &lt;- function(x, i) {
+  advance_bar()
+  NextMethod()
+}</code></pre>
+<p>I’ll implement the <code>initialize_bar()</code> and <code>advance_bar()</code> functions behind the scenes and it’ll be up and running just fine. Right?</p>
+</div>
+<div id="the-mystery" class="section level2">
+<h2>The mystery</h2>
+<p>The <code>pb()</code> function is supposed to wrap the iterable object inside an iterator; this provides a simple way to enrich the existing code with progress bars:</p>
+<pre class="r"><code>iterable &lt;- as.list(1:5)
+sapply(pb(iterable), identity)</code></pre>
+<pre><code>## ============================================================</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<p>The argument order makes <code>pb()</code> pipeable too:</p>
+<pre class="r"><code>as.list(1:5) |&gt;
+  pb() |&gt;
+  purrr::reduce(sum)</code></pre>
+<pre><code>## ============================================================</code></pre>
+<pre><code>## [1] 15</code></pre>
+<p>If we want, we can assign an <code>aurrera_iter</code> object to a variable and use it in an iterator as well:</p>
+<pre class="r"><code>iterable &lt;- pb(as.list(1:5))
+purrr::map_int(iterable, identity)</code></pre>
+<pre><code>## ============================================================</code></pre>
+<pre><code>## [1] 1 2 3 4 5</code></pre>
+<p>So far so good.</p>
+<p>But… have you tried running this code by yourself in RStudio? I did, using the “Run Chunk” option in the .Rmd file containing this very post.</p>
+<p>The first two examples work just as depicted. The last one, though…</p>
+<div class="figure">
+<img src="naive_error.png" alt="" />
+<p class="caption">This <code>pb()</code> error is caused by <code>.PROGRESS_BAR</code> being a <code>NULL</code>.</p>
+</div>
+<p>The <code>.PROGRESS_BAR</code> is set to <code>NULL</code> upon terminating (i.e. reaching completion), which <code>getTxtProgressBar()</code> doesn’t like too much. This is understandable, but… why would the bar terminate in the first place?</p>
+</div>
+<div id="the-investigation" class="section level2">
+<h2>The investigation</h2>
+<p>I investigated the issue by making the code a bit more verbose. The bar is closed when advanced for the n-th time, so there’s must be something that triggers this advancing. Perhaps <a href="/2022/07/28/ice-cream-for-r-programmers/">an ice cream</a> strategically placed in the <code>[[</code> method could shed some light?</p>
+<pre class="r"><code>`[[.aurrera_iter` &lt;- function(x, i) {
+  icecream::ic(i)
+  advance_bar()
+  NextMethod()
+}</code></pre>
+<p>Now let me run the faulty code line by–</p>
+<pre class="r"><code>iterable &lt;- pb(as.list(1:5))</code></pre>
+<div class="figure">
+<img src="verbose_assignment.png" alt="" />
+<p class="caption">Can you explain these calls?</p>
+</div>
+<p>Oh.</p>
+<p>There’s a tool that helps track down the source call: <code>sys.calls()</code>. I replaced the <code>icecream::ic()</code> call with a <code>browser()</code> and ran the line above. It failed and my R died.</p>
+<p>Then I removed the <code>browser()</code> call and inserted a <code>print(sys.calls())</code>. Which did not print anything to the console.</p>
+<p>I switched back to <code>icecream::ic()</code> and managed to display the length of <code>sys.calls()</code>, amounting to 26.</p>
+<p>Finally, I added a <code>for</code> loop that printed successive calls from <code>sys.calls()</code> using <code>icecream::ic()</code>. The top entry was the offender and the solution laid further down the tree.</p>
+</div>
+<div id="the-solution" class="section level2">
+<h2>The solution</h2>
+<p>The <code>[[</code> calls were triggered by a function named <code>.rs.describeObject()</code>. This – like all other objects with names starting with <code>.rs.</code> – is used by RStudio to provide all sorts of functionalities. They are all stored in a <code>tools:rstudio</code> environment that’s by default a child of <code>package:stats</code> and a parent of the global environment, albeit the latter stops being true upon attaching other packages (they are attached between <code>tools:rstudio</code> and the global env).</p>
+<p>What is this function for? Turns out that <code>.rs.describeObject()</code> is used to create a description displayed in “Environment” tab! The in-depth investigation explains why there was no <code>print()</code> output – this function uses <code>capture.output()</code> to collect the string to display.</p>
+<p>And the function that provides this output – and makes calls to <code>[[</code> – is <code>str()</code>. <code>utils:::str.default()</code>, to be precise. It’s a nearly 600 lines long behemoth that performs a lot of implicit dispatch, so it’s more of a <code>str.list()</code> in this case. And it iterates over the list to provide a simplified glimpse into the list’s structure, which can be seen in “Environment” tab as well:</p>
+<div class="figure">
+<img src="RStudio_list_description_ex.png" alt="" />
+<p class="caption">It took me ages to find the culprit.</p>
+</div>
+<p>The solution was simple; I implemented a custom <code>str.aurrera_iter()</code> method that delegated to the other methods – but only after temporarily removing <code>aurrera_iter</code> class from the object, so that the following calls wouldn’t dispatch to <code>[[.aurrera_iter</code>:</p>
+<pre class="r"><code>str.aurrera_iter &lt;- function(object, ...) {
+  cat(&quot;Bar-spawning &quot;)
+  class(object) &lt;- setdiff(class(object), &quot;aurrera_iter&quot;)
+  NextMethod()
+}</code></pre>
+<p>As a side note, I have added a short text to display before the actual contents of <code>str()</code>, but refrained from inserting a newline. It was a deliberate action, because the <code>.rs.describeObject()</code> function (actually <code>.rs.valueContentsImpl()</code> called for lists, data frames, and S4 objects) is hardcoded to treat all lines but the first one as object’s contents. Should I add a newline character or two…</p>
+<pre class="r"><code>str.aurrera_iter &lt;- function(object, ...) {
+  cat(&quot;Spawns progress bars\nAnd newlines\n&quot;)
+  class(object) &lt;- setdiff(class(object), &quot;aurrera_iter&quot;)
+  NextMethod()
+}</code></pre>
+<p>…I’d be getting this curiosity:</p>
+<p><img src="RStudio_list_desc_faulty.png" /></p>
+<p>Now I want the option to customize RStudio variable descriptions!</p>
+<p><em>opens the RStudio repository on Github</em></p>
+</div>
+<div id="the-future" class="section level2">
+<h2>The future</h2>
+<p>Having fixed the problem, I was able to proceed with the idea. I’ve implemented a basic solution covering the simplest case of one iterable processed by an iterator function like <code>lapply()</code>, <code>purrr::map()</code>, or <code>foreach::foreach()</code>, and I was planning on wrapping the loose ends and preparing the package for wider audience.</p>
+<p>However, I’ve come across an experimental function in cli package, <a href="https://cli.r-lib.org/reference/cli_progress_along.html"><code>cli::cli_progress_along()</code></a>. It takes advantage of the same idea, linking a progress bar to an iterable and responding to an iterator action. So, I’ve moved on to other ideas, thinking the niche is already being covered.</p>
+<p>I think I might have been wrong there. I’ve read more about <code>cli::cli_progress_along()</code> while researching for this post and I’ve noticed a peculiar feature – the function performs a <code>seq_along()</code> action, meaning that the iterator isn’t provided with iterable’s elements; it receives indices instead!</p>
+<p>This is huge, for me at least. Being clear about objects being passed to iterators is paramount to loop readability; code in the form of</p>
+<pre class="r"><code>x &lt;- c(&quot;a character&quot;, &quot;vector&quot;, &quot;to process&quot;)
+
+lapply(seq_along(x), function(index) {
+  do_process(x[[index]])
+})</code></pre>
+<p>is much less intuitive than</p>
+<pre class="r"><code>lapply(x, function(element) {
+  do_process(element)
+})</code></pre>
+<p>and the latter sometimes enables an even shorter, more concise form of</p>
+<pre class="r"><code>lapply(x, do_process)</code></pre>
+<p>Perhaps <a href="https://github.com/turtletopia/aurrera">aurrera</a> may not be so dead after all. It still fails to produce a progress bar when used with <code>for</code> or <code>rapply()</code>; it doesn’t integrate with any solution other than base R; it fails without grace when anything goes not to plan. But, there’s no package, no function (that I know of) that I could take, wrap over a variable in an existing piece of code, and have it simply work. No adjustments needed.</p>
+</div>
+<div id="todays-questions-answer" class="section level2">
+<h2>Today’s question’s answer</h2>
+<p>A simple, very likely scenario that breaks the code:</p>
+<pre class="r"><code>iter_1 &lt;- pb(letters)
+iter_2 &lt;- pb(1:10)
+lapply(iter_1, nchar)</code></pre>
+<p>The second call to <code>pb()</code> overwrites the bar created in the first one, yet the loop triggers the progress based on the first iterable. We can avoid this scenario by initializing the bar lazily, when the first iteration is triggered; or by initializing separate bars for each <code>pb()</code> call.</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Citing the original: “<em>tqdm</em> means ‘progress’ in Arabic (<em>taqadum</em>, تقدّم)”. It made sense to name the package in a similar vein. In Basque, “progress” is translated as <em>aurrerapen</em> or <em>aurrerabide</em>, but it wasn’t too catchy of a name, so I settled on <em>aurrera</em>, meaning “forward”.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
