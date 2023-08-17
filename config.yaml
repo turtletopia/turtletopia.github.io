@@ -41,12 +41,12 @@ params:
     url: logo.png
     width: 50
   categoryColors:
-    Overview: "#D33F49B0"
-    Tutorial: "#77BA99B0"
-    Organisational: "#D7C0D0B0"
-    Essay: "#FABC2AB0"
-    Turtletools: "#52489CB0"
-    Default: "#EEEEEEB0"
+    Overview: "#E40303B0"
+    Organisational: "#FF8C00B0"
+    Essay: "#FFED00B0"
+    Tutorial: "#008026B0"
+    RStudio: "#24408EB0"
+    Turtletools: "#732982B0"
   images:
     - images/logo.png
   relativeURLs: true
