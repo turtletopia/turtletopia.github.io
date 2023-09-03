@@ -9,16 +9,23 @@ tags: ['r', 'tutorial', 'dplyr', 'environments', 'rlang']
 
 # Intro
 
-Hello everyone! We've had quite a long hiatus caused by various life things (including graduating from college, changing jobs and lawsuits), but we're back and want to bring the blog back to life. And since the basics of advanced methods is what interests me the most, today I'm going to introduce you to a post about something that sooner or later every dplyr user will encounter.
+Hello everyone! After an extended hiatus for various reasons (from graduating college to navigating job changes and legal challenges), we're back and eager to breathe new life into this blog. Given my deep interest in the fundamentals of advanced methods, today we're delving into an essential topic every dplyr user will eventually face.
+
+dplyr is meticulously designed with the primary goal of making code workflows read as naturally and close to plain language as possible. This design philosophy manifests in two critical dimensions: *semantic* and *syntactic*.
+
+Semantically, the emphasis is on **employing words with intuitive and easily understood meanings**. For instance, dplyr and its friends adhere to a robust naming convention where function names typically take on verb forms, elucidating the action they perform.
+
+Syntactically, the **arrangement and combination of these descriptive words is paramount**. Arguably, this is even more critical to the user experience. One of the most evident manifestations of this syntactical approach is the tidyverse's hallmark feature: **the pipe operator**. But we are not going to tackle this today. I will look into caveats of another essential and intuitive syntactic feature: the **use of symbols instead of strings to refer to variables within datasets**. This offers a more natural-feeling mode of interaction but, as I have found out over many years of using R, this feature can lead to some problems.
+
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 library(dplyr)
 iris <- iris %>% slice(1:5)
 ```
 
-# Problem 1: symbols treated as names vs variables containing strings with names
+# Problem 1: Symbols vs. strings with names
 
-dplyr verbs are very convenient, because we can use *symbols* instead of constantly accessing the data with *strings with names*. E.g. compare the code for selecting columns in data frame in base R and in dplyr:
+Let's compare how we select columns in a data frame using base R versus dplyr:
 
 ```{r eval=FALSE}
 # base
@@ -29,40 +36,52 @@ iris %>%
   select(Sepal.Length, Sepal.Width)
 ```
 
-We can see the clear difference between the base style and the dplyr style:
+Notice the difference:
 
-* `"Sepal.Length", "Sepal.Width"` -- strings with names, they are quoted by " or '
-* `Sepal.Length, Sepal.Width` -- symbols, they are not quoted (or quoted using \` character, if they contain spaces)
+* In base R, we use `"Sepal.Length", "Sepal.Width"`, which are **strings** enclosed in quotes (single and double quotes are both valid).
+* With dplyr, we have `Sepal.Length, Sepal.Width`, unquoted **symbols**.
 
-In the second case *symbols* are used to access columns in data.frame (it is not important how that works in details, we will take care of that in another post). It is crucial to know this difference and understand it, as it might help us not to fall into the traps which I will discuss in the rest of the post.
+In the second case *symbols* are used to access columns in a data frame, just like we use symbols to access any variable or function that we store in our top-level environments.
+It is vital to grasp this distinction to sidestep potential pitfalls. which I will discuss in the rest of the post.
 
-dplyr introduced this syntax, because it is simpler. Less characters to type is always nice, especially when we are using column names really often, which usually is the case.
+So, what symbols actually are? We use them as names of objects and this is the identity of their core. This is why it feels natural to use them to not only access top-level variables, but also variables in data. There is more to the nature of symbols, but we will come back to that later.
 
-Sometimes, however, we do not know names of columns to select in advance. E.g., we have an external variable containing names of columns to select, like this:
+Notice that dplyr is smart enough to let you select variables by strings as well:
+
+```{r}
+iris %>%
+  select("Sepal.Length", "Sepal.Width")
+```
+
+This is, however, inadvisable, as this is exactly what tidyverse designers wanted to avoid.
+
+Now, consider a scenario where we have an external variable storing column names:
 
 ```{r}
 my_variables <- c("Sepal.Length", "Sepal.Width")
 ```
 
-We can provide it to `select` directly:
+Although it might seem intuitive to directly supply it to select:
 
 ```{r warning=TRUE}
 iris %>%
   select(my_variables)
 ```
 
-but it throws a warning. tidyverse boasts detailed messages and it is worth always taking them into consideration. This is not recommended, as it is ambiguous. We can easily imagine situation when there is a column in data called "my_variables". What should happen, if we have both such a column and such an external variable? Which one would be selected? The answer does not matter for us, as we want to stick to best practices. 
+This generates a warning. Given the tidyverse's informative error messages, it's wise to pay heed. Directly supplying can be ambiguous —- imagine having a column named "my_variables". Which should be selected if we have both the column and the external variable?
 
-A solution suggested by authors of dplyr is to use `dplyr::all_of()`, which explicitly transforms a vector of names (or a single name) into symbols. In this way there is no ambiguity -- dplyr knows that it should use columns named by vector `my_variables`, not use `my_variables` as a name of column. 
+
+![Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections.](/images/selection-ambiguity.png)
+To ensure clarity, dplyr authors suggest using dplyr::all_of(), which explicitly converts a name vector into symbols, resolving any ambiguities.
 
 ```{r warning=TRUE}
 iris %>%
   select(all_of(my_variables))
 ```
 
-## Problem 2: passing columns as arguments to custom functions
+## Problem 2: Passing column names as arguments to custom functions
 
-This difference between passing a variable name vs or symbol as a name can be especially tricky when building a function which calls dplyr verbs inside of it and is parametrized by column names. Let's see an example:
+Differentiating between passing a variable name or a symbol becomes trickier when constructing functions that internally use dplyr verbs. Consider:
 
 ```{r}
 my_subset <- function(data, my_var) {
@@ -71,10 +90,9 @@ my_subset <- function(data, my_var) {
 }
 ```
 
+This might cause a lot of issues. Should we provide a string as a name (`my_subset(iris, "Sepal.Length")`) or a symbol (`my_subset(iris, Sepal.Length)`)?  To answer this question, **we should first be clear about our intent** (it would be nice to write a few words of documentation -- for other users or for ourselves in the future). **Both approaches are possible and valid**. It is important to **choose one and remain consistent** across all functions that we write.
 
-This might cause a lot of issues. Should we provide a string as a name (`my_subset(iris, "Sepal.Length")`) or a symbol (`my_subset(iris, Sepal.Length)`)?  To answer this question, we should first be clear about our intent (it would be nice to write a few words of documentation -- for other users or for ourselves in the future). Both approaches are possible, but it is better to stick to one.
-
-If we decide that we want to use names as a string (it is a common case, e.g. when building shiny app and columns are selected in inputs), then we should use previously shown trick with `dplyr::all_of()`:
+For instances where column names are passed as strings (common in Shiny apps when columns are selected by some input), one could utilize the previously discussed `dplyr::all_of()`:
 
 
 ```{r, eval=FALSE}
@@ -97,30 +115,25 @@ my_subset_with_symbols <- function(data, my_var_as_symbol) {
 my_subset_with_symbols(iris, Petal.Length)
 
 my_subset_with_symbols(iris, Petal.Length, Sepal.Width)
-
-iris %>%
-  select(Petal.Length)
-
-iris %>%
-  select(Petal.Length, Sepal.Width)
-
-
-my_var_as_symbol = Petal.Length
-iris %>%
-  select(my_var_as_symbol)
-
 ```
 
-In this way we let dplyr know that `my_var_as_symbol` has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: "Take what user provided in place of `my_var_as_symbol` in function call and plug it directly into `select`, without creating any intermediate variables.". Call to `my_subset_with_symbols()` is basically replaced with what lies inside of it. You can see comparison in figure TODO.
+In this way we let dplyr know that `my_var_as_symbol` has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: "Take what user provided in place of `my_var_as_symbol` in function call and plug it directly into `select`, without creating any intermediate variables.". Call to `my_subset_with_symbols()` is basically replaced with what lies inside of it. 
 
 # Problem 3: dynamic columns in purrr formulas in `across` 
 
-Solutions above work fine when we provide those column names to `dplyr::select()`, `dplyr::filter()` or `dplyr::group_by()` directly. But sometimes we need a function that does something more. Let's say we want to have a function `do_magic`, which takes as an input some data, name of column `special` and names of other columns `others`. This function subtracts column `special` from all columns `others`.
+While the above solutions work seamlessly with functions like `dplyr::select()`, challenges arise when operations grow complex. Suppose we wish to craft a function, `do_magic`, that takes data, a special `column`, and several `others` columns. This function should add the special column to all others.
 
-We can try to do it with `dplyr::mutate(dplyr::across())`. It has a syntax `mutate(across(columns_to_mutate, function_to_apply))`. If we want to provide a custom unnamed function, we can use *purrr formula syntax*: `~ expression with .x` where `.x` is column. This (without enclosing it in a function yet) could look like:
+Leveraging `dplyr::mutate(dplyr::across())` can achieve this. Its syntax is:
+
+```{r eval=FALSE}
+mutate(across(columns_to_mutate, function_to_apply))
+```
+
+For custom, unnamed functions, the *purrr formula syntax* (`~ expression` with `.x`) is beneficial. In our case (without enclosing it in a function yet) could look like:
 
 ```{r, eval=FALSE}
 iris %>%
   mutate(across(all_of(c("Sepal.Length", "Sepal.Width")), ~ .x - Petal.Length))
-
 ```
+
+However, contrary to most languages, in R **symbols can be treated as objects themselves**. This allows dplyr to even perform such simplifications. The details are irrelevant now
