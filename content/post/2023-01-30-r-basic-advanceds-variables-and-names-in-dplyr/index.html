@@ -112,5 +112,53 @@ my_subset_with_symbols(iris, Petal.Length, Sepal.Width)</code></pre>
 <p>For custom, unnamed functions, the <em>purrr formula syntax</em> (<code>~ expression</code> with <code>.x</code>) is beneficial. In our case (without enclosing it in a function yet) could look like:</p>
 <pre class="r"><code>iris %&gt;%
   mutate(across(all_of(c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)), ~ .x - Petal.Length))</code></pre>
-<p>However, contrary to most languages, in R <strong>symbols can be treated as objects themselves</strong>. This allows dplyr to even perform such simplifications. The details are irrelevant now</p>
+<p>Elegant, isn’t it? Now, let’s proceed by encapsulating this logic within a function where column names are passed as strings:</p>
+<pre class="r"><code>do_magic &lt;- function(data, special, others) {
+  data %&gt;%
+    mutate(across(all_of(others), ~ .x - all_of(special)))
+}
+
+# won&#39;t work:
+# do_magic(iris, special = &quot;Petal.Length&quot;, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+<p>Surprisingly, it fails! When used within the context of <code>across</code>, dplyr seems unable to utilize the tidyselect rules (the ones that make <code>all_of()</code> possible). But we’re not defeated; let’s try embracing:</p>
+<pre class="r"><code>do_magic_but_better &lt;- function(data, special, others) {
+  data %&gt;%
+    mutate(across(all_of(others), ~ .x - {{special}}))
+}
+
+do_magic_but_better(iris, special = Petal.Length, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          3.7         2.1          1.4         0.2  setosa
+## 2          3.5         1.6          1.4         0.2  setosa
+## 3          3.4         1.9          1.3         0.2  setosa
+## 4          3.1         1.6          1.5         0.2  setosa
+## 5          3.6         2.2          1.4         0.2  setosa</code></pre>
+<p>By adopting this approach, it’s imperative to provide special as a symbol. Also, this does not look fine: one parameter is provided as symbol, another one is as character vector… <strong>We should always aim at being consistent</strong>. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let’s say that we want to stick to strings only. How can we do it?</p>
+<div id="tip-when-all_of-does-not-work-use-.data" class="section level4">
+<h4>Tip: when <code>all_of()</code> does not work, use <code>.data</code></h4>
+<p>There’s a workaround for this conundrum:</p>
+<pre class="r"><code>do_magic_but_in_other_way &lt;- function(data, special, others) {
+  data %&gt;%
+    mutate(across(all_of(others), ~ .x - .data[[special]]))
+}
+
+do_magic_but_in_other_way(iris, special = &quot;Petal.Length&quot;, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          3.7         2.1          1.4         0.2  setosa
+## 2          3.5         1.6          1.4         0.2  setosa
+## 3          3.4         1.9          1.3         0.2  setosa
+## 4          3.1         1.6          1.5         0.2  setosa
+## 5          3.6         2.2          1.4         0.2  setosa</code></pre>
+<p>When you need to reference the underlying data within the context of functions, the <code>.data</code> pronoun comes to the rescue. As demonstrated, it operates similarly to directly accessing the data.</p>
+</div>
+<div id="summary-next-steps" class="section level2">
+<h2>Summary &amp; Next Steps</h2>
+<p>Throughout this post, we ventured deep into some of the intricacies of dplyr. We’ve unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like <code>all_of()</code> and <code>.data</code> demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we’ve covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this <em>embracing</em> and <em>tidyselect</em> rules might be intimidating, but we will be continue to explore more facets of the tidyverse in future posts of “basic advanceds”, aiming to empower you with advanced techniques that enhance your data analysis journey.</p>
+<p>If you’ve found this post enlightening and wish to delve deeper, or if you have any questions or insights, we’d love to hear from you! You can contact us directly via <a href="https://twitter.com/Rturtletopia">X</a>. Alternatively, for those who prefer a more open-source avenue, feel free to open an issue on our <a href="https://github.com/turtletopia/turtletopia.github.io/issues">GitHub</a> repository. Your feedback and insights not only help us improve, but they also contribute to the broader data science community.</p>
+<p>Until next time, keep exploring, learning, and sharing!</p>
+</div>
+<div id="dive-deeper-resources-for-the-curious-minds" class="section level2">
+<h2>Dive Deeper: Resources for the Curious Minds:</h2>
+<p>For those wishing to delve further or who may have lingering questions: <a href="https://dplyr.tidyverse.org/articles/programming.html">Dplyr official programming guide</a></p>
+</div>
 </div>

@@ -136,4 +136,54 @@ iris %>%
   mutate(across(all_of(c("Sepal.Length", "Sepal.Width")), ~ .x - Petal.Length))
 ```
 
-However, contrary to most languages, in R **symbols can be treated as objects themselves**. This allows dplyr to even perform such simplifications. The details are irrelevant now
+Elegant, isn't it? Now, let's proceed by encapsulating this logic within a function where column names are passed as strings:
+
+```{r}
+do_magic <- function(data, special, others) {
+  data %>%
+    mutate(across(all_of(others), ~ .x - all_of(special)))
+}
+
+# won't work:
+# do_magic(iris, special = "Petal.Length", others = c("Sepal.Length", "Sepal.Width"))
+```
+
+Surprisingly, it fails! When used within the context of `across`, dplyr seems unable to utilize the tidyselect rules (the ones that make `all_of()` possible). But we're not defeated; let's try embracing:
+
+```{r}
+do_magic_but_better <- function(data, special, others) {
+  data %>%
+    mutate(across(all_of(others), ~ .x - {{special}}))
+}
+
+do_magic_but_better(iris, special = Petal.Length, others = c("Sepal.Length", "Sepal.Width"))
+```
+
+By adopting this approach, it's imperative to provide special as a symbol. Also, this does not look fine: one parameter is provided as symbol, another one is as character vector... **We should always aim at being consistent**. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let's say that we want to stick to strings only. How can we do it?
+
+#### Tip: when `all_of()` does not work, use `.data`
+
+There's a workaround for this conundrum:
+
+```{r}
+do_magic_but_in_other_way <- function(data, special, others) {
+  data %>%
+    mutate(across(all_of(others), ~ .x - .data[[special]]))
+}
+
+do_magic_but_in_other_way(iris, special = "Petal.Length", others = c("Sepal.Length", "Sepal.Width"))
+```
+
+When you need to reference the underlying data within the context of functions, the `.data` pronoun comes to the rescue. As demonstrated, it operates similarly to directly accessing the data.
+
+## Summary & Next Steps
+
+Throughout this post, we ventured deep into some of the intricacies of dplyr. We've unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like `all_of()` and `.data` demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we've covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this *embracing* and *tidyselect* rules might be intimidating, but we will be continue to explore more facets of the tidyverse in future posts of "basic advanceds", aiming to empower you with advanced techniques that enhance your data analysis journey.
+
+If you've found this post enlightening and wish to delve deeper, or if you have any questions or insights, we'd love to hear from you! You can contact us directly via [X](https://twitter.com/Rturtletopia). Alternatively, for those who prefer a more open-source avenue, feel free to open an issue on our [GitHub](https://github.com/turtletopia/turtletopia.github.io/issues) repository. Your feedback and insights not only help us improve, but they also contribute to the broader data science community.
+
+Until next time, keep exploring, learning, and sharing!
+
+## Dive Deeper: Resources for the Curious Minds:
+
+For those wishing to delve further or who may have lingering questions: [Dplyr official programming guide](https://dplyr.tidyverse.org/articles/programming.html)
