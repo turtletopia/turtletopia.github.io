@@ -5,9 +5,13 @@ date: '2023-01-30'
 slug: r-basic-advanceds-variables-and-names-in-dplyr
 categories: ['Tutorial']
 tags: ['r', 'tutorial', 'dplyr', 'environments', 'rlang']
+description: "TODO."
+output:
+  blogdown::html_page:
+    toc: true
 ---
 
-# Intro
+## Intro
 
 Hello everyone! After an extended hiatus for various reasons (from graduating college to navigating job changes and legal challenges), we're back and eager to breathe new life into this blog. Given my deep interest in the fundamentals of advanced methods, today we're delving into an essential topic every dplyr user will eventually face.
 
@@ -23,7 +27,7 @@ library(dplyr)
 iris <- iris %>% slice(1:5)
 ```
 
-# Problem 1: Symbols vs. strings with names
+## Problem 1: Symbols vs. strings with names
 
 Let's compare how we select columns in a data frame using base R versus dplyr:
 
@@ -119,7 +123,7 @@ my_subset_with_symbols(iris, Petal.Length, Sepal.Width)
 
 In this way we let dplyr know that `my_var_as_symbol` has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: "Take what user provided in place of `my_var_as_symbol` in function call and plug it directly into `select`, without creating any intermediate variables.". Call to `my_subset_with_symbols()` is basically replaced with what lies inside of it. 
 
-# Problem 3: dynamic columns in purrr formulas in `across` 
+## Problem 3: dynamic columns in purrr formulas in `across` 
 
 While the above solutions work seamlessly with functions like `dplyr::select()`, challenges arise when operations grow complex. Suppose we wish to craft a function, `do_magic`, that takes data, a special `column`, and several `others` columns. This function should add the special column to all others.
 
