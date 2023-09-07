@@ -56,10 +56,7 @@ It is vital to grasp this distinction to sidestep potential pitfalls. which I wi
 ##   # Now:
 ##   data %&gt;% select(all_of(my_variables))
 ## 
-## See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
+## See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
 <pre><code>##   Sepal.Length Sepal.Width
 ## 1          5.1         3.5
 ## 2          4.9         3.0
@@ -67,7 +64,7 @@ It is vital to grasp this distinction to sidestep potential pitfalls. which I wi
 ## 4          4.6         3.1
 ## 5          5.0         3.6</code></pre>
 <p>This generates a warning. Given the tidyverse’s informative error messages, it’s wise to pay heed. Directly supplying can be ambiguous —- imagine having a column named “my_variables”. Which should be selected if we have both the column and the external variable?</p>
-<p><img src="/images/selection-ambiguity.png" alt="Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections." />
+<p><img src="images/selection-ambiguity.png" alt="Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections." />
 To ensure clarity, dplyr authors suggest using dplyr::all_of(), which explicitly converts a name vector into symbols, resolving any ambiguities.</p>
 <pre class="r"><code>iris %&gt;%
   select(all_of(my_variables))</code></pre>
