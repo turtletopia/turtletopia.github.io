@@ -17,7 +17,7 @@ output:
 <li><a href="#intro">Intro</a></li>
 <li><a href="#problem-1-symbols-vs.-strings-with-names">Problem 1: Symbols vs. strings with names</a></li>
 <li><a href="#problem-2-passing-column-names-as-arguments-to-custom-functions">Problem 2: Passing column names as arguments to custom functions</a></li>
-<li><a href="#problem-3-dynamic-columns-in-purrr-formulas-in-across">Problem 3: dynamic columns in purrr formulas in <code>across</code></a></li>
+<li><a href="#problem-3-dynamic-columns-in-purrr-formulas-in-across">Problem 3: Dynamic columns in purrr formulas in <code>across</code></a></li>
 <li><a href="#summary-next-steps">Summary &amp; Next Steps</a></li>
 <li><a href="#dive-deeper-resources-for-the-curious-minds">Dive Deeper: Resources for the Curious Minds:</a></li>
 </ul>
@@ -26,7 +26,7 @@ output:
 <div id="intro" class="section level2">
 <h2>Intro</h2>
 <p>Hello everyone! After an extended hiatus for various reasons (from graduating college to navigating job changes and legal challenges), we’re back and eager to breathe new life into this blog. Given my deep interest in the fundamentals of advanced methods, today we’re delving into an essential topic every dplyr user will eventually face.</p>
-<p>dplyr is meticulously designed with the primary goal of making code workflows read as naturally and close to plain language as possible. This design philosophy manifests in two critical dimensions: <em>semantic</em> and <em>syntactic</em>.</p>
+<p>dplyr is meticulously designed with the primary goal of making code workflows read possibly close to natural languages. This design philosophy manifests in two critical dimensions: <em>semantic</em> and <em>syntactic</em>.</p>
 <p>Semantically, the emphasis is on <strong>employing words with intuitive and easily understood meanings</strong>. For instance, dplyr and its friends adhere to a robust naming convention where function names typically take on verb forms, elucidating the action they perform.</p>
 <p>Syntactically, the <strong>arrangement and combination of these descriptive words is paramount</strong>. Arguably, this is even more critical to the user experience. One of the most evident manifestations of this syntactical approach is the tidyverse’s hallmark feature: <strong>the pipe operator</strong>. But we are not going to tackle this today. I will look into caveats of another essential and intuitive syntactic feature: the <strong>use of symbols instead of strings to refer to variables within datasets</strong>. This offers a more natural-feeling mode of interaction but, as I have found out over many years of using R, this feature can lead to some problems.</p>
 </div>
@@ -77,7 +77,7 @@ It is vital to grasp this distinction to sidestep potential pitfalls. which I wi
 ## 3          4.7         3.2
 ## 4          4.6         3.1
 ## 5          5.0         3.6</code></pre>
-<p>This generates a warning. Given the tidyverse’s informative error messages, it’s wise to pay heed. Directly supplying can be ambiguous —- imagine having a column named “my_variables”. Which should be selected if we have both the column and the external variable?</p>
+<p>This generates a warning. Given the tidyverse’s informative error messages, it’s wise to pay heed. Directly supplying can be ambiguous – imagine having a column named <code>my_variable</code>. Which should be selected if we have both the column and the external variable?</p>
 <p><img src="images/selection-ambiguity.png" alt="Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections." />
 To ensure clarity, dplyr authors suggest using dplyr::all_of(), which explicitly converts a name vector into symbols, resolving any ambiguities.</p>
 <pre class="r"><code>iris %&gt;%
@@ -104,7 +104,7 @@ To ensure clarity, dplyr authors suggest using dplyr::all_of(), which explicitly
 }
 
 my_subset_with_strings(iris, c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
-<p>If we want to use symbols, just like directly in dplyr functions (mostly when those columns to use are predefined, in our internal functions or analyses), we have to <em>embrace</em> the variable:</p>
+<p>If we want to use symbols, just like directly in dplyr functions (mostly when those columns to use are predefined, be it in our internal functions or in analyses), we have to <em>embrace</em> the variable:</p>
 <pre class="r"><code>my_subset_with_symbols &lt;- function(data, my_var_as_symbol) {
   data %&gt;%
     select({{ my_var_as_symbol }})
@@ -116,7 +116,7 @@ my_subset_with_symbols(iris, Petal.Length, Sepal.Width)</code></pre>
 <p>In this way we let dplyr know that <code>my_var_as_symbol</code> has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: “Take what user provided in place of <code>my_var_as_symbol</code> in function call and plug it directly into <code>select</code>, without creating any intermediate variables.”. Call to <code>my_subset_with_symbols()</code> is basically replaced with what lies inside of it.</p>
 </div>
 <div id="problem-3-dynamic-columns-in-purrr-formulas-in-across" class="section level2">
-<h2>Problem 3: dynamic columns in purrr formulas in <code>across</code></h2>
+<h2>Problem 3: Dynamic columns in purrr formulas in <code>across</code></h2>
 <p>While the above solutions work seamlessly with functions like <code>dplyr::select()</code>, challenges arise when operations grow complex. Suppose we wish to craft a function, <code>do_magic</code>, that takes data, a special <code>column</code>, and several <code>others</code> columns. This function should add the special column to all others.</p>
 <p>Leveraging <code>dplyr::mutate(dplyr::across())</code> can achieve this. Its syntax is:</p>
 <pre class="r"><code>mutate(across(columns_to_mutate, function_to_apply))</code></pre>
@@ -165,11 +165,11 @@ do_magic_but_in_other_way(iris, special = &quot;Petal.Length&quot;, others = c(&
 </div>
 <div id="summary-next-steps" class="section level2">
 <h2>Summary &amp; Next Steps</h2>
-<p>Throughout this post, we ventured deep into some of the intricacies of dplyr. We’ve unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like <code>all_of()</code> and <code>.data</code> demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we’ve covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this <em>embracing</em> and <em>tidyselect</em> rules might be intimidating, but we will be continue to explore more facets of the tidyverse in future posts of “basic advanceds”, aiming to empower you with advanced techniques that enhance your data analysis journey.</p>
+<p>Throughout this post, we ventured deep into some of the intricacies of dplyr. We’ve unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like <code>all_of()</code> and <code>.data</code> demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we’ve covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this <em>embracing</em> and <em>tidyselect</em> rules might be intimidating, but we will continue to explore more facets of the tidyverse in future posts of “basic advanceds”, aiming to empower you with advanced techniques that enhance your data analysis journey.</p>
 <p>If you’ve found this post enlightening and wish to delve deeper, or if you have any questions or insights, we’d love to hear from you! You can contact us directly via <a href="https://twitter.com/Rturtletopia">X</a>. Alternatively, for those who prefer a more open-source avenue, feel free to open an issue on our <a href="https://github.com/turtletopia/turtletopia.github.io/issues">GitHub</a> repository. Your feedback and insights not only help us improve, but they also contribute to the broader data science community.</p>
 <p>Until next time, keep exploring, learning, and sharing!</p>
 </div>
 <div id="dive-deeper-resources-for-the-curious-minds" class="section level2">
 <h2>Dive Deeper: Resources for the Curious Minds:</h2>
-<p>For those wishing to delve further or who may have lingering questions: <a href="https://dplyr.tidyverse.org/articles/programming.html">Dplyr official programming guide</a></p>
+<p>For those wishing to delve further or who may have lingering questions: <a href="https://dplyr.tidyverse.org/articles/programming.html">dplyr official programming guide</a></p>
 </div>
