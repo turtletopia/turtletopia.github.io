@@ -9,6 +9,8 @@ description: "TODO."
 output:
   blogdown::html_page:
     toc: true
+images:
+  - selection-ambiguity.png
 ---
 
 ## Intro
@@ -75,7 +77,7 @@ iris %>%
 This generates a warning. Given the tidyverse's informative error messages, it's wise to pay heed. Directly supplying can be ambiguous -- imagine having a column named `my_variable`. Which should be selected if we have both the column and the external variable?
 
 
-![Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections.](images/selection-ambiguity.png)
+![Diagram showing the dillema that dplyr is faced with when we torment it with ambiguous selections.](selection-ambiguity.png)
 To ensure clarity, dplyr authors suggest using dplyr::all_of(), which explicitly converts a name vector into symbols, resolving any ambiguities.
 
 ```{r warning=TRUE}
