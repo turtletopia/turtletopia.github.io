@@ -11,6 +11,7 @@ output:
     toc: true
 images:
   - selection-ambiguity.png
+  - embracing.png
 ---
 
 
@@ -117,64 +118,97 @@ my_subset_with_strings(iris, c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;
 
 my_subset_with_symbols(iris, Petal.Length)
 
-my_subset_with_symbols(iris, Petal.Length, Sepal.Width)</code></pre>
+# We still need to wrap column names in a vector if we provide more than one of them for a single parameter
+# (or we can use ellipsis operator for the function, but this is a separate design question)
+my_subset_with_symbols(iris, c(Petal.Length, Sepal.Width))</code></pre>
 <p>In this way we let dplyr know that <code>my_var_as_symbol</code> has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: “Take what user provided in place of <code>my_var_as_symbol</code> in function call and plug it directly into <code>select</code>, without creating any intermediate variables.”. Call to <code>my_subset_with_symbols()</code> is basically replaced with what lies inside of it.</p>
+<div class="float">
+<img src="embracing.png" alt="Diagram showing how the embracing works." />
+<div class="figcaption">Diagram showing how the embracing works.</div>
+</div>
 </div>
 <div id="problem-3-dynamic-columns-in-purrr-formulas-in-across" class="section level2">
 <h2>Problem 3: Dynamic columns in purrr formulas in <code>across</code></h2>
-<p>While the above solutions work seamlessly with functions like <code>dplyr::select()</code>, challenges arise when operations grow complex. Suppose we wish to craft a function, <code>do_magic</code>, that takes data, a special <code>column</code>, and several <code>others</code> columns. This function should add the special column to all others.</p>
-<p>Leveraging <code>dplyr::mutate(dplyr::across())</code> can achieve this. Its syntax is:</p>
-<pre class="r"><code>mutate(across(columns_to_mutate, function_to_apply))</code></pre>
-<p>For custom, unnamed functions, the <em>purrr formula syntax</em> (<code>~ expression</code> with <code>.x</code>) is beneficial. In our case (without enclosing it in a function yet) could look like:</p>
-<pre class="r"><code>iris %&gt;%
-  mutate(across(all_of(c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;)), ~ .x - Petal.Length))</code></pre>
-<p>Elegant, isn’t it? Now, let’s proceed by encapsulating this logic within a function where column names are passed as strings:</p>
-<pre class="r"><code>do_magic &lt;- function(data, special, others) {
+<p>While the above solutions work seamlessly with functions like <code>dplyr::select()</code>, challenges arise when operations grow complex. Suppose we wish to craft a function, <code>do_magic</code>, that takes <code>data</code>, a special <code>column</code>, and several <code>other</code> columns. This function should add the special <code>column</code> to all <code>other</code>. For now, do not assume in what form <code>column</code> and <code>other</code> parameters are provided.</p>
+<p>The naive way of doing it, would be to construct some <code>dplyr::mutate()</code> call that would operate on each of the provided columns:</p>
+<pre class="r"><code># only for illustration purposes, won&#39;t actually work:
+data %&gt;%
+  mutate(
+    other[[1]] = other[[1]] + special,
+    other[[2]] = other[[2]] + special,
+    ...
+    other[[N]] = other[[N]] + special
+  )</code></pre>
+<p>As you might have known, the code above will not be functional, neither inside or outside function – you cannot index neither character vector nor symbol on the left side of argument assignment in <code>dplyr::mutate()</code> call. We need to use another tool: <code>dplyr::across()</code>. Its syntax is:</p>
+<pre class="r"><code>data %&gt;% mutate(across(columns_to_mutate, function_to_apply))</code></pre>
+<p>For custom, unnamed functions, the <em>function shorthand syntax</em> <code>\(x)</code> is beneficial. The idea from example above could be rewritten as:</p>
+<pre class="r"><code># still won&#39;t work, but we are getting somewhere:
+data %&gt;%
+  mutate(
+    across(other, \(x) + special)
+  )</code></pre>
+<p>Now it is time to actually encapsulate this into a function and think about how to pass those column names as parameters. Since we are already armed with knowledge of previous chapter of this article we might try embracing first:</p>
+<pre class="r"><code>do_magic &lt;- function(data, special, other) {
   data %&gt;%
-    mutate(across(all_of(others), ~ .x - all_of(special)))
+    mutate(across({{other}}, \(x) + {{special}}))
+} 
+
+do_magic(iris, Petal.Length, c(Sepal.Length, Petal.Width))</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          1.4         3.5          1.4         1.4  setosa
+## 2          1.4         3.0          1.4         1.4  setosa
+## 3          1.3         3.2          1.3         1.3  setosa
+## 4          1.5         3.1          1.5         1.5  setosa
+## 5          1.4         3.6          1.4         1.4  setosa</code></pre>
+<p>Hooray! It works just fine! However, at this point it is worth trying it out another way and asking question: what if we want to pass those parameters as strings? Again, we can go back to the example from before and use supporting functions to transform the strings into actual selections:</p>
+<pre class="r"><code>do_magic &lt;- function(data, special, other) {
+  data %&gt;%
+    mutate(across(all_of(other), \(x) - all_of(special)))
 }
 
 # won&#39;t work:
-# do_magic(iris, special = &quot;Petal.Length&quot;, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
-<p>Surprisingly, it fails! When used within the context of <code>across</code>, dplyr seems unable to utilize the tidyselect rules (the ones that make <code>all_of()</code> possible). But we’re not defeated; let’s try embracing:</p>
-<pre class="r"><code>do_magic_but_better &lt;- function(data, special, others) {
+# do_magic(iris, special = &quot;Petal.Length&quot;, other = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+<p>Surprisingly, it fails! The reason for that is simple: the function we pass into across (in this case: <code>\(x) - all_of(special)</code>) is unable to evaluate this selector function as it is unexpected there. Tidyselect rules (the ones that make <code>all_of()</code> and its friends possible) are not automagical and require to be invoked manually by the function designer. <code>dplyr::select</code> knows that it might expect such expressions but inside some seemingly random function it cannot evaluate properly on its own.</p>
+<p>So, what to do now? We can try mixed approach with embracing:</p>
+<pre class="r"><code>do_magic_but_better &lt;- function(data, special, other) {
   data %&gt;%
-    mutate(across(all_of(others), ~ .x - {{special}}))
+    mutate(across(all_of(other), ~ .x - {{special}}))
 }
 
-do_magic_but_better(iris, special = Petal.Length, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+do_magic_but_better(iris, special = Petal.Length, other = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
 <pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 ## 1          3.7         2.1          1.4         0.2  setosa
 ## 2          3.5         1.6          1.4         0.2  setosa
 ## 3          3.4         1.9          1.3         0.2  setosa
 ## 4          3.1         1.6          1.5         0.2  setosa
 ## 5          3.6         2.2          1.4         0.2  setosa</code></pre>
-<p>By adopting this approach, it’s imperative to provide special as a symbol. Also, this does not look fine: one parameter is provided as symbol, another one is as character vector… <strong>We should always aim at being consistent</strong>. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let’s say that we want to stick to strings only. How can we do it?</p>
+<p>This works. How come then that embracing inside anonymous function works while <code>all_of</code> helper does not? This is because they use a very different approach and detailed explanation goes out of the scope of this article. To simplify: embracing is a more general approach for replacing one chunk of a code with another provided as a parameter.</p>
+<p>The one issue with above approach is that it does not look fine: one parameter is provided as symbol, another one is as character vector… <strong>We should always aim at being consistent</strong>. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let’s say that we want to stick to strings only. How can we do it?</p>
 <div id="tip-when-all_of-does-not-work-use-.data" class="section level4">
 <h4>Tip: when <code>all_of()</code> does not work, use <code>.data</code></h4>
 <p>There’s a workaround for this conundrum:</p>
-<pre class="r"><code>do_magic_but_in_other_way &lt;- function(data, special, others) {
+<pre class="r"><code>do_magic_but_in_other_way &lt;- function(data, special, other) {
   data %&gt;%
-    mutate(across(all_of(others), ~ .x - .data[[special]]))
+    mutate(across(all_of(other), ~ .x - .data[[special]]))
 }
 
-do_magic_but_in_other_way(iris, special = &quot;Petal.Length&quot;, others = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
+do_magic_but_in_other_way(iris, special = &quot;Petal.Length&quot;, other = c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;))</code></pre>
 <pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 ## 1          3.7         2.1          1.4         0.2  setosa
 ## 2          3.5         1.6          1.4         0.2  setosa
 ## 3          3.4         1.9          1.3         0.2  setosa
 ## 4          3.1         1.6          1.5         0.2  setosa
 ## 5          3.6         2.2          1.4         0.2  setosa</code></pre>
-<p>When you need to reference the underlying data within the context of functions, the <code>.data</code> pronoun comes to the rescue. As demonstrated, it operates similarly to directly accessing the data.</p>
+<p>When you need to reference the underlying data within the context of dplyr functions, the <code>.data</code> pronoun comes to the rescue. It is available also from within the function that is evaluated inside <code>across</code> helper. As demonstrated, it operates similarly to directly accessing the data and as a result, we can use regular base extraction operator.</p>
 </div>
 </div>
 <div id="summary-next-steps" class="section level2">
 <h2>Summary &amp; Next Steps</h2>
-<p>Throughout this post, we ventured deep into some of the intricacies of dplyr. We’ve unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like <code>all_of()</code> and <code>.data</code> demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we’ve covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this <em>embracing</em> and <em>tidyselect</em> rules might be intimidating, but we will continue to explore more facets of the tidyverse in future posts of “basic advanceds”, aiming to empower you with advanced techniques that enhance your data analysis journey.</p>
+<p>Throughout this post, we ventured deep into some of the intricacies of dplyr. We’ve unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions and pronouns like <code>all_of()</code> and <code>.data</code> demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we’ve covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this <em>embracing</em> and <em>tidyselect</em> rules might be intimidating, but we will continue to explore more facets of the tidyverse in future posts of “basic advanceds”, aiming to empower you with advanced techniques that enhance your data analysis journey.</p>
 <p>If you’ve found this post enlightening and wish to delve deeper, or if you have any questions or insights, we’d love to hear from you! You can contact us directly via <a href="https://twitter.com/Rturtletopia">X</a>. Alternatively, for those who prefer a more open-source avenue, feel free to open an issue on our <a href="https://github.com/turtletopia/turtletopia.github.io/issues">GitHub</a> repository. Your feedback and insights not only help us improve, but they also contribute to the broader data science community.</p>
 <p>Until next time, keep exploring, learning, and sharing!</p>
 </div>
 <div id="dive-deeper-resources-for-the-curious-minds" class="section level2">
 <h2>Dive Deeper: Resources for the Curious Minds:</h2>
-<p>For those wishing to delve further or who may have lingering questions: <a href="https://dplyr.tidyverse.org/articles/programming.html">dplyr official programming guide</a></p>
+<p>For those wishing to delve further or who may have lingering questions a great resource would be <a href="https://dplyr.tidyverse.org/articles/programming.html">dplyr official programming guide</a>. If this is still not enough for you, we recommend a few chapters of <a href="https://adv-r.hadley.nz/metaprogramming.html">Advanced R book</a> that focus on metaprogramming and underlying tools used to build tidyverse.</p>
 </div>

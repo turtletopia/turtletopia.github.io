@@ -11,6 +11,7 @@ output:
     toc: true
 images:
   - selection-ambiguity.png
+  - embracing.png
 ---
 
 ## Intro
@@ -120,71 +121,108 @@ my_subset_with_symbols <- function(data, my_var_as_symbol) {
 
 my_subset_with_symbols(iris, Petal.Length)
 
-my_subset_with_symbols(iris, Petal.Length, Sepal.Width)
+# We still need to wrap column names in a vector if we provide more than one of them for a single parameter
+# (or we can use ellipsis operator for the function, but this is a separate design question)
+my_subset_with_symbols(iris, c(Petal.Length, Sepal.Width))
 ```
 
 In this way we let dplyr know that `my_var_as_symbol` has to be passed directly as user provided it. We can think of embracing as of cut-paste operation. We tell dplyr: "Take what user provided in place of `my_var_as_symbol` in function call and plug it directly into `select`, without creating any intermediate variables.". Call to `my_subset_with_symbols()` is basically replaced with what lies inside of it. 
 
+![Diagram showing how the embracing works.](embracing.png)
+
 ## Problem 3: Dynamic columns in purrr formulas in `across` 
 
-While the above solutions work seamlessly with functions like `dplyr::select()`, challenges arise when operations grow complex. Suppose we wish to craft a function, `do_magic`, that takes data, a special `column`, and several `others` columns. This function should add the special column to all others.
+While the above solutions work seamlessly with functions like `dplyr::select()`, challenges arise when operations grow complex. Suppose we wish to craft a function, `do_magic`, that takes `data`, a special `column`, and several `other` columns. This function should add the special `column` to all `other`. For now, do not assume in what form `column` and `other` parameters are provided.
 
-Leveraging `dplyr::mutate(dplyr::across())` can achieve this. Its syntax is:
+The naive way of doing it, would be to construct some `dplyr::mutate()` call that would operate on each of the provided columns:
+
 
 ```{r eval=FALSE}
-mutate(across(columns_to_mutate, function_to_apply))
+# only for illustration purposes, won't actually work:
+data %>%
+  mutate(
+    other[[1]] = other[[1]] + special,
+    other[[2]] = other[[2]] + special,
+    ...
+    other[[N]] = other[[N]] + special
+  )
 ```
 
-For custom, unnamed functions, the *purrr formula syntax* (`~ expression` with `.x`) is beneficial. In our case (without enclosing it in a function yet) could look like:
 
-```{r, eval=FALSE}
-iris %>%
-  mutate(across(all_of(c("Sepal.Length", "Sepal.Width")), ~ .x - Petal.Length))
+As you might have known, the code above will not be functional, neither inside or outside function -- you cannot index neither character vector nor symbol on the left side of argument assignment in `dplyr::mutate()` call. We need to use another tool: `dplyr::across()`. Its syntax is:
+
+```{r eval=FALSE}
+data %>% mutate(across(columns_to_mutate, function_to_apply))
 ```
 
-Elegant, isn't it? Now, let's proceed by encapsulating this logic within a function where column names are passed as strings:
+For custom, unnamed functions, the *function shorthand syntax* `\(x)` is beneficial. The idea from example above could be rewritten as:
+
+```{r eval=FALSE}
+# still won't work, but we are getting somewhere:
+data %>%
+  mutate(
+    across(other, \(x) + special)
+  )
+```
+
+Now it is time to actually encapsulate this into a function and think about how to pass those column names as parameters. Since we are already armed with knowledge of previous chapter of this article we might try embracing first:
 
 ```{r}
-do_magic <- function(data, special, others) {
+do_magic <- function(data, special, other) {
   data %>%
-    mutate(across(all_of(others), ~ .x - all_of(special)))
+    mutate(across({{other}}, \(x) + {{special}}))
+} 
+
+do_magic(iris, Petal.Length, c(Sepal.Length, Petal.Width))
+```
+
+Hooray! It works just fine! However, at this point it is worth trying it out another way and asking question: what if we want to pass those parameters as strings? Again, we can go back to the example from before and use supporting functions to transform the strings into actual selections:
+
+```{r}
+do_magic <- function(data, special, other) {
+  data %>%
+    mutate(across(all_of(other), \(x) - all_of(special)))
 }
 
 # won't work:
-# do_magic(iris, special = "Petal.Length", others = c("Sepal.Length", "Sepal.Width"))
+# do_magic(iris, special = "Petal.Length", other = c("Sepal.Length", "Sepal.Width"))
 ```
 
-Surprisingly, it fails! When used within the context of `across`, dplyr seems unable to utilize the tidyselect rules (the ones that make `all_of()` possible). But we're not defeated; let's try embracing:
+Surprisingly, it fails! The reason for that is simple: the function we pass into across (in this case: `\(x) - all_of(special)`) is unable to evaluate this selector function as it is unexpected there. Tidyselect rules (the ones that make `all_of()` and its friends possible) are not automagical and require to be invoked manually by the function designer. `dplyr::select` knows that it might expect such expressions but inside some seemingly random function it cannot evaluate properly on its own. 
+
+So, what to do now? We can try mixed approach with embracing:
 
 ```{r}
-do_magic_but_better <- function(data, special, others) {
+do_magic_but_better <- function(data, special, other) {
   data %>%
-    mutate(across(all_of(others), ~ .x - {{special}}))
+    mutate(across(all_of(other), ~ .x - {{special}}))
 }
 
-do_magic_but_better(iris, special = Petal.Length, others = c("Sepal.Length", "Sepal.Width"))
+do_magic_but_better(iris, special = Petal.Length, other = c("Sepal.Length", "Sepal.Width"))
 ```
 
-By adopting this approach, it's imperative to provide special as a symbol. Also, this does not look fine: one parameter is provided as symbol, another one is as character vector... **We should always aim at being consistent**. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let's say that we want to stick to strings only. How can we do it?
+This works. How come then that embracing inside anonymous function works while `all_of` helper does not? This is because they use a very different approach and detailed explanation goes out of the scope of this article. To simplify: embracing is a more general approach for replacing one chunk of a code with another provided as a parameter.
+
+The one issue with above approach is that it does not look fine: one parameter is provided as symbol, another one is as character vector... **We should always aim at being consistent**. Either all column-like parameters should be symbols or all should be character strings. There are pros and cons to both ways. Let's say that we want to stick to strings only. How can we do it?
 
 #### Tip: when `all_of()` does not work, use `.data`
 
 There's a workaround for this conundrum:
 
 ```{r}
-do_magic_but_in_other_way <- function(data, special, others) {
+do_magic_but_in_other_way <- function(data, special, other) {
   data %>%
-    mutate(across(all_of(others), ~ .x - .data[[special]]))
+    mutate(across(all_of(other), ~ .x - .data[[special]]))
 }
 
-do_magic_but_in_other_way(iris, special = "Petal.Length", others = c("Sepal.Length", "Sepal.Width"))
+do_magic_but_in_other_way(iris, special = "Petal.Length", other = c("Sepal.Length", "Sepal.Width"))
 ```
 
-When you need to reference the underlying data within the context of functions, the `.data` pronoun comes to the rescue. As demonstrated, it operates similarly to directly accessing the data.
+When you need to reference the underlying data within the context of dplyr functions, the `.data` pronoun comes to the rescue. It is available also from within the function that is evaluated inside `across` helper. As demonstrated, it operates similarly to directly accessing the data and as a result, we can use regular base extraction operator.
 
 ## Summary & Next Steps
 
-Throughout this post, we ventured deep into some of the intricacies of dplyr. We've unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions like `all_of()` and `.data` demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we've covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this *embracing* and *tidyselect* rules might be intimidating, but we will continue to explore more facets of the tidyverse in future posts of "basic advanceds", aiming to empower you with advanced techniques that enhance your data analysis journey.
+Throughout this post, we ventured deep into some of the intricacies of dplyr. We've unraveled how the package strives to make our code both semantic and syntactic, all while simplifying complex operations. The power of symbols and the utility of functions and pronouns like `all_of()` and `.data` demonstrate just how dynamic and adaptable dplyr can be, especially when working with variable column names. While we've covered much ground, the world of dplyr is vast and constantly evolving. We are aware that all this *embracing* and *tidyselect* rules might be intimidating, but we will continue to explore more facets of the tidyverse in future posts of "basic advanceds", aiming to empower you with advanced techniques that enhance your data analysis journey.
 
 If you've found this post enlightening and wish to delve deeper, or if you have any questions or insights, we'd love to hear from you! You can contact us directly via [X](https://twitter.com/Rturtletopia). Alternatively, for those who prefer a more open-source avenue, feel free to open an issue on our [GitHub](https://github.com/turtletopia/turtletopia.github.io/issues) repository. Your feedback and insights not only help us improve, but they also contribute to the broader data science community.
 
@@ -192,4 +230,4 @@ Until next time, keep exploring, learning, and sharing!
 
 ## Dive Deeper: Resources for the Curious Minds:
 
-For those wishing to delve further or who may have lingering questions: [dplyr official programming guide](https://dplyr.tidyverse.org/articles/programming.html)
+For those wishing to delve further or who may have lingering questions a great resource would be [dplyr official programming guide](https://dplyr.tidyverse.org/articles/programming.html). If this is still not enough for you, we recommend a few chapters of [Advanced R book](https://adv-r.hadley.nz/metaprogramming.html) that focus on metaprogramming and underlying tools used to build tidyverse. 
