@@ -1,7 +1,7 @@
 ---
 title: 'R Basic Advanceds: Variables and Names in dplyr'
 author: Dominik Rafacz
-date: '2023-01-30'
+date: '2025-03-19'
 slug: r-basic-advanceds-variables-and-names-in-dplyr
 categories: ['Tutorial']
 tags: ['r', 'tutorial', 'dplyr', 'environments', 'rlang']
